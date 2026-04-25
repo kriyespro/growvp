@@ -1,0 +1,46 @@
+{% extends 'base.jinja' %}
+{% import 'components/input.jinja' as input %}
+{% import 'components/button.jinja' as btn %}
+{% import 'components/card.jinja' as card %}
+
+{% block content %}
+<div class="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-textMain">Register Your Business</h2>
+            <p class="mt-2 text-center text-sm text-textMuted">Launch your multi-channel booking engine in 30 seconds.</p>
+        </div>
+
+        {% set form_content %}
+        <form hx-post="/auth/register/" hx-target="this" hx-swap="outerHTML" class="space-y-6">
+            {{ input.render("Business Name", "business_name", required=True) }}
+            
+            <div class="space-y-1">
+                <label for="industry_type" class="block text-sm font-medium text-textMain">Industry Type</label>
+                <select name="industry_type" id="industry_type" required class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm sm:leading-6 appearance-none">
+                    {% for value, label in form.fields.industry_type.choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {{ input.render("Email address", "email", type="email", required=True) }}
+            
+            <div class="space-y-1">
+                <label for="password" class="block text-sm font-medium text-textMain">Password</label>
+                <input type="password" name="password" id="password" required class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset {% if form.errors %}ring-red-500 focus:ring-red-500{% else %}ring-stone-300 focus:ring-brand{% endif %} focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 transition-all">
+                {% if form.errors %}
+                    <p class="text-red-500 text-xs mt-2">{{ form.errors }}</p>
+                {% endif %}
+            </div>
+
+            <div class="mt-6">
+                {{ btn.render(type="submit", text="Launch Dashboard", cls="w-full justify-center") }}
+            </div>
+        </form>
+        {% endset %}
+        
+        {{ card.render(content=form_content) }}
+    </div>
+</div>
+{% endblock %}

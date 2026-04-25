@@ -1,0 +1,22 @@
+Phase 1: Foundation & Project Initialization (Completed)
+- Setup Django, SQLite, Jinja2, base apps
+- Implement Business, User, UserProfile models
+
+Phase 2: Core Booking Schema & Admin (Completed)
+- Implement ServiceCategory, Service, Customer, Appointment
+- Register all to Django admin for basic management
+
+Phase 3: Public Booking Interface (Completed)
+- Service selection, date picking, slot generation
+- Public booking validation and overlap checks
+
+Phase 4: Revenue & CRM Additions (Completed)
+- Billing checkout flow hardened (invoice totals sync + guarded mark-paid)
+- CRM customer update-on-phone behavior to prevent duplicates
+- Dashboard-supporting booking and billing integrity fixes
+
+Phase 5: Security and Quality (Completed)
+- Environment-based security settings (secret/debug/allowed hosts)
+- Production deploy checks clean with DJANGO_DEBUG=False
+- Added regression tests for booking, catalog, auth, CRM, and billing
+- Seeded deterministic test users for manual QA

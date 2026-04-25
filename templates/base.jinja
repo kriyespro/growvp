@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SaaS Appointment Engine{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        creameBg: '#FDFBF7', /* Soft cream background */
+                        creameSurface: '#FFFFFF', /* White cards */
+                        brand: '#b45309', /* amber-700 for a warm, premium feel */
+                        brandHover: '#92400e', /* amber-800 */
+                        textMain: '#292524', /* stone-800 */
+                        textMuted: '#78716c' /* stone-500 */
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.11"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        .htmx-indicator { display: none; }
+        .htmx-request .htmx-indicator { display: inline-block; }
+        .htmx-request.htmx-indicator { display: inline-block; }
+        [x-cloak] { display: none !important; }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-creameBg text-textMain font-sans min-h-screen flex flex-col">
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            let match = document.cookie.match(new RegExp('(^| )csrftoken=([^;]+)'));
+            if (match) {
+                event.detail.headers['X-CSRFToken'] = match[2];
+            }
+        });
+    </script>
+    <main class="flex-grow flex flex-col items-stretch">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

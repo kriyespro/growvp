@@ -1,0 +1,22 @@
+{% macro render(title="", subtitle="", content="", footer="") %}
+<div class="bg-creameSurface rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+    {% if title %}
+    <div class="px-6 py-5 border-b border-stone-200 border-solid">
+        <h3 class="text-lg font-semibold leading-6 text-textMain">{{ title }}</h3>
+        {% if subtitle %}
+        <p class="mt-1 text-sm text-textMuted">{{ subtitle }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <div class="px-6 py-6 border-solid">
+        {{ content|safe }}
+    </div>
+
+    {% if footer %}
+    <div class="px-6 py-4 bg-stone-50 border-t border-stone-200 border-solid">
+        {{ footer|safe }}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}

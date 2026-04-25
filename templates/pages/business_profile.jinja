@@ -1,0 +1,42 @@
+{% import 'components/card.jinja' as card %}
+{% import 'components/input.jinja' as input %}
+{% import 'components/button.jinja' as btn %}
+
+<div class="space-y-6">
+    <div class="flex items-center justify-between border-b border-stone-200 pb-4">
+        <h2 class="text-2xl font-bold text-textMain">Business Landing Page Setup</h2>
+        <a href="/b/{{ business.slug }}/" target="_blank" class="text-sm font-semibold text-brand hover:text-brandHover">Open Public Page</a>
+    </div>
+
+    {% set form_content %}
+        <form hx-post="/auth/business-profile/" hx-target="#main-content" hx-swap="innerHTML" class="space-y-4">
+            {{ input.render("Hero Title", "hero_title", value=form.hero_title.value() or "") }}
+            <div class="space-y-1">
+                <label for="hero_subtitle" class="block text-sm font-medium text-textMain">Hero Subtitle</label>
+                <textarea id="hero_subtitle" name="hero_subtitle" rows="3" class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm">{{ form.hero_subtitle.value() or "" }}</textarea>
+            </div>
+            {{ input.render("Hero Image URL", "hero_image_url", type="url", value=form.hero_image_url.value() or "", placeholder="https://example.com/hero.jpg") }}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {{ input.render("Public Phone", "public_phone", value=form.public_phone.value() or "") }}
+                {{ input.render("Public Email", "public_email", type="email", value=form.public_email.value() or "") }}
+            </div>
+
+            <div class="space-y-1">
+                <label for="public_address" class="block text-sm font-medium text-textMain">Business Address</label>
+                <textarea id="public_address" name="public_address" rows="2" class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm">{{ form.public_address.value() or "" }}</textarea>
+            </div>
+            {{ input.render("Google Map Embed URL", "map_embed_url", type="url", value=form.map_embed_url.value() or "", placeholder="https://maps.google.com/...") }}
+
+            <div class="space-y-1">
+                <label for="testimonial_quote" class="block text-sm font-medium text-textMain">Featured Testimonial</label>
+                <textarea id="testimonial_quote" name="testimonial_quote" rows="3" class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm">{{ form.testimonial_quote.value() or "" }}</textarea>
+            </div>
+            {{ input.render("Testimonial Author", "testimonial_author", value=form.testimonial_author.value() or "") }}
+
+            {{ btn.render(type="submit", text="Save Landing Content", cls="w-full justify-center") }}
+        </form>
+    {% endset %}
+
+    {{ card.render(title="Public Page Content", subtitle="This content appears on your business landing page.", content=form_content) }}
+</div>

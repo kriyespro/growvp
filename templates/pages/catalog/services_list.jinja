@@ -1,0 +1,157 @@
+{% import 'components/card.jinja' as card %}
+{% import 'components/input.jinja' as input %}
+{% import 'components/button.jinja' as btn %}
+
+<div class="space-y-6">
+    <div class="flex items-center justify-between border-b border-stone-200 pb-4">
+        <h2 class="text-2xl font-bold text-textMain">Service Catalog</h2>
+        <div class="flex space-x-3">
+            <button hx-get="/catalog/categories/" hx-target="#main-content" class="inline-flex items-center rounded-md bg-stone-100 px-3 py-2 text-sm font-medium text-textMain shadow-sm border border-stone-200 hover:bg-stone-200 transition-colors">
+                Manage Categories
+            </button>
+        </div>
+    </div>
+
+    <!-- Main List & Form Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left: Services List -->
+        <div class="lg:col-span-2 space-y-4">
+            {% if not services %}
+                {{ card.render(content='<div class="text-center py-6 text-textMuted text-sm">No services configured yet. Start adding them!</div>') }}
+            {% else %}
+                <div class="bg-creameSurface rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-stone-200">
+                        <thead class="bg-stone-50">
+                            <tr>
+                                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-textMain sm:pl-6">Name</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-textMain">Image</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-textMain">Category</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-textMain">Duration</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-textMain">Price</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-textMain">Status</th>
+                                <th scope="col" class="px-3 py-3.5 text-right text-sm font-semibold text-textMain sm:pr-6">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-200 bg-white">
+                            {% for service in services %}
+                            <tr>
+                                <td class="py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                    <p class="font-medium text-textMain">{{ service.name }}</p>
+                                    <p class="text-xs text-textMuted mt-1">{{ service.description or '-' }}</p>
+                                </td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">
+                                    {% if service.image %}
+                                        <img src="{{ service.image.url }}" alt="{{ service.name }}" class="h-10 w-10 rounded object-cover border border-stone-200">
+                                    {% elif service.image_url %}
+                                        <img src="{{ service.image_url }}" alt="{{ service.name }}" class="h-10 w-10 rounded object-cover border border-stone-200">
+                                    {% else %}
+                                        <span class="text-xs text-stone-400">No image</span>
+                                    {% endif %}
+                                </td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">{{ service.category.name }}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">{{ service.duration_mins }}m</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">₹{{ service.price }}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">
+                                    {% if service.is_active %}
+                                        <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Active</span>
+                                    {% else %}
+                                        <span class="inline-flex items-center rounded-md bg-stone-50 px-2 py-1 text-xs font-medium text-stone-600 ring-1 ring-inset ring-stone-500/10">Disabled</span>
+                                    {% endif %}
+                                </td>
+                                <td class="whitespace-nowrap px-3 py-4 text-right text-sm sm:pr-6">
+                                    <div class="inline-flex items-center gap-2">
+                                        <button
+                                            hx-get="/catalog/services/?edit={{ service.id }}"
+                                            hx-target="#main-content"
+                                            hx-swap="innerHTML"
+                                            class="rounded-md border border-stone-300 bg-white px-2.5 py-1.5 text-xs font-medium text-textMain hover:bg-stone-50"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            hx-post="/catalog/services/{{ service.id }}/delete/"
+                                            hx-target="#main-content"
+                                            hx-swap="innerHTML"
+                                            hx-confirm="Delete this service?"
+                                            class="rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-100"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Right: Add Service Form -->
+        <div class="lg:col-span-1">
+            {% set form_content %}
+                <form hx-post="/catalog/services/{% if editing_service %}?edit={{ editing_service.id }}{% endif %}" hx-target="#main-content" hx-swap="innerHTML" class="space-y-4" enctype="multipart/form-data">
+                    {% if not categories_exist %}
+                        <div class="rounded-md bg-amber-50 p-4 border border-brand/20">
+                            <div class="flex">
+                                <div class="ml-3">
+                                    <h3 class="text-sm shadow-none font-medium text-brand">Action Required</h3>
+                                    <div class="mt-2 text-sm text-amber-700">
+                                        <p>You must create a Service Category before adding services. Please click "Manage Categories" above to add one.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="space-y-1">
+                            <label class="block text-sm font-medium text-textMain">Category</label>
+                            <select name="category" required class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm sm:leading-6 appearance-none">
+                                {% for choice in form.fields.category.queryset %}
+                                    <option value="{{ choice.id }}" {% if editing_service and editing_service.category_id == choice.id %}selected{% endif %}>{{ choice.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        {{ input.render("Service Name", "name", value=editing_service.name if editing_service else "", required=True) }}
+                        <div class="space-y-1">
+                            <label for="description" class="block text-sm font-medium text-textMain">Service Details</label>
+                            <textarea id="description" name="description" rows="3" class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm">{{ editing_service.description if editing_service else '' }}</textarea>
+                        </div>
+                        {{ input.render("Image URL", "image_url", type="url", value=editing_service.image_url if editing_service else "", placeholder="https://example.com/service.jpg") }}
+                        <div class="space-y-1">
+                            <label for="image" class="block text-sm font-medium text-textMain">Upload Image</label>
+                            <input id="image" name="image" type="file" accept="image/*" class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-sm text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand">
+                            <p class="text-xs text-textMuted">If uploaded, this image is used on the public landing page.</p>
+                        </div>
+                        {{ input.render("Duration (mins)", "duration_mins", type="number", value=editing_service.duration_mins if editing_service else "30", required=True) }}
+                        {{ input.render("Price", "price", type="number", value=editing_service.price if editing_service else "0.00", required=True) }}
+                        
+                        <div class="relative flex items-start mt-4">
+                            <div class="flex h-6 items-center">
+                                <input id="is_active" name="is_active" type="checkbox" {% if not editing_service or editing_service.is_active %}checked{% endif %} class="h-4 w-4 rounded border-stone-300 text-brand focus:ring-brand">
+                            </div>
+                            <div class="ml-3 text-sm leading-6">
+                                <label for="is_active" class="font-medium text-textMain">Active Service</label>
+                                <p class="text-textMuted">Visible to customers.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-2">
+                            {{ btn.render(type="submit", text="Update Service" if editing_service else "Save Service", cls="w-full justify-center") }}
+                        </div>
+                        {% if editing_service %}
+                        <div class="pt-1">
+                            <button hx-get="/catalog/services/" hx-target="#main-content" hx-swap="innerHTML" type="button" class="w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm font-semibold text-textMain hover:bg-stone-50">
+                                Cancel Editing
+                            </button>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </form>
+            {% endset %}
+            
+            {{ card.render(title="Edit Service" if editing_service else "Add New Service", content=form_content) }}
+        </div>
+    </div>
+</div>

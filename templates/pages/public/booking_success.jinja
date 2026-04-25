@@ -1,0 +1,25 @@
+{% extends 'base.jinja' %}
+
+{% block content %}
+<div class="min-h-screen bg-stone-50 flex flex-col justify-center py-8 px-4 pb-24 sm:py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
+        <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-100 mb-6 shadow-sm border border-green-200">
+            <svg class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-textMain">Booking Confirmed!</h2>
+        <p class="mt-4 text-center text-lg text-textMuted">You are successfully booked at {{ business.name }}. We look forward to seeing you!</p>
+        <div class="mt-8">
+            <a href="/booking/{{ business.slug }}/" class="font-medium text-brand hover:text-brandHover">Book another appointment &rarr;</a>
+        </div>
+    </div>
+</div>
+<nav class="sm:hidden fixed bottom-0 inset-x-0 z-30 border-t border-stone-200 bg-white/95 backdrop-blur">
+    <div class="grid grid-cols-3 gap-1 p-2">
+        <a href="/b/{{ business.slug }}/" class="flex items-center justify-center rounded-lg py-3 text-xs font-semibold text-textMain hover:bg-stone-100">Home</a>
+        <a href="/booking/{{ business.slug }}/" class="flex items-center justify-center rounded-lg py-3 text-xs font-semibold text-textMain bg-stone-100">Book</a>
+        <a href="/b/{{ business.slug }}/#contact-location" class="flex items-center justify-center rounded-lg py-3 text-xs font-semibold text-textMain hover:bg-stone-100">Contact</a>
+    </div>
+</nav>
+{% endblock %}

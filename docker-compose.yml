@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: sd_prasant_web
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    ports:
+      - "127.0.0.1:8989:8000"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    container_name: sd_prasant_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sd_prasant}
+      POSTGRES_USER: ${POSTGRES_USER:-sd_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sd_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

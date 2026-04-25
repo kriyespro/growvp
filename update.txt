@@ -1,0 +1,217 @@
+Project Deep Feature Plan (Business-Focused, Revenue-First)
+Date: 2026-04-17
+
+1) Current Product Snapshot (What is already strong)
+
+- Multi-tenant baseline is in place:
+  - Business, staff roles, customer ownership, service catalog, appointments, invoices.
+- Public business pages and booking URLs exist:
+  - Per-business slug landing and booking path.
+- Core operational loop is working:
+  - Service -> booking -> invoice -> mark paid.
+- Mobile-style navigation is already introduced for public and dashboard views.
+- Foundational security and quality controls exist:
+  - User-scoped queries in key places, deploy checks clean, automated tests present.
+
+This is a strong MVP foundation. The next step is not broad rewrites; it is strategic feature layering that grows revenue and retention.
+
+
+2) Biggest Business Gaps (High-value opportunities)
+
+Gap A: No automated reminder/recovery system
+- Impact: no-show risk remains high.
+- Revenue effect: direct loss from unused slots.
+
+Gap B: No deposits / advance payments
+- Impact: weak commitment from customers.
+- Revenue effect: cancellations/no-shows hurt cash flow.
+
+Gap C: No packages/memberships
+- Impact: only one-time service billing.
+- Revenue effect: low repeat predictability (LTV not maximized).
+
+Gap D: Limited pricing intelligence
+- Impact: static pricing for all times/days.
+- Revenue effect: misses peak-hour margin opportunities.
+
+Gap E: Weak rebooking and retention journeys
+- Impact: after service completion, no auto rebook/follow-up funnel.
+- Revenue effect: lower repeat bookings and customer lifetime value.
+
+Gap F: Public page trust signals are still basic
+- Impact: conversion friction for first-time visitors.
+- Revenue effect: lower booking conversion rate from page traffic.
+
+
+3) Recommended Feature Roadmap (Ordered by ROI)
+
+Phase 1: Revenue Protection (Immediate)
+Priority: Critical
+
+Feature 1.1 - Advance Booking Deposit
+- Add optional per-service deposit amount or deposit percentage.
+- Capture status at booking (deposit_paid / deposit_pending).
+- Block final confirmation or reserve slot for limited time if unpaid.
+- Business value: fewer no-shows + better cash predictability.
+
+Feature 1.2 - Cancellation and No-show Policy Engine
+- Business-level settings:
+  - free cancellation window (e.g., 12h)
+  - no-show fee (fixed or percentage)
+- Auto-apply policy on appointment state changes.
+- Business value: protects revenue leakage.
+
+Feature 1.3 - Reminder Automation Queue
+- Schedule reminders at T-24h and T-2h.
+- First channel: WhatsApp template-ready payload table (or SMS fallback).
+- Track reminder_sent_at and delivery state.
+- Business value: reduces no-shows immediately.
+
+
+Phase 2: Conversion and Trust (Public Experience)
+Priority: High
+
+Feature 2.1 - Rich Public Profile Completeness Score
+- Show business profile completion in dashboard:
+  - hero, services, pricing, images, contact, map, testimonial.
+- Prompt missing items with one-click actions.
+- Business value: increases booking page conversion.
+
+Feature 2.2 - Social Proof and Service FAQ Blocks
+- Per-business testimonial list (not single quote only).
+- FAQ block for policies, booking process, payment accepted.
+- Business value: lowers hesitation, increases first-time booking confidence.
+
+Feature 2.3 - Promo Banner / Offer Code on Public Page
+- Time-bound offer per business (e.g., weekday 10% off).
+- Show on landing and checkout summary.
+- Business value: drives immediate campaign conversions.
+
+
+Phase 3: Repeat Revenue Engine
+Priority: High
+
+Feature 3.1 - Packages
+- Prepaid service bundles:
+  - e.g., 5 sessions at discounted total.
+- Track package balance and redemption history.
+- Business value: upfront cash + repeat lock-in.
+
+Feature 3.2 - Membership Plans
+- Monthly membership with included services/discounts.
+- Member pricing overrides standard catalog pricing.
+- Business value: recurring predictable revenue.
+
+Feature 3.3 - Rebook Flow
+- “Book again” from last appointment with one tap.
+- Suggested next date based on service cycle.
+- Business value: boosts repeat rate.
+
+
+Phase 4: Margin Optimization
+Priority: Medium-High
+
+Feature 4.1 - Dynamic Pricing Rules
+- Peak hour/day multipliers.
+- Staff/provider premium rules.
+- Business value: higher yield during demand peaks.
+
+Feature 4.2 - Add-on Upsell Engine
+- Attach add-ons to services in booking flow.
+- Show “frequently added” options at checkout.
+- Business value: increases average order value (AOV).
+
+Feature 4.3 - Revenue Analytics Upgrade
+- Existing dashboard is good; add decision metrics:
+  - conversion by source/page
+  - repeat vs new revenue split
+  - reminder impact on no-show rate
+  - package/member revenue share.
+- Business value: clearer growth decisions.
+
+
+Phase 5: Ops Scale and Team Productivity
+Priority: Medium
+
+Feature 5.1 - Waitlist + Auto-fill
+- If cancellation occurs, notify waitlist in order.
+- Business value: recovers cancelled slot revenue.
+
+Feature 5.2 - Staff Incentive Reports
+- Revenue per provider, service mix, utilization.
+- Business value: better staffing and incentives.
+
+Feature 5.3 - Multi-location readiness
+- Current model can evolve:
+  - add Branch model and branch-scoped services/staff/hours.
+- Business value: supports growth businesses without platform migration.
+
+
+4) Suggested Data Model Expansions (Planning Only)
+
+Core additions:
+- Appointment:
+  - source (web, walkin, whatsapp, phone)
+  - cancellation_reason
+  - reminder_status fields
+- Billing:
+  - payment_method
+  - discount_amount
+  - deposit_amount
+- Customer:
+  - last_visit_at
+  - preferred_services
+  - tags (VIP/new/at-risk)
+
+New models to add in future iterations:
+- ReminderLog
+- DepositTransaction
+- Package / PackagePurchase / PackageRedemption
+- MembershipPlan / MembershipSubscription
+- PricingRule
+- OfferCampaign
+
+
+5) What to Build Next (Exact order for maximum return)
+
+If the goal is fastest business impact in next 2-4 weeks:
+
+Week 1:
+- Deposits + cancellation policy + reminder queue scaffolding.
+
+Week 2:
+- Public profile completeness + campaign banner + testimonial list.
+
+Week 3:
+- Packages + basic rebook flow.
+
+Week 4:
+- Dynamic pricing (simple rules) + upsells + expanded analytics.
+
+
+6) Practical KPIs to Track After Rollout
+
+Must-track metrics:
+- Booking conversion rate (public page visits -> confirmed bookings)
+- No-show rate
+- Average order value
+- Repeat booking rate (30 days)
+- Revenue per day and per provider
+- Deposit adoption rate
+- Package/membership revenue share
+
+Success definition:
+- 20-30% no-show reduction
+- 10-20% AOV increase
+- 15%+ repeat booking lift
+
+
+7) Final Recommendation
+
+Do not over-expand feature surface all at once.
+Focus first on:
+1) no-show prevention (reminders + deposits),
+2) repeat revenue (packages/rebook),
+3) conversion trust (richer public business pages).
+
+These three pillars will deliver the fastest and most measurable business gain from the current codebase.

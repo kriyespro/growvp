@@ -1,0 +1,56 @@
+{% import 'components/card.jinja' as card %}
+{% import 'components/input.jinja' as input %}
+{% import 'components/button.jinja' as btn %}
+
+<div class="space-y-6">
+    <div class="flex items-center justify-between border-b border-stone-200 pb-4">
+        <h2 class="text-2xl font-bold text-textMain">Service Categories</h2>
+        <div class="flex space-x-3">
+            <button hx-get="/catalog/services/" hx-target="#main-content" class="inline-flex items-center rounded-md bg-stone-100 px-3 py-2 text-sm font-medium text-textMain shadow-sm border border-stone-200 hover:bg-stone-200 transition-colors">
+                &larr; Back to Services
+            </button>
+        </div>
+    </div>
+
+    <!-- Main List & Form Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left: List -->
+        <div class="lg:col-span-2 space-y-4">
+            {% if not categories %}
+                {{ card.render(content='<div class="text-center py-6 text-textMuted text-sm">No categories configured yet. Start adding them!</div>') }}
+            {% else %}
+                <div class="bg-creameSurface rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-stone-200">
+                        <thead class="bg-stone-50">
+                            <tr>
+                                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-textMain sm:pl-6">Name</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-200 bg-white">
+                            {% for cat in categories %}
+                            <tr>
+                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-textMain sm:pl-6">{{ cat.name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Right: Add Form -->
+        <div class="lg:col-span-1">
+            {% set form_content %}
+                <form hx-post="/catalog/categories/" hx-target="#main-content" hx-swap="innerHTML" class="space-y-4">
+                    {{ input.render("Category Name", "name", required=True) }}
+                    <div class="pt-2">
+                        {{ btn.render(type="submit", text="Save Category", cls="w-full justify-center") }}
+                    </div>
+                </form>
+            {% endset %}
+            
+            {{ card.render(title="Add New Category", content=form_content) }}
+        </div>
+    </div>
+</div>

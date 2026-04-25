@@ -1,0 +1,92 @@
+{% import 'components/card.jinja' as card %}
+{% import 'components/input.jinja' as input %}
+{% import 'components/button.jinja' as btn %}
+
+<div class="space-y-6">
+    <div class="flex items-center justify-between border-b border-stone-200 pb-4">
+        <h2 class="text-2xl font-bold text-textMain">Customer Base</h2>
+    </div>
+
+    <!-- Main List & Form Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left: Customer List -->
+        <div class="lg:col-span-2 space-y-4">
+            {% if not customers %}
+                {{ card.render(content='<div class="text-center py-6 text-textMuted text-sm">No customers found.</div>') }}
+            {% else %}
+                <div class="bg-creameSurface rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-stone-200">
+                        <thead class="bg-stone-50">
+                            <tr>
+                                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-textMain sm:pl-6">Name</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-textMain">Phone</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-textMain">Email</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-textMain">Added</th>
+                                <th scope="col" class="px-3 py-3.5 text-right text-sm font-semibold text-textMain sm:pr-6">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-200 bg-white">
+                            {% for c in customers %}
+                            <tr>
+                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-textMain sm:pl-6">{{ c.first_name }} {{ c.last_name }}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">{{ c.phone }}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">{{ c.email|default('-', True) }}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">{{ c.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-right text-sm sm:pr-6">
+                                    <div class="inline-flex items-center gap-2">
+                                        <button
+                                            hx-get="/crm/?edit={{ c.id }}"
+                                            hx-target="#main-content"
+                                            hx-swap="innerHTML"
+                                            class="rounded-md border border-stone-300 bg-white px-2.5 py-1.5 text-xs font-medium text-textMain hover:bg-stone-50"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            hx-post="/crm/{{ c.id }}/delete/"
+                                            hx-target="#main-content"
+                                            hx-swap="innerHTML"
+                                            hx-confirm="Delete this customer?"
+                                            class="rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-100"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Right: Add Form -->
+        <div class="lg:col-span-1">
+            {% set form_content %}
+                <form hx-post="/crm/{% if editing_customer %}?edit={{ editing_customer.id }}{% endif %}" hx-target="#main-content" hx-swap="innerHTML" class="space-y-4">
+                    {{ input.render("First Name", "first_name", value=editing_customer.first_name if editing_customer else "", required=True) }}
+                    {{ input.render("Last Name", "last_name", value=editing_customer.last_name if editing_customer else "") }}
+                    {{ input.render("Phone", "phone", value=editing_customer.phone if editing_customer else "", required=True) }}
+                    {{ input.render("Email (Optional)", "email", type="email", value=editing_customer.email if editing_customer else "") }}
+                    <div class="space-y-1">
+                        <label class="block text-sm font-medium text-textMain">Notes</label>
+                        <textarea name="notes" rows="3" class="block w-full rounded-md border-0 bg-white py-2 px-3 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-brand focus:ring-2 sm:text-sm">{{ editing_customer.notes if editing_customer else '' }}</textarea>
+                    </div>
+                    <div class="pt-2">
+                        {{ btn.render(type="submit", text="Update Customer" if editing_customer else "Add Customer", cls="w-full justify-center") }}
+                    </div>
+                    {% if editing_customer %}
+                    <div class="pt-1">
+                        <button hx-get="/crm/" hx-target="#main-content" hx-swap="innerHTML" type="button" class="w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm font-semibold text-textMain hover:bg-stone-50">
+                            Cancel Editing
+                        </button>
+                    </div>
+                    {% endif %}
+                </form>
+            {% endset %}
+            {{ card.render(title="Edit Customer" if editing_customer else "New Customer", content=form_content) }}
+        </div>
+    </div>
+</div>

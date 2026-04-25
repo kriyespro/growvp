@@ -1,0 +1,85 @@
+{% import 'components/card.jinja' as card %}
+
+<div class="space-y-6">
+    <div class="flex items-center justify-between border-b border-stone-200 pb-4">
+        <h2 class="text-2xl font-bold text-textMain">Overview</h2>
+        <div class="flex space-x-3">
+            <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">System Online</span>
+            <span class="inline-flex items-center rounded-md bg-brand/10 px-2 py-1 text-xs font-medium text-brand ring-1 ring-inset ring-brand/20">{{ business.get_industry_type_display() }}</span>
+        </div>
+    </div>
+
+    <!-- Metrics Grid -->
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {% set m1 %}
+            <div class="flex items-center space-x-4">
+                <div class="p-3 bg-brand/10 rounded-lg text-brand">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-textMuted">Today's Revenue</p>
+                    <p class="text-2xl font-bold text-textMain">₹{{ today_revenue_display }}</p>
+                </div>
+            </div>
+        {% endset %}
+        {{ card.render(content=m1) }}
+
+        {% set m2 %}
+            <div class="flex items-center space-x-4">
+                <div class="p-3 bg-emerald-100 rounded-lg text-emerald-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-textMuted">Appointments</p>
+                    <p class="text-2xl font-bold text-textMain">{{ today_appointments }}</p>
+                </div>
+            </div>
+        {% endset %}
+        {{ card.render(content=m2) }}
+        
+        {% set m3 %}
+            <div class="flex items-center space-x-4">
+                <div class="p-3 bg-purple-100 rounded-lg text-purple-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-textMuted">Total Clients</p>
+                    <p class="text-2xl font-bold text-textMain">{{ total_clients }}</p>
+                </div>
+            </div>
+        {% endset %}
+        {{ card.render(content=m3) }}
+
+        {% set m4 %}
+            <div class="flex items-center space-x-4">
+                <div class="p-3 bg-rose-100 rounded-lg text-rose-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-textMuted">No Shows</p>
+                    <p class="text-2xl font-bold text-textMain">{{ no_show_rate }}%</p>
+                </div>
+            </div>
+        {% endset %}
+        {{ card.render(content=m4) }}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-8">
+        <h3 class="text-lg font-medium text-textMain mb-4">Quick Actions</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button hx-get="/booking/calendar/" hx-target="#main-content" class="flex items-center justify-center space-x-2 py-3 px-4 border border-brand/30 bg-brand/5 hover:bg-brand/10 text-brand rounded-lg transition-colors font-medium text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                <span>New Booking</span>
+            </button>
+            <button hx-get="/crm/" hx-target="#main-content" class="flex items-center justify-center space-x-2 py-3 px-4 bg-white hover:bg-stone-50 border border-stone-200 shadow-sm text-textMain rounded-lg transition-colors font-medium text-sm">
+                <svg class="w-5 h-5 text-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                <span>Add Customer</span>
+            </button>
+            <button hx-get="/catalog/services/" hx-target="#main-content" class="flex items-center justify-center space-x-2 py-3 px-4 bg-white hover:bg-stone-50 border border-stone-200 shadow-sm text-textMain rounded-lg transition-colors font-medium text-sm">
+                <svg class="w-5 h-5 text-textMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <span>View Catalog</span>
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,63 @@
+{% import 'components/button.jinja' as btn %}
+
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm shadow-none" id="checkout-modal">
+    <div class="bg-creameSurface rounded-xl p-0 max-w-lg w-full shadow-lg overflow-hidden border border-stone-200" @click.stop>
+        
+        <!-- Header -->
+        <div class="px-6 py-5 border-b border-stone-200 bg-stone-50 flex justify-between items-center">
+            <div>
+                <h3 class="text-lg font-bold text-textMain shadow-none border-none">Checkout & Invoice</h3>
+                <p class="text-sm text-textMuted shadow-none border-none">{{ appointment.customer.first_name }} - {{ appointment.service.name }}</p>
+            </div>
+            <button onclick="document.getElementById('checkout-modal').remove()" class="text-stone-400 hover:text-stone-600 bg-transparent border-none">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Left: Bill Details -->
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm shadow-none border-none">
+                        <span class="text-textMuted shadow-none border-none">Subtotal</span>
+                        <span class="font-medium text-textMain shadow-none border-none">₹{{ invoice.subtotal }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm shadow-none border-none">
+                        <span class="text-textMuted shadow-none border-none">GST (18%)</span>
+                        <span class="font-medium text-textMain shadow-none border-none">₹{{ invoice.tax_amount }}</span>
+                    </div>
+                    <div class="pt-2 border-t border-stone-200 flex justify-between shadow-none">
+                        <span class="font-bold text-textMain shadow-none border-none">Total Due</span>
+                        <span class="font-bold text-brand text-lg shadow-none border-none">₹{{ invoice.total_amount }}</span>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-stone-200">
+                    <form hx-post="/billing/checkout/{{ appointment.id }}/" hx-target="#checkout-modal" hx-swap="outerHTML">
+                        <input type="hidden" name="mark_paid" value="1">
+                        {{ btn.render(type="submit", text="Mark Paid in Cash/Card", cls="w-full justify-center bg-stone-100 !text-textMain border border-stone-300 hover:bg-stone-200 shadow-sm") }}
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right: UPI QR Code -->
+            <div class="border-t md:border-t-0 md:border-l border-stone-200 pt-6 md:pt-0 md:pl-6 flex flex-col items-center justify-center text-center">
+                <p class="text-sm font-semibold text-textMain mb-3 shadow-none border-none">Scan to Pay (UPI)</p>
+                {% if business.upi_id %}
+                    <div class="p-2 bg-white rounded-lg border border-stone-200 shadow-sm inline-block">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa={{ business.upi_id }}&pn={{ business.name|urlencode }}&am={{ invoice.total_amount }}" alt="UPI QR Code" class="w-32 h-32 object-contain" />
+                    </div>
+                    <p class="text-xs text-textMuted mt-3 shadow-none border-none">Supports GPay, PhonePe, Paytm</p>
+                    <p class="text-[10px] font-mono mt-1 text-stone-400 shadow-none border-none">{{ business.upi_id }}</p>
+                {% else %}
+                    <div class="w-32 h-32 bg-stone-100 border border-dashed border-stone-300 rounded-lg flex items-center justify-center text-stone-400 p-4 text-xs shadow-inner">
+                        UPI ID Not Configured
+                    </div>
+                    <p class="text-xs text-red-500 mt-3 max-w-[150px] shadow-none border-none">Update UPI in Admin to show code.</p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,29 @@
+# Admin Test Credentials
+email: admin@test.com
+password: test1234
+role: Business Admin
+
+# Regular Staff Credentials
+email: staff@test.com
+password: test1234
+role: Service Provider
+business: Test Business
+
+# Notes
+- Credentials are seeded in local DB.
+- Login URL: /auth/login/
+- Run demo seed command: python manage.py seed_demo_data
+
+# Demo Business (created by seed_demo_data)
+business_name: Demo Glow Studio
+public_landing: /b/demo-glow-studio/
+
+# Demo Business Admin
+email: demo.admin@test.com
+password: test1234
+role: Business Admin
+
+# Demo Business Staff
+email: demo.staff@test.com
+password: test1234
+role: Service Provider

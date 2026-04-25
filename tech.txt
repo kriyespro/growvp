@@ -1,0 +1,42 @@
+Project Tech Stack
+==================
+
+Backend
+- Python 3.x
+- Django 4.2 (configured project version)
+- Jinja2 templates (primary UI rendering)
+- Django Templates (admin usage)
+- HTMX for server-driven interactivity
+- Alpine.js for lightweight frontend interactions
+
+Frontend
+- Tailwind CSS (CDN setup in base template)
+- HTML + Jinja partial components
+
+Database
+- SQLite (default local development)
+- PostgreSQL-ready via DATABASE_URL + psycopg
+
+Core Django Apps
+- core
+- users
+- catalog
+- booking
+- crm
+- billing
+
+Auth + Security
+- Custom user model: users.User
+- CSRF middleware enabled
+- Secure cookie + HSTS options when DEBUG=False
+
+Deployment/Runtime
+- Gunicorn as WSGI server
+- Dockerfile for containerized deployment
+- docker-compose.yml for app + postgres
+- Env-driven config via .env values
+
+Useful Commands
+- Local run: python manage.py runserver
+- Seed demo data: python manage.py seed_demo_data
+- Production server: gunicorn config.wsgi:application --bind 0.0.0.0:8000

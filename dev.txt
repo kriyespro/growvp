@@ -1,0 +1,19 @@
+# In Progress
+- Manual QA and production deployment prep
+
+# Completed
+- Phase 1 initialization
+- Scaffolding apps and models
+- Added public booking validation for malformed date/time inputs
+- Added booking overlap guard to prevent double-booking slots
+- Added internal calendar overlap and time-range validation via AppointmentForm
+- Added unauthorized profile guard in billing checkout view
+- Added missing login page template for auth flow
+- Added secure login redirect validation to block unsafe external next URLs
+- Added CRM customer de-duplication by phone at business scope
+- Added invoice total synchronization and guarded mark-paid handling in checkout
+- Added service form validation for non-negative price and positive duration
+- Added regression tests for booking, catalog, users, CRM, and billing flows
+- Applied environment-based security defaults in settings
+- Verified deploy checks are clean with DJANGO_DEBUG=False
+- Seeded deterministic test credentials in local database

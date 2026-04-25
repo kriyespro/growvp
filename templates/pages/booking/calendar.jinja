@@ -1,0 +1,90 @@
+{% import 'components/card.jinja' as card %}
+{% import 'components/input.jinja' as input %}
+{% import 'components/button.jinja' as btn %}
+
+<div class="space-y-6">
+    <div class="flex items-center justify-between border-b border-stone-200 pb-4">
+        <div>
+            <h2 class="text-2xl font-bold text-textMain">Calendar & Bookings</h2>
+            <p class="mt-1 text-xs text-textMuted">Showing latest bookings first for your business account.</p>
+        </div>
+    </div>
+
+    <!-- Main List & Form Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-2 space-y-4">
+            {% if not appointments %}
+                {{ card.render(content='<div class="text-center py-6 text-textMuted text-sm">No scheduled bookings.</div>') }}
+            {% else %}
+                <div class="bg-creameSurface rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-stone-200">
+                        <thead class="bg-stone-50">
+                            <tr>
+                                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-textMain sm:pl-6">Date & Time</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-textMain">Customer</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-textMain">Service</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-textMain">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-200 bg-white">
+                            {% for a in appointments %}
+                            <tr>
+                                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-textMain sm:pl-6">{{ a.date }} ({{ a.start_time.strftime('%H:%M') }})</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">{{ a.customer.first_name }}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">{{ a.service.name }}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">
+                                    <span class="inline-flex items-center rounded-md bg-stone-100 px-2 py-1 text-xs font-medium text-stone-600 ring-1 ring-inset ring-stone-500/20">{{ a.status|title }}</span>
+                                    {% if a.status != 'completed' %}
+                                        <button hx-get="/billing/checkout/{{ a.id }}/" hx-target="body" hx-swap="beforeend" class="ml-2 inline-flex items-center rounded bg-brand px-2 py-1 text-xs font-medium text-white hover:bg-brandHover shadow-sm transition-colors border-none">Checkout</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Right: Add Form -->
+        <div class="lg:col-span-1">
+            {% set form_content %}
+                <form hx-post="/booking/calendar/" hx-target="#main-content" hx-swap="innerHTML" class="space-y-4">
+                    
+                    <div class="space-y-1">
+                        <label class="block text-sm font-medium text-textMain">Customer</label>
+                        <select name="customer" required class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm sm:leading-6 appearance-none">
+                            <option value="">-- Select Customer --</option>
+                            {% for choice in form.fields.customer.queryset %}
+                                <option value="{{ choice.id }}">{{ choice.first_name }} {{ choice.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="block text-sm font-medium text-textMain">Service</label>
+                        <select name="service" required class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm sm:leading-6 appearance-none">
+                            <option value="">-- Select Service --</option>
+                            {% for choice in form.fields.service.queryset %}
+                                <option value="{{ choice.id }}">{{ choice.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    {{ input.render("Date", "date", type="date", required=True) }}
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        {{ input.render("Start Time", "start_time", type="time", required=True) }}
+                        {{ input.render("End Time", "end_time", type="time", required=True) }}
+                    </div>
+
+                    <div class="pt-2">
+                        {{ btn.render(type="submit", text="Book Slot", cls="w-full justify-center") }}
+                    </div>
+                </form>
+            {% endset %}
+            {{ card.render(title="New Appointment", content=form_content) }}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,33 @@
+# ===============================
+# Django Production Environment
+# Copy this file to .env on server
+# ===============================
+
+# Core Django
+DJANGO_DEBUG=False
+DJANGO_SECRET_KEY=kG$70d+NwnPt=ckJlW3^l&sRYG1H)Oj&fG8X-#od^Sd@D(kqinAs6HKWyPQFD^7H
+DJANGO_ALLOWED_HOSTS=growvyapaar.com,www.growvyapaar.com,161.97.146.14
+CSRF_TRUSTED_ORIGINS=https://growvyapaar.com,https://www.growvyapaar.com
+
+# Database (PostgreSQL)
+POSTGRES_DB=growvyapaar_prod
+POSTGRES_USER=growvyapaar_admin
+POSTGRES_PASSWORD=lMBDKaD9ljlS16jVvC4BA-nEqTWPb9Y34JSvkqsF
+DATABASE_URL=postgresql://growvyapaar_admin:lMBDKaD9ljlS16jVvC4BA-nEqTWPb9Y34JSvkqsF@db:5432/growvyapaar_prod
+
+# Security / production defaults
+SECURE_SSL_REDIRECT=True
+SESSION_COOKIE_SECURE=True
+CSRF_COOKIE_SECURE=True
+SECURE_HSTS_SECONDS=31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+SECURE_HSTS_PRELOAD=True
+
+# Optional email (fill with your SMTP values)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=your-email@example.com
+EMAIL_HOST_PASSWORD=your-email-app-password
+EMAIL_USE_TLS=True
+DEFAULT_FROM_EMAIL=GrowVyapaar <noreply@growvyapaar.com>
+

@@ -1,0 +1,147 @@
+Here’s a **tight, no-BS feature list** for a **multi-industry appointment system** (salon, parlour, dentist, optical, pet shop). Focus: **revenue, automation, retention**.
+
+---
+
+# 🔥 CORE SYSTEM (must-have)
+
+* Multi-business support (salon / clinic / shop toggle)
+* Multi-branch + location management
+* Staff/user roles (admin, receptionist, service provider)
+* Service catalog (duration, price, category)
+* Real-time availability engine (slot-based + buffer time)
+* Online booking (public page + shareable link)
+* Walk-in + manual booking
+* Calendar view (day / week / staff-wise)
+* Timezone + working hours config
+* Booking status: pending / confirmed / completed / cancelled / no-show
+
+---
+
+# 💰 REVENUE FEATURES (critical)
+
+* Dynamic pricing (weekend, peak hours)
+* Add-ons / upsell services
+* Packages & memberships (e.g. 5 haircuts, dental plans)
+* Coupons / discount engine
+* Advance booking payments (partial/full)
+* No-show penalty rules
+* POS billing (service + product combo)
+* GST invoice generation (India-ready)
+
+---
+
+# 👥 CUSTOMER MANAGEMENT (CRM-lite)
+
+* Customer profiles (history, notes, preferences)
+* Visit history timeline
+* Tags (VIP, frequent, risky)
+* Birthday / anniversary tracking
+* Loyalty points system
+* Wallet / credit balance
+
+---
+
+# 📅 BOOKING EXPERIENCE (conversion focused)
+
+* One-click rebooking
+* Staff selection OR auto-assign best available
+* Service duration auto-calculation (multi-service stacking)
+* Queue mode (for walk-ins)
+* Waitlist system (auto-fill cancelled slots)
+* Google Calendar sync (optional)
+
+---
+
+# 🔔 AUTOMATION (money-maker)
+
+* WhatsApp / SMS reminders (before appointment)
+* Auto-confirmation messages
+* Follow-up reminders (e.g. dental check after 6 months)
+* Missed appointment recovery (auto message + rebook link)
+* Review request after visit
+
+---
+
+# 📊 ANALYTICS (decision-making)
+
+* Daily / weekly revenue
+* Staff performance (utilization %, revenue)
+* Most booked services
+* Customer retention rate
+* No-show rate tracking
+* Peak hours analysis
+
+---
+
+# 🧾 INVENTORY (important for salon / optical / pet)
+
+* Product stock tracking
+* Low stock alerts
+* Product sales via POS
+* Supplier management (basic)
+
+---
+
+# 🧑‍⚕️ INDUSTRY-SPECIFIC ADD-ONS
+
+## 💇 Salon / Parlour
+
+* Chair/room allocation
+* Combo services (hair + facial bundles)
+* Stylist performance tracking
+
+## 🦷 Dentist
+
+* Patient records (treatment history, prescriptions)
+* Case sheets / notes
+* Recurring treatments (root canal, braces follow-ups)
+
+## 👓 Optical Shop
+
+* Prescription storage
+* Lens + frame catalog
+* Order tracking (ready / delivered)
+
+## 🐶 Pet Shop / Clinic
+
+* Pet profiles (name, breed, age)
+* Vaccination reminders
+* Grooming + medical history
+
+---
+
+# 📲 ADMIN + SYSTEM
+
+* Mobile-friendly dashboard (no app needed)
+* Data export (CSV / Excel)
+* Role-based access control
+* Multi-language (English + Hindi/Gujarati optional)
+* Backup & restore
+* API/webhook support (future integrations)
+
+---
+
+# ⚡ GROWTH FEATURES (optional but powerful)
+
+* Affiliate/referral system (earn per booking)
+* White-label for multiple businesses
+* Custom domain booking page
+* Google review integration
+* SEO-friendly booking pages
+
+---
+
+# 🚫 DO NOT BUILD (waste)
+
+* Complex AI suggestions (initially useless)
+* Fancy UI dashboards with no action value
+* Over-engineered EMR (keep it light)
+* Too many integrations early
+
+---
+
+If you want, I can convert this into:
+
+* **Django app structure (models + apps)**
+* **DB schema**
+* **Revenue-first MVP (build in 7 days plan)**
