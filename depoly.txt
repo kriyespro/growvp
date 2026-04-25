@@ -99,7 +99,7 @@ sudo certbot renew --dry-run
 
 - DJANGO_DEBUG=False
 - DJANGO_ALLOWED_HOSTS=growvyapaar.com,www.growvyapaar.com,161.97.146.14
-- CSRF_TRUSTED_ORIGINS=https://growvyapaar.com,https://www.growvyapaar.com
+- DJANGO_CSRF_TRUSTED_ORIGINS=https://growvyapaar.com,https://www.growvyapaar.com
 - Strong DJANGO_SECRET_KEY
 - Strong POSTGRES_PASSWORD
 - Use gunicorn (already in docker compose command)

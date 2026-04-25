@@ -7,7 +7,7 @@
 DJANGO_DEBUG=False
 DJANGO_SECRET_KEY=kG$70d+NwnPt=ckJlW3^l&sRYG1H)Oj&fG8X-#od^Sd@D(kqinAs6HKWyPQFD^7H
 DJANGO_ALLOWED_HOSTS=growvyapaar.com,www.growvyapaar.com,161.97.146.14
-CSRF_TRUSTED_ORIGINS=https://growvyapaar.com,https://www.growvyapaar.com
+DJANGO_CSRF_TRUSTED_ORIGINS=https://growvyapaar.com,https://www.growvyapaar.com
 
 # Database (PostgreSQL)
 POSTGRES_DB=growvyapaar_prod
