@@ -1,9 +1,9 @@
 {% import 'components/card.jinja' as card %}
 
 <div class="space-y-6">
-    <div class="flex items-center justify-between border-b border-stone-200 pb-4">
-        <h2 class="text-2xl font-bold text-textMain">Overview</h2>
-        <div class="flex space-x-3">
+    <div class="flex flex-col gap-3 border-b border-stone-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <h2 class="text-xl font-bold text-textMain sm:text-2xl">Overview</h2>
+        <div class="flex flex-wrap gap-2 sm:space-x-3">
             <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">System Online</span>
             <span class="inline-flex items-center rounded-md bg-brand/10 px-2 py-1 text-xs font-medium text-brand ring-1 ring-inset ring-brand/20">{{ business.get_industry_type_display() }}</span>
         </div>
@@ -67,7 +67,7 @@
     <!-- Quick Actions -->
     <div class="mt-8">
         <h3 class="text-lg font-medium text-textMain mb-4">Quick Actions</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 md:gap-4">
             <button hx-get="/booking/calendar/" hx-target="#main-content" class="flex items-center justify-center space-x-2 py-3 px-4 border border-brand/30 bg-brand/5 hover:bg-brand/10 text-brand rounded-lg transition-colors font-medium text-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 <span>New Booking</span>

@@ -3,33 +3,52 @@
 {% block title %}DurgaOS | Appointment & Revenue Platform{% endblock %}
 
 {% block content %}
-<div class="bg-gradient-to-b from-amber-50/40 to-creameBg">
-  <header class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
-    <a href="/" class="text-lg font-bold tracking-tight text-textMain">DurgaOS</a>
-    <nav class="hidden items-center gap-6 md:flex">
+<div class="bg-gradient-to-b from-amber-50/40 to-creameBg" x-data="{ mobileMenuOpen: false }">
+  <header class="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between">
+      <a href="/" class="text-lg font-bold tracking-tight text-textMain">DurgaOS</a>
+      <button
+        class="inline-flex items-center justify-center rounded-md border border-stone-300 bg-white p-2 text-textMain md:hidden"
+        @click="mobileMenuOpen = !mobileMenuOpen"
+        type="button"
+        aria-label="Toggle navigation"
+      >
+        <span class="text-xs font-semibold">Menu</span>
+      </button>
+    </div>
+    <nav class="hidden items-center gap-6 pt-4 md:flex md:pt-0">
       <a href="#features" class="text-sm font-medium text-textMuted hover:text-textMain">Features</a>
       <a href="#industries" class="text-sm font-medium text-textMuted hover:text-textMain">Industries</a>
       <a href="#pricing" class="text-sm font-medium text-textMuted hover:text-textMain">Pricing</a>
+      <div class="ml-auto flex items-center gap-3">
+        <a href="/auth/login/" class="text-sm font-semibold text-textMain hover:text-brand">Sign in</a>
+        <a href="/auth/register/" class="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brandHover">Start free</a>
+      </div>
     </nav>
-    <div class="flex items-center gap-3">
-      <a href="/auth/login/" class="text-sm font-semibold text-textMain hover:text-brand">Sign in</a>
-      <a href="/auth/register/" class="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brandHover">Start free</a>
-    </div>
+    <nav x-show="mobileMenuOpen" x-cloak class="mt-3 space-y-2 rounded-lg border border-stone-200 bg-white p-3 md:hidden">
+      <a href="#features" class="block rounded-md px-3 py-2 text-sm font-medium text-textMain hover:bg-stone-50">Features</a>
+      <a href="#industries" class="block rounded-md px-3 py-2 text-sm font-medium text-textMain hover:bg-stone-50">Industries</a>
+      <a href="#pricing" class="block rounded-md px-3 py-2 text-sm font-medium text-textMain hover:bg-stone-50">Pricing</a>
+      <div class="grid grid-cols-2 gap-2 pt-2">
+        <a href="/auth/login/" class="inline-flex items-center justify-center rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-textMain">Sign in</a>
+        <a href="/auth/register/" class="inline-flex items-center justify-center rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white">Start free</a>
+      </div>
+    </nav>
   </header>
 
-  <section class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-4 pb-20 pt-12 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8 lg:pb-24 lg:pt-16">
+  <section class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 pb-14 pt-8 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8 lg:pb-24 lg:pt-16">
     <div>
       <p class="inline-flex rounded-full border border-amber-200 bg-amber-100/70 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-800">Built for growth-first businesses</p>
-      <h1 class="mt-5 text-4xl font-bold tracking-tight text-textMain sm:text-5xl lg:text-6xl">Fill your calendar, reduce no-shows, and increase repeat revenue.</h1>
+      <h1 class="mt-4 text-3xl font-bold tracking-tight text-textMain sm:text-5xl lg:text-6xl">Fill your calendar, reduce no-shows, and increase repeat revenue.</h1>
       <p class="mt-5 max-w-xl text-base leading-7 text-textMuted sm:text-lg">
         An all-in-one appointment operating system for salons, clinics, optical stores, and pet care teams.
         Manage bookings, customers, reminders, billing, and service performance from one dashboard.
       </p>
       <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <a href="/auth/register/" class="inline-flex items-center justify-center rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brandHover">Create your account</a>
-        <a href="/auth/login/" class="inline-flex items-center justify-center rounded-md border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-textMain hover:bg-stone-50">View dashboard</a>
+        <a href="/auth/register/" class="inline-flex w-full items-center justify-center rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brandHover sm:w-auto">Create your account</a>
+        <a href="/auth/login/" class="inline-flex w-full items-center justify-center rounded-md border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-textMain hover:bg-stone-50 sm:w-auto">View dashboard</a>
       </div>
-      <div class="mt-8 grid max-w-lg grid-cols-3 gap-3 text-center">
+      <div class="mt-8 grid max-w-lg grid-cols-3 gap-2 text-center sm:gap-3">
         <div class="rounded-lg border border-stone-200 bg-white p-3">
           <p class="text-lg font-bold text-textMain">30%</p>
           <p class="text-xs text-textMuted">Fewer no-shows</p>

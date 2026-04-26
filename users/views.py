@@ -7,6 +7,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from django.middleware.csrf import get_token
 from django.utils.http import url_has_allowed_host_and_scheme
+from catalog.services import ensure_starter_categories
 
 @ensure_csrf_cookie
 def register_business(request):
@@ -32,6 +33,7 @@ def register_business(request):
                 business=business,
                 role='admin'
             )
+            ensure_starter_categories(business)
             
             # Login immediately
             login(request, user)
@@ -39,9 +41,9 @@ def register_business(request):
             if request.htmx:
                 # If HTMX request, we can trigger client-side redirect
                 response = render(request, 'partials/_redirect.jinja')
-                response['HX-Redirect'] = '/dashboard/'
+                response['HX-Redirect'] = '/auth/business-profile/?onboarding=1'
                 return response
-            return redirect('/dashboard/')
+            return redirect('/auth/business-profile/?onboarding=1')
             
     else:
         form = RegistrationForm()
@@ -61,6 +63,11 @@ def login_view(request):
         user = authenticate(request, username=email, password=password)
         if user is not None:
             login(request, user)
+            profile = getattr(user, 'profile', None)
+            if profile:
+                ensure_starter_categories(profile.business)
+                if not profile.business.is_profile_ready:
+                    return redirect('/auth/business-profile/?onboarding=1')
             next_url = request.GET.get('next', '/dashboard/')
             if not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
                 next_url = '/dashboard/'
@@ -93,7 +100,10 @@ def business_profile(request):
     if request.method == 'POST':
         form = BusinessLandingForm(request.POST, instance=business)
         if form.is_valid():
-            form.save()
+            updated_business = form.save(commit=False)
+            updated_business.profile_setup_completed = True
+            updated_business.save()
+            business = updated_business
             form = BusinessLandingForm(instance=business)
     else:
         form = BusinessLandingForm(instance=business)
@@ -101,5 +111,9 @@ def business_profile(request):
     context = {
         'form': form,
         'business': business,
+        'onboarding_mode': request.GET.get('onboarding') == '1',
+        'dashboard_embed': request.htmx,
+        'csrf_input_html': f'<input type="hidden" name="csrfmiddlewaretoken" value="{get_token(request)}">',
     }
-    return render(request, 'pages/business_profile.jinja', context)
+    template_name = 'partials/_business_profile_content.jinja' if request.htmx else 'pages/business_profile.jinja'
+    return render(request, template_name, context)

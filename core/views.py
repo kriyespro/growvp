@@ -33,6 +33,9 @@ def dashboard(request):
         from django.shortcuts import redirect
         logout(request)
         return redirect('landing')
+    if not profile.business.is_profile_ready:
+        from django.shortcuts import redirect
+        return redirect('/auth/business-profile/?onboarding=1')
 
     context = {
         'business': profile.business,

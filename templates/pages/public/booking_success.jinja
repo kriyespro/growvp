@@ -10,8 +10,9 @@
         </div>
         <h2 class="mt-6 text-center text-3xl font-extrabold text-textMain">Booking Confirmed!</h2>
         <p class="mt-4 text-center text-lg text-textMuted">You are successfully booked at {{ business.name }}. We look forward to seeing you!</p>
-        <div class="mt-8">
-            <a href="/booking/{{ business.slug }}/" class="font-medium text-brand hover:text-brandHover">Book another appointment &rarr;</a>
+        <div class="mt-8 flex flex-col items-center gap-3">
+            <a href="/booking/{{ business.slug }}/" class="inline-flex w-full justify-center rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brandHover sm:w-auto">Book another appointment</a>
+            <a href="/b/{{ business.slug }}/" class="text-sm font-medium text-textMuted hover:text-textMain">Back to {{ business.name }}</a>
         </div>
     </div>
 </div>
