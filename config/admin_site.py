@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.core.exceptions import PermissionDenied
 
@@ -20,3 +21,21 @@ class SuperuserAdminSite(AdminSite):
             return wrapped_view(request, *args, **kwargs)
 
         return superuser_only
+
+
+class DefaultStaffAdminSite(AdminSite):
+    site_header = 'Django administration'
+    site_title = 'Django site admin'
+    index_title = 'Site administration'
+
+
+default_admin_site = DefaultStaffAdminSite(name='default_admin')
+
+
+def get_default_admin_site():
+    if default_admin_site._registry:
+        return default_admin_site
+
+    for model, model_admin in admin.site._registry.items():
+        default_admin_site.register(model, model_admin.__class__)
+    return default_admin_site
