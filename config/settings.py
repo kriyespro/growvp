@@ -78,7 +78,8 @@ TEMPLATES = [
     },
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        # Django admin uses DjangoTemplates, so include project templates here.
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'config' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
