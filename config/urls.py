@@ -18,9 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
 
 urlpatterns = [
-    path('sd/', admin.site.urls),
+    path('admin/', admin.site.urls),
+    path('sd/', RedirectView.as_view(pattern_name='admin:index', permanent=False)),
     path('auth/', include('users.urls')),
     path('catalog/', include('catalog.urls')),
     path('crm/', include('crm.urls')),
