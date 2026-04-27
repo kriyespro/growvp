@@ -1,12 +1,15 @@
 from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count, Sum
+from django.db.models.functions import Coalesce
 
 
 class SuperuserAdminSite(AdminSite):
     site_header = 'Grow Vyapaar Super Admin'
     site_title = 'Grow Vyapaar Admin'
     index_title = 'Platform Control Center'
+    index_template = 'admin/custom_index.html'
 
     def has_permission(self, request):
         user = request.user
@@ -21,6 +24,33 @@ class SuperuserAdminSite(AdminSite):
             return wrapped_view(request, *args, **kwargs)
 
         return superuser_only
+
+    def each_context(self, request):
+        context = super().each_context(request)
+        from users.models import User, Business
+        from booking.models import Appointment
+        from billing.models import Invoice
+
+        total_users = User.objects.count()
+        total_businesses = Business.objects.count()
+        total_bookings = Appointment.objects.count()
+        total_revenue = Invoice.objects.filter(status='paid').aggregate(
+            total=Coalesce(Sum('total_amount'), 0)
+        )['total']
+        paid_businesses = Invoice.objects.filter(status='paid').aggregate(
+            count=Count('business', distinct=True)
+        )['count'] or 0
+        trial_businesses = max(total_businesses - paid_businesses, 0)
+
+        context['dashboard_kpis'] = {
+            'total_users': total_users,
+            'total_businesses': total_businesses,
+            'paid_businesses': paid_businesses,
+            'trial_businesses': trial_businesses,
+            'total_bookings': total_bookings,
+            'total_revenue': total_revenue,
+        }
+        return context
 
 
 class DefaultStaffAdminSite(AdminSite):

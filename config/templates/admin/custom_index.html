@@ -1,0 +1,45 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+<div id="content-main">
+  <div class="module">
+    <h2>Business Dashboard</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Total Users</td>
+          <td>{{ dashboard_kpis.total_users }}</td>
+        </tr>
+        <tr>
+          <td>Total Businesses</td>
+          <td>{{ dashboard_kpis.total_businesses }}</td>
+        </tr>
+        <tr>
+          <td>Paid Businesses (Plan Active)</td>
+          <td>{{ dashboard_kpis.paid_businesses }}</td>
+        </tr>
+        <tr>
+          <td>Trial Businesses</td>
+          <td>{{ dashboard_kpis.trial_businesses }}</td>
+        </tr>
+        <tr>
+          <td>Total Bookings</td>
+          <td>{{ dashboard_kpis.total_bookings }}</td>
+        </tr>
+        <tr>
+          <td>Total Revenue (Paid Invoices)</td>
+          <td>{{ dashboard_kpis.total_revenue }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  {{ block.super }}
+</div>
+{% endblock %}
