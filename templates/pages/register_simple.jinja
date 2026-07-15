@@ -1,0 +1,33 @@
+{% extends 'base.jinja' %}
+{% import 'components/input.jinja' as input %}
+{% import 'components/button.jinja' as btn %}
+{% import 'components/card.jinja' as card %}
+
+{% block title %}{{ title }} | SuratBazar{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-amber-50/50 to-creameBg px-4 py-10">
+  <div class="mx-auto w-full max-w-lg">
+    <div class="mb-8 text-center">
+      {% set logo_height = 'h-14' %}
+      {% set logo_class = 'mx-auto inline-flex' %}
+      {% include 'partials/_brand_logo.jinja' %}
+      <a href="/auth/register/" class="mt-3 inline-block text-sm font-semibold text-brand">← All account types</a>
+      <h1 class="mt-4 text-3xl font-bold tracking-tight text-textMain">{{ title }}</h1>
+      <p class="mt-2 text-sm text-textMuted">{{ subtitle }}</p>
+    </div>
+    {% set form_content %}
+    <form method="post" action="{{ post_url }}" class="space-y-5">
+      {{ csrf_field(request) }}
+      {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+      {{ input.render("Email address", "email", type="email", required=True, value=form.email.value() or "", errors=form.email.errors|join(', ') if form.email.errors else "") }}
+      {{ input.render("Password", "password", type="password", required=True, errors=form.password.errors|join(', ') if form.password.errors else "") }}
+      {{ input.render("Confirm password", "password_confirm", type="password", required=True, errors=form.password_confirm.errors|join(', ') if form.password_confirm.errors else "") }}
+      {{ btn.render(type="submit", text=submit_label, cls="w-full justify-center") }}
+      <p class="text-center text-sm text-textMuted">Already have an account? <a href="/auth/login/" class="font-semibold text-brand">Sign in</a></p>
+    </form>
+    {% endset %}
+    {{ card.render(content=form_content) }}
+  </div>
+</div>
+{% endblock %}

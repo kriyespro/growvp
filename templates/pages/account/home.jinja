@@ -1,0 +1,20 @@
+{% extends 'pages/account/base_account.jinja' %}
+
+{% block account_content %}
+<p class="text-sm text-textMuted">Signed in as <strong class="text-textMain">{{ request.user.email }}</strong></p>
+<h2 class="mt-6 font-display text-2xl font-bold text-textMain">Your enquiries</h2>
+{% if not enquiries %}
+<p class="mt-4 rounded-xl border border-dashed border-stone-300 bg-white p-8 text-center text-textMuted">
+  No enquiries yet. Find a business on the <a href="/" class="font-semibold text-brand">directory</a> and send a message.
+</p>
+{% else %}
+<ul class="mt-4 divide-y divide-stone-200 overflow-hidden rounded-xl border border-stone-200 bg-white">
+  {% for e in enquiries %}
+  <li class="px-4 py-3">
+    <a href="/leads/{{ e.id }}/" class="font-semibold text-textMain hover:text-brand">{{ e.subject or ('Enquiry #' ~ e.id) }}</a>
+    <p class="text-xs text-textMuted">{{ e.business.name }} · {{ e.get_status_display() }} · {{ e.updated_at.strftime('%d %b %Y') }}</p>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

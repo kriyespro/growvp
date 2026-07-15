@@ -66,3 +66,22 @@ class BillingCheckoutTests(TestCase):
         self.appointment.refresh_from_db()
         self.assertEqual(self.appointment.status, "confirmed")
 
+    def test_paid_invoice_totals_are_not_rewritten_by_later_price_changes(self):
+        invoice = Invoice.objects.create(
+            business=self.business,
+            appointment=self.appointment,
+            subtotal=Decimal("500.00"),
+            tax_amount=Decimal("90.00"),
+            total_amount=Decimal("590.00"),
+            status="paid",
+        )
+        self.service.price = Decimal("900.00")
+        self.service.save(update_fields=["price"])
+
+        response = self.client.get(reverse("checkout_modal", kwargs={"appointment_id": self.appointment.id}))
+        self.assertEqual(response.status_code, 200)
+        invoice.refresh_from_db()
+        self.assertEqual(invoice.subtotal, Decimal("500.00"))
+        self.assertEqual(invoice.tax_amount, Decimal("90.00"))
+        self.assertEqual(invoice.total_amount, Decimal("590.00"))
+

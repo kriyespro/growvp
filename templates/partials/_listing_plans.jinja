@@ -1,0 +1,87 @@
+{% import 'components/button.jinja' as btn %}
+
+<div class="space-y-6">
+    <div class="border-b border-stone-200 pb-4">
+        <h2 class="text-2xl font-bold text-textMain">Listing plans</h2>
+        <p class="mt-1 text-sm text-textMuted">
+            Current plan: <span class="font-semibold text-textMain">{{ current_plan.name }}</span>
+            · Billed yearly ·
+            <a href="/pricing/#compare" target="_blank" class="font-semibold text-brand hover:text-brandHover">Compare plans</a>
+            · Payment checkout comes later — switch freely for now.
+        </p>
+    </div>
+
+    {% if saved %}
+    <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+        Plan updated to <strong>{{ current_plan.name }}</strong>.
+        {% if current_plan.website_enabled %}
+        Add your website under
+        <a href="#" hx-get="/auth/business-profile/" hx-target="#main-content" class="font-semibold underline">Business Landing Setup</a>.
+        {% endif %}
+        {% if current_plan.product_limit != 0 %}
+        Manage products under
+        <a href="#" hx-get="/catalog/products/" hx-target="#main-content" class="font-semibold underline">Products</a>.
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <form
+        {% if dashboard_embed %}
+        hx-post="/auth/listing-plans/"
+        hx-target="#main-content"
+        hx-swap="innerHTML"
+        {% else %}
+        method="post"
+        action="/auth/listing-plans/"
+        {% endif %}
+        class="grid grid-cols-1 gap-4 lg:grid-cols-3"
+    >
+        {% if not dashboard_embed %}
+        {{ csrf_input_html|safe }}
+        {% endif %}
+
+        {% for key, plan in plans.items() %}
+        <label class="relative flex cursor-pointer flex-col rounded-2xl border p-5 shadow-sm transition {% if business.listing_plan == plan.key %}border-brand bg-brand/5 ring-2 ring-brand{% elif plan.key == 'pro' %}border-brand/40{% else %}border-stone-200 bg-white hover:border-brand/40{% endif %}">
+            {% if plan.key == 'pro' and business.listing_plan != 'pro' %}
+            <span class="absolute -top-2.5 right-4 rounded-full bg-brand px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">Best value</span>
+            {% endif %}
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-lg font-bold text-textMain">{{ plan.name }}</p>
+                    <p class="mt-1 text-sm text-textMuted">{{ plan.tagline }}</p>
+                </div>
+                <input
+                    type="radio"
+                    name="listing_plan"
+                    value="{{ plan.key }}"
+                    {% if business.listing_plan == plan.key %}checked{% endif %}
+                    class="mt-1 h-4 w-4 border-stone-300 text-brand focus:ring-brand"
+                >
+            </div>
+            <p class="mt-4 font-display text-2xl font-bold text-brand">{{ plan.price_label }}</p>
+            <p class="text-xs font-medium text-textMuted">{{ plan.billing_label }}</p>
+            <ul class="mt-4 flex-1 space-y-2 text-sm text-textMuted">
+                {% for feature in plan.features %}
+                <li class="flex gap-2">
+                    <span class="text-brand">✓</span>
+                    <span>{{ feature }}</span>
+                </li>
+                {% endfor %}
+                {% for item in plan.not_included %}
+                <li class="flex gap-2 text-stone-400">
+                    <span>—</span>
+                    <span>{{ item }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% if business.listing_plan == plan.key %}
+            <p class="mt-4 text-xs font-semibold uppercase tracking-wide text-brand">Current plan</p>
+            {% endif %}
+        </label>
+        {% endfor %}
+
+        <div class="lg:col-span-3">
+            {{ btn.render(type="submit", text="Save plan selection", cls="w-full justify-center sm:w-auto") }}
+        </div>
+    </form>
+</div>

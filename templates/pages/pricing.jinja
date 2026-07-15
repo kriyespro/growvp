@@ -1,0 +1,119 @@
+{% extends 'base.jinja' %}
+
+{% block title %}Pricing & plans | SuratBazar{% endblock %}
+{% block meta_description %}Compare Free, Pro, and Premium listing plans for local businesses. Yearly pricing with website, products, and featured placement.{% endblock %}
+{% block canonical %}{{ canonical_url }}{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-stone-50" x-data="{ mobileMenuOpen: false }">
+  <header class="sticky top-0 z-30 border-b border-stone-200 bg-white/90 backdrop-blur">
+    <div class="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
+      {% set logo_height = 'h-12' %}
+      {% include 'partials/_brand_logo.jinja' %}
+      <nav class="hidden items-center gap-4 md:flex">
+        <a href="/" class="text-sm font-semibold text-textMuted hover:text-brand">Directory</a>
+        <a href="/pricing/" class="text-sm font-semibold text-brand">Pricing</a>
+        {% if request.user.is_authenticated %}
+        <a href="/dashboard/" class="rounded-md bg-brand px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-brandHover">Dashboard</a>
+        {% else %}
+        <a href="/auth/login/" class="text-sm font-semibold text-textMain hover:text-brand">Sign in</a>
+        <a href="/auth/register/" class="rounded-md bg-brand px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-brandHover">Get started</a>
+        {% endif %}
+      </nav>
+      <button type="button" class="md:hidden rounded-md border border-stone-300 px-3 py-1.5 text-xs font-semibold" @click="mobileMenuOpen = !mobileMenuOpen">Menu</button>
+    </div>
+    <nav x-show="mobileMenuOpen" x-cloak class="border-t border-stone-200 bg-white px-4 py-3 md:hidden">
+      <div class="grid gap-2 text-sm font-semibold">
+        <a href="/" class="rounded-md border border-stone-200 px-3 py-2 text-textMain">Directory</a>
+        <a href="/pricing/" class="rounded-md border border-brand/30 bg-brand/5 px-3 py-2 text-brand">Pricing</a>
+        <a href="/auth/register/" class="rounded-md bg-brand px-3 py-2 text-center text-white">Get started</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="mx-auto max-w-6xl px-4 pt-10 pb-6 sm:px-6 sm:pt-14 lg:px-8">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand">Pricing</p>
+    <h1 class="mt-2 max-w-2xl font-display text-3xl font-bold tracking-tight text-textMain sm:text-4xl">
+      Simple yearly plans for every local business
+    </h1>
+    <p class="mt-3 max-w-xl text-base text-textMuted">
+      Start free to get booked. Upgrade for website, products, map & testimonials — or go Premium for featured placement and no branding.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 pb-10 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      {% for plan in plans %}
+      <article class="relative flex flex-col rounded-2xl border bg-white p-5 shadow-sm {% if plan.key == 'pro' %}border-brand ring-2 ring-brand/20{% else %}border-stone-200{% endif %}">
+        {% if plan.key == 'pro' %}
+        <span class="absolute -top-2.5 right-4 rounded-full bg-brand px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">Popular</span>
+        {% endif %}
+        <h2 class="text-lg font-bold text-textMain">{{ plan.name }}</h2>
+        <p class="mt-1 text-sm text-textMuted">{{ plan.tagline }}</p>
+        <p class="mt-5 font-display text-3xl font-bold text-brand">{{ plan.price_label }}</p>
+        <p class="text-xs font-medium text-textMuted">{{ plan.billing_label }}</p>
+        <ul class="mt-5 flex-1 space-y-2 text-sm text-textMuted">
+          {% for feature in plan.features %}
+          <li class="flex gap-2">
+            <span class="text-brand">✓</span>
+            <span>{{ feature }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% if request.user.is_authenticated %}
+        <a href="/auth/listing-plans/" class="mt-6 inline-flex items-center justify-center rounded-md {% if plan.key == 'pro' %}bg-brand text-white hover:bg-brandHover{% else %}border border-stone-300 bg-white text-textMain hover:bg-stone-50{% endif %} px-4 py-2.5 text-sm font-semibold">
+          Choose {{ plan.name }}
+        </a>
+        {% else %}
+        <a href="/auth/register/" class="mt-6 inline-flex items-center justify-center rounded-md {% if plan.key == 'pro' %}bg-brand text-white hover:bg-brandHover{% else %}border border-stone-300 bg-white text-textMain hover:bg-stone-50{% endif %} px-4 py-2.5 text-sm font-semibold">
+          Start with {{ plan.name }}
+        </a>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section id="compare" class="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
+    <div class="mb-5">
+      <h2 class="font-display text-2xl font-bold text-textMain">Compare plans</h2>
+      <p class="mt-1 text-sm text-textMuted">See what you get on Free, Pro, and Premium. <span class="sm:hidden">Swipe sideways to see all columns.</span></p>
+    </div>
+    <div class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+      <div class="overflow-x-auto overscroll-x-contain">
+        <table class="min-w-[36rem] w-full text-left text-sm">
+          <thead class="bg-stone-50 text-textMain">
+            <tr>
+              <th scope="col" class="sticky left-0 z-10 bg-stone-50 px-4 py-3 font-semibold sm:px-5">Feature</th>
+              <th scope="col" class="px-4 py-3 font-semibold sm:px-5">Free</th>
+              <th scope="col" class="px-4 py-3 font-semibold text-brand sm:px-5">Pro</th>
+              <th scope="col" class="px-4 py-3 font-semibold sm:px-5">Premium</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-stone-100">
+            {% for label, free_v, pro_v, premium_v in compare_rows %}
+            <tr class="hover:bg-stone-50/80">
+              <th scope="row" class="sticky left-0 z-10 bg-white px-4 py-3 font-medium text-textMain sm:px-5">{{ label }}</th>
+              <td class="px-4 py-3 text-textMuted sm:px-5">{{ free_v }}</td>
+              <td class="px-4 py-3 font-medium text-textMain sm:px-5">{{ pro_v }}</td>
+              <td class="px-4 py-3 text-textMuted sm:px-5">{{ premium_v }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="mt-4 text-center text-sm text-textMuted">
+      Website button is on <strong class="text-textMain">Pro</strong> and <strong class="text-textMain">Premium</strong>.
+      {% if request.user.is_authenticated %}
+      <a href="/auth/business-profile/" class="font-semibold text-brand hover:text-brandHover">Add yours in profile setup →</a>
+      {% else %}
+      <a href="/auth/register/" class="font-semibold text-brand hover:text-brandHover">List your business free →</a>
+      {% endif %}
+    </p>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'control/base_control.jinja' %}
+
+{% block title %}Activity{% endblock %}
+{% block page_title %}Activity feed{% endblock %}
+
+{% block content %}
+<section
+  class="mx-auto max-w-2xl rounded-xl border border-control-border bg-control-panel p-5"
+  hx-get="{{ url('control:activity_partial') }}"
+  hx-trigger="every 30s"
+  hx-swap="innerHTML"
+>
+  {% include 'control/partials/_activity_feed.jinja' %}
+</section>
+{% endblock %}

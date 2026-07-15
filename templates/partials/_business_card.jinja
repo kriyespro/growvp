@@ -1,0 +1,84 @@
+<article class="group flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-lg {% if business.card_style == 'featured' %}border-amber-400 ring-2 ring-amber-200/80 hover:border-amber-500{% elif business.card_style == 'highlight' %}border-indigo-300 ring-1 ring-indigo-100 hover:border-indigo-400{% else %}border-stone-200 hover:border-brand/30{% endif %}">
+  <a href="/b/{{ business.slug }}/" class="relative block aspect-[16/10] overflow-hidden bg-stone-100">
+    <img
+      src="{{ business.public_hero_image_url }}"
+      alt="{{ business.name }}"
+      class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+      loading="lazy"
+      data-fallbacks="{{ business.image_fallbacks }}"
+      onerror="sbImgFallback(this)"
+    >
+    <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-stone-950/55 to-transparent"></div>
+    <div class="absolute left-3 top-3 flex flex-wrap gap-1.5">
+      <span class="inline-flex rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-brand shadow-sm">
+        {{ business.get_industry_type_display() }}
+      </span>
+      {% if business.is_featured_listing %}
+      <span class="inline-flex rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm">Featured</span>
+      {% elif business.has_pro_badge %}
+      <span class="inline-flex rounded-full bg-indigo-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm">Pro</span>
+      {% endif %}
+      {% if business.is_verified %}
+      <span class="inline-flex rounded-full bg-sky-700 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm">Verified</span>
+      {% endif %}
+    </div>
+    <div class="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
+      {% if business.today_status == 'open' %}
+      <span class="inline-flex rounded-full bg-green-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm">{{ business.today_label }}</span>
+      {% elif business.today_status == 'closed' %}
+      <span class="inline-flex rounded-full bg-stone-900/80 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm">Closed</span>
+      {% else %}
+      <span></span>
+      {% endif %}
+      {% if business.price_range_label %}
+      <span class="inline-flex rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-bold text-brand shadow-sm">{{ business.price_range_label }}</span>
+      {% endif %}
+    </div>
+  </a>
+
+  <div class="flex flex-1 flex-col p-4 sm:p-5">
+    <a href="/b/{{ business.slug }}/" class="block">
+      <h2 class="font-display text-xl font-bold text-textMain transition group-hover:text-brand">{{ business.name }}</h2>
+      <p class="mt-1 line-clamp-1 text-sm text-textMuted">
+        {% if business.area_label %}{{ business.area_label }}{% elif business.public_address %}{{ business.public_address }}{% else %}{{ business.get_industry_type_display() }}{% endif %}
+      </p>
+    </a>
+
+    {% if business.top_services %}
+    <div class="mt-3 flex flex-wrap gap-1.5">
+      {% for name in business.top_services %}
+      <span class="rounded-md bg-stone-100 px-2 py-0.5 text-[11px] font-medium text-textMain">{{ name }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-textMuted">
+      <span class="font-semibold text-textMain">{{ business.service_count }} service{% if business.service_count != 1 %}s{% endif %}</span>
+      {% if business.booking_count and business.booking_count > 0 %}
+      <span>{{ business.booking_count }} bookings</span>
+      {% endif %}
+      {% if business.is_bookable %}
+      <span class="font-semibold text-green-700">Online booking</span>
+      {% endif %}
+    </div>
+
+    <div class="mt-auto flex gap-2 pt-5">
+      <a href="/b/{{ business.slug }}/" class="inline-flex flex-1 items-center justify-center rounded-md border border-stone-300 bg-white px-3 py-2.5 text-sm font-semibold text-textMain hover:bg-stone-50">
+        Details
+      </a>
+      {% if business.is_bookable %}
+      <a href="/booking/{{ business.slug }}/" class="inline-flex flex-1 items-center justify-center rounded-md bg-brand px-3 py-2.5 text-sm font-semibold text-white hover:bg-brandHover">
+        Book
+      </a>
+      {% elif business.whatsapp_url %}
+      <a href="{{ business.whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex flex-1 items-center justify-center rounded-md bg-green-600 px-3 py-2.5 text-sm font-semibold text-white hover:bg-green-700">
+        WhatsApp
+      </a>
+      {% elif business.public_phone %}
+      <a href="tel:{{ business.public_phone }}" class="inline-flex flex-1 items-center justify-center rounded-md bg-brand px-3 py-2.5 text-sm font-semibold text-white hover:bg-brandHover">
+        Call
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</article>

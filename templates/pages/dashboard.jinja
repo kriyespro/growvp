@@ -1,11 +1,15 @@
 {% extends 'base.jinja' %}
 
+{% block title %}Dashboard | SuratBazar{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block site_footer %}{% endblock %}
+
 {% block content %}
-<div class="flex min-h-screen overflow-hidden" x-data="{ activeTab: 'home' }">
+<div class="flex min-h-screen overflow-hidden" x-data="{ activeTab: 'home', moreOpen: false }">
     <!-- Sidebar -->
     <div class="hidden md:flex w-64 flex-col border-r border-stone-200 bg-creameBg pt-5 pb-4 shadow-sm z-10">
         <div class="flex flex-shrink-0 items-center px-6">
-            <h1 class="text-xl font-bold text-textMain tracking-widest">{{ business.name|default('Dashboard') }}</h1>
+            <h1 class="text-xl font-bold text-textMain tracking-widest truncate">{{ business.name|default('Dashboard') }}</h1>
         </div>
         <div class="mt-8 flex flex-grow flex-col">
             <nav class="flex-1 space-y-2 px-4" aria-label="Sidebar">
@@ -14,6 +18,9 @@
                 </a>
                 <a href="#" hx-get="/catalog/services/" hx-target="#main-content" @click.prevent="activeTab = 'services'" :class="activeTab === 'services' ? 'bg-brand/10 text-brand border border-brand/20 font-semibold' : 'text-textMuted hover:bg-stone-100 hover:text-textMain font-medium'" class="group flex items-center px-3 py-2.5 text-sm rounded-md transition-colors">
                     Services & Catalog
+                </a>
+                <a href="#" hx-get="/catalog/products/" hx-target="#main-content" @click.prevent="activeTab = 'products'" :class="activeTab === 'products' ? 'bg-brand/10 text-brand border border-brand/20 font-semibold' : 'text-textMuted hover:bg-stone-100 hover:text-textMain font-medium'" class="group flex items-center px-3 py-2.5 text-sm rounded-md transition-colors">
+                    Products
                 </a>
                 <a href="#" hx-get="/booking/calendar/" hx-target="#main-content" @click.prevent="activeTab = 'bookings'" :class="activeTab === 'bookings' ? 'bg-brand/10 text-brand border border-brand/20 font-semibold' : 'text-textMuted hover:bg-stone-100 hover:text-textMain font-medium'" class="group flex items-center px-3 py-2.5 text-sm rounded-md transition-colors">
                     Calendar & Bookings
@@ -24,20 +31,26 @@
                 <a href="#" hx-get="/auth/business-profile/" hx-target="#main-content" @click.prevent="activeTab = 'profile'" :class="activeTab === 'profile' ? 'bg-brand/10 text-brand border border-brand/20 font-semibold' : 'text-textMuted hover:bg-stone-100 hover:text-textMain font-medium'" class="group flex items-center px-3 py-2.5 text-sm rounded-md transition-colors">
                     Business Landing Setup
                 </a>
+                <a href="#" hx-get="/auth/listing-plans/" hx-target="#main-content" @click.prevent="activeTab = 'plans'" :class="activeTab === 'plans' ? 'bg-brand/10 text-brand border border-brand/20 font-semibold' : 'text-textMuted hover:bg-stone-100 hover:text-textMain font-medium'" class="group flex items-center px-3 py-2.5 text-sm rounded-md transition-colors">
+                    Listing Plans
+                </a>
+                <a href="#" hx-get="/leads/" hx-target="#main-content" @click.prevent="activeTab = 'enquiries'" :class="activeTab === 'enquiries' ? 'bg-brand/10 text-brand border border-brand/20 font-semibold' : 'text-textMuted hover:bg-stone-100 hover:text-textMain font-medium'" class="group flex items-center px-3 py-2.5 text-sm rounded-md transition-colors">
+                    Enquiries
+                </a>
             </nav>
         </div>
         
         <div class="flex flex-shrink-0 border-t border-stone-200 p-4 bg-stone-50 mt-auto">
-            <a href="#" class="group block w-full flex-shrink-0">
+            <a href="/auth/logout/" class="group block w-full flex-shrink-0">
                 <div class="flex items-center">
                     <div>
                         <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-brand to-brandHover shadow-sm">
                             <span class="text-sm font-bold leading-none text-white">{{ request.user.email[0]|upper }}</span>
                         </div>
                     </div>
-                    <div class="ml-3">
+                    <div class="ml-3 min-w-0">
                         <p class="text-sm font-medium text-textMain truncate max-w-[150px]">{{ request.user.email }}</p>
-                        <p class="text-xs font-medium text-brand group-hover:text-brandHover transition-colors">{{ role|capitalize }}</p>
+                        <p class="text-xs font-medium text-brand group-hover:text-brandHover transition-colors">{{ role|capitalize }} · Logout</p>
                     </div>
                 </div>
             </a>
@@ -45,25 +58,24 @@
     </div>
 
     <!-- Main Content Area -->
-    <div class="flex flex-1 flex-col overflow-y-auto overflow-x-hidden bg-stone-50 relative pb-24 md:pb-0">
+    <div class="flex flex-1 flex-col overflow-y-auto overflow-x-hidden bg-stone-50 relative pb-28 md:pb-0">
         <div class="md:hidden sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-stone-200 px-4 py-3">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between gap-3">
                 <p class="text-sm font-semibold text-textMain truncate">{{ business.name }}</p>
-                <a href="/auth/logout/" class="text-xs font-medium text-brand">Logout</a>
+                <a href="/auth/logout/" class="shrink-0 text-xs font-semibold text-brand">Logout</a>
             </div>
         </div>
         <main class="flex-1">
-            <div class="py-6 sm:py-8 md:py-10">
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
-                    <!-- HTMX Loaded Content -->
+            <div class="py-5 sm:py-8 md:py-10">
+                <div class="mx-auto max-w-7xl px-3 sm:px-6 md:px-8">
                     <div id="main-content" class="transition-all duration-300" hx-indicator="#dashboard-loading-indicator">
                         <div hx-get="/dashboard/home" hx-trigger="load">
-                            <div class="flex flex-col items-center justify-center h-96 space-y-4">
+                            <div class="flex flex-col items-center justify-center h-72 space-y-4 sm:h-96">
                                 <svg id="dashboard-loading-indicator" class="htmx-indicator animate-spin h-8 w-8 text-brand" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                <span class="text-textMuted text-sm animate-pulse">Loading dashboard environment...</span>
+                                <span class="text-textMuted text-sm animate-pulse">Loading dashboard…</span>
                             </div>
                         </div>
                     </div>
@@ -72,23 +84,32 @@
         </main>
     </div>
 </div>
-<nav class="md:hidden fixed bottom-0 inset-x-0 z-30 border-t border-stone-200 bg-white/95 backdrop-blur">
-    <div class="grid grid-cols-5 gap-1 p-2">
-        <button hx-get="/dashboard/home" hx-target="#main-content" @click="activeTab = 'home'" :class="activeTab === 'home' ? 'bg-stone-100 text-textMain' : 'text-textMuted hover:bg-stone-100 hover:text-textMain'" class="flex flex-col items-center justify-center rounded-lg py-2 text-[11px] font-medium">
-            <span>Home</span>
+
+<nav class="md:hidden fixed bottom-0 inset-x-0 z-30 border-t border-stone-200 bg-white/95 backdrop-blur pb-safe">
+    <div class="grid grid-cols-5 gap-0.5 p-1.5">
+        <button type="button" hx-get="/dashboard/home" hx-target="#main-content" @click="activeTab = 'home'; moreOpen = false" :class="activeTab === 'home' ? 'bg-stone-100 text-textMain' : 'text-textMuted'" class="flex min-h-12 flex-col items-center justify-center rounded-lg py-2 text-[10px] font-semibold">
+            Home
         </button>
-        <button hx-get="/catalog/services/" hx-target="#main-content" @click="activeTab = 'services'" :class="activeTab === 'services' ? 'bg-stone-100 text-textMain' : 'text-textMuted hover:bg-stone-100 hover:text-textMain'" class="flex flex-col items-center justify-center rounded-lg py-2 text-[11px] font-medium">
-            <span>Services</span>
+        <button type="button" hx-get="/catalog/services/" hx-target="#main-content" @click="activeTab = 'services'; moreOpen = false" :class="activeTab === 'services' ? 'bg-stone-100 text-textMain' : 'text-textMuted'" class="flex min-h-12 flex-col items-center justify-center rounded-lg py-2 text-[10px] font-semibold">
+            Services
         </button>
-        <button hx-get="/booking/calendar/" hx-target="#main-content" @click="activeTab = 'bookings'" :class="activeTab === 'bookings' ? 'bg-stone-100 text-textMain' : 'text-textMuted hover:bg-stone-100 hover:text-textMain'" class="flex flex-col items-center justify-center rounded-lg py-2 text-[11px] font-medium">
-            <span>Bookings</span>
+        <button type="button" hx-get="/booking/calendar/" hx-target="#main-content" @click="activeTab = 'bookings'; moreOpen = false" :class="activeTab === 'bookings' ? 'bg-stone-100 text-textMain' : 'text-textMuted'" class="flex min-h-12 flex-col items-center justify-center rounded-lg py-2 text-[10px] font-semibold">
+            Bookings
         </button>
-        <button hx-get="/crm/" hx-target="#main-content" @click="activeTab = 'crm'" :class="activeTab === 'crm' ? 'bg-stone-100 text-textMain' : 'text-textMuted hover:bg-stone-100 hover:text-textMain'" class="flex flex-col items-center justify-center rounded-lg py-2 text-[11px] font-medium">
-            <span>CRM</span>
+        <button type="button" hx-get="/crm/" hx-target="#main-content" @click="activeTab = 'crm'; moreOpen = false" :class="activeTab === 'crm' ? 'bg-stone-100 text-textMain' : 'text-textMuted'" class="flex min-h-12 flex-col items-center justify-center rounded-lg py-2 text-[10px] font-semibold">
+            CRM
         </button>
-        <button hx-get="/auth/business-profile/" hx-target="#main-content" @click="activeTab = 'profile'" :class="activeTab === 'profile' ? 'bg-stone-100 text-textMain' : 'text-textMuted hover:bg-stone-100 hover:text-textMain'" class="flex flex-col items-center justify-center rounded-lg py-2 text-[11px] font-medium">
-            <span>Profile</span>
+        <button type="button" @click="moreOpen = !moreOpen" :class="moreOpen || ['products','profile','plans','enquiries'].includes(activeTab) ? 'bg-stone-100 text-textMain' : 'text-textMuted'" class="flex min-h-12 flex-col items-center justify-center rounded-lg py-2 text-[10px] font-semibold">
+            More
         </button>
+    </div>
+    <div x-show="moreOpen" x-cloak class="border-t border-stone-200 bg-white px-3 py-2">
+        <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <button type="button" hx-get="/catalog/products/" hx-target="#main-content" @click="activeTab = 'products'; moreOpen = false" class="rounded-md border border-stone-200 px-2 py-2.5 text-xs font-semibold text-textMain">Products</button>
+            <button type="button" hx-get="/auth/business-profile/" hx-target="#main-content" @click="activeTab = 'profile'; moreOpen = false" class="rounded-md border border-stone-200 px-2 py-2.5 text-xs font-semibold text-textMain">Profile</button>
+            <button type="button" hx-get="/auth/listing-plans/" hx-target="#main-content" @click="activeTab = 'plans'; moreOpen = false" class="rounded-md border border-stone-200 px-2 py-2.5 text-xs font-semibold text-textMain">Plans</button>
+            <button type="button" hx-get="/leads/" hx-target="#main-content" @click="activeTab = 'enquiries'; moreOpen = false" class="rounded-md border border-stone-200 px-2 py-2.5 text-xs font-semibold text-textMain">Enquiries</button>
+        </div>
     </div>
 </nav>
 {% endblock %}

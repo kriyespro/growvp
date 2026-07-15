@@ -1,0 +1,37 @@
+{% extends 'control/base_control.jinja' %}
+
+{% block title %}Businesses{% endblock %}
+{% block page_title %}Business listings{% endblock %}
+
+{% block content %}
+<form class="mb-4" method="get">
+  <input type="search" name="q" value="{{ q or '' }}" placeholder="Search name or slug…" class="w-full max-w-md rounded-md border border-control-border bg-control-panel px-3 py-2 text-sm">
+</form>
+<div class="overflow-hidden rounded-xl border border-control-border bg-control-panel">
+  <table class="min-w-full text-left text-sm">
+    <thead class="border-b border-control-border text-[11px] uppercase text-control-muted">
+      <tr>
+        <th class="px-4 py-3">Business</th>
+        <th class="px-4 py-3">Plan</th>
+        <th class="px-4 py-3">Created by</th>
+        <th class="px-4 py-3">Partners</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in businesses %}
+      <tr class="border-b border-control-border/60">
+        <td class="px-4 py-3">
+          <a href="/b/{{ b.slug }}/" class="text-control-link hover:underline" target="_blank">{{ b.name }}</a>
+          <p class="text-xs text-control-muted">{{ b.get_industry_type_display() }}</p>
+        </td>
+        <td class="px-4 py-3">{{ b.plan_label }}</td>
+        <td class="px-4 py-3 text-control-muted">{% if b.created_by %}{{ b.created_by.email }}{% else %}—{% endif %}</td>
+        <td class="px-4 py-3 text-control-muted">{{ b.assigned_partners.all()|length }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="px-4 py-8 text-center text-control-muted">No businesses.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

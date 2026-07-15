@@ -2,61 +2,252 @@
 {% import 'components/input.jinja' as input %}
 {% import 'components/button.jinja' as btn %}
 
-<div class="space-y-6">
+<div class="space-y-6" x-data="{ tab: 'essentials' }">
     {% if onboarding_mode %}
     <div class="rounded-xl border border-brand/20 bg-brand/5 p-4 sm:p-5">
-        <p class="text-sm font-semibold text-brand">Welcome! Complete your public profile to go live faster.</p>
-        <p class="mt-1 text-sm text-textMuted">This is a one-time setup. Save this form and your profile is marked complete.</p>
+        <p class="text-sm font-semibold text-brand">Step 2 of 3 — Make your listing customer-ready</p>
+        <p class="mt-1 text-sm text-textMuted">Phone and address are required. Then set hours and add services so customers can book online.</p>
+        {% if readiness %}
+        <div class="mt-4">
+            <div class="mb-2 flex items-center justify-between text-xs font-semibold">
+                <span class="text-textMain">Listing readiness</span>
+                <span class="text-brand">{{ readiness.percent }}%</span>
+            </div>
+            <div class="h-2 overflow-hidden rounded-full bg-stone-200">
+                <div class="h-full rounded-full bg-brand" style="width: {{ readiness.percent }}%"></div>
+            </div>
+            <ul class="mt-3 grid gap-1.5 text-xs text-textMuted sm:grid-cols-2">
+                {% for step in readiness.steps %}
+                <li class="{% if step.done %}text-green-700{% endif %}">
+                    {% if step.done %}✓{% else %}○{% endif %} {{ step.label }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
     </div>
     {% endif %}
 
-    <div class="flex items-center justify-between border-b border-stone-200 pb-4">
-        <h2 class="text-xl font-bold text-textMain sm:text-2xl">Business Landing Page Setup</h2>
-        <a href="/b/{{ business.slug }}/" target="_blank" class="text-sm font-semibold text-brand hover:text-brandHover">Open Public Page</a>
+    {% if saved %}
+    <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+        Public profile saved.
+        <a href="/b/{{ business.slug }}/" target="_blank" class="font-semibold underline">Preview listing</a>
+        ·
+        <a href="/catalog/services/" class="font-semibold underline">Add services</a>
+    </div>
+    {% endif %}
+
+    <div class="flex flex-col gap-3 border-b border-stone-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-xl font-bold text-textMain sm:text-2xl">Public listing setup</h2>
+            <p class="mt-1 text-sm text-textMuted">Public URL: <span class="font-medium text-textMain">/b/{{ business.slug }}/</span></p>
+        </div>
+        <a href="/b/{{ business.slug }}/" target="_blank" class="text-sm font-semibold text-brand hover:text-brandHover">Preview public page</a>
     </div>
 
-    {% set form_content %}
-        <form
-            {% if dashboard_embed %}
-            hx-post="/auth/business-profile/"
-            hx-target="#main-content"
-            hx-swap="innerHTML"
-            {% else %}
-            method="post"
-            action="/auth/business-profile/{% if onboarding_mode %}?onboarding=1{% endif %}"
-            {% endif %}
-            class="space-y-4"
-        >
-            {% if not dashboard_embed %}
-            {{ csrf_input_html|safe }}
-            {% endif %}
-            {{ input.render("Hero Title", "hero_title", value=form.hero_title.value() or "") }}
-            <div class="space-y-1">
-                <label for="hero_subtitle" class="block text-sm font-medium text-textMain">Hero Subtitle</label>
-                <textarea id="hero_subtitle" name="hero_subtitle" rows="3" class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm">{{ form.hero_subtitle.value() or "" }}</textarea>
-            </div>
-            {{ input.render("Hero Image URL", "hero_image_url", type="url", value=form.hero_image_url.value() or "", placeholder="https://example.com/hero.jpg") }}
+    <div class="flex flex-wrap gap-2">
+        <button type="button" @click="tab = 'essentials'" :class="tab === 'essentials' ? 'bg-brand text-white border-brand' : 'bg-white text-textMuted border-stone-300'" class="rounded-full border px-3 py-1.5 text-xs font-semibold">Essentials</button>
+        <button type="button" @click="tab = 'hours'" :class="tab === 'hours' ? 'bg-brand text-white border-brand' : 'bg-white text-textMuted border-stone-300'" class="rounded-full border px-3 py-1.5 text-xs font-semibold">Hours</button>
+        <button type="button" @click="tab = 'appearance'" :class="tab === 'appearance' ? 'bg-brand text-white border-brand' : 'bg-white text-textMuted border-stone-300'" class="rounded-full border px-3 py-1.5 text-xs font-semibold">Appearance</button>
+        <button type="button" @click="tab = 'trust'" :class="tab === 'trust' ? 'bg-brand text-white border-brand' : 'bg-white text-textMuted border-stone-300'" class="rounded-full border px-3 py-1.5 text-xs font-semibold">Trust</button>
+    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {{ input.render("Public Phone", "public_phone", value=form.public_phone.value() or "") }}
-                {{ input.render("Public Email", "public_email", type="email", value=form.public_email.value() or "") }}
-            </div>
+    <div x-show="tab === 'essentials'">
+        {% set form_content %}
+            <form
+                {% if dashboard_embed %}
+                hx-post="/auth/business-profile/"
+                hx-target="#main-content"
+                hx-swap="innerHTML"
+                {% else %}
+                method="post"
+                action="/auth/business-profile/{% if onboarding_mode %}?onboarding=1{% endif %}"
+                {% endif %}
+                class="space-y-4"
+            >
+                {% if not dashboard_embed %}
+                {{ csrf_input_html|safe }}
+                {% endif %}
 
-            <div class="space-y-1">
-                <label for="public_address" class="block text-sm font-medium text-textMain">Business Address</label>
-                <textarea id="public_address" name="public_address" rows="2" class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm">{{ form.public_address.value() or "" }}</textarea>
-            </div>
-            {{ input.render("Google Map Embed URL", "map_embed_url", type="url", value=form.map_embed_url.value() or "", placeholder="https://maps.google.com/...") }}
+                {{ input.render("Business name", "name", value=form.name.value() or "", required=True, errors=form.name.errors|join(', ') if form.name.errors else "") }}
 
-            <div class="space-y-1">
-                <label for="testimonial_quote" class="block text-sm font-medium text-textMain">Featured Testimonial</label>
-                <textarea id="testimonial_quote" name="testimonial_quote" rows="3" class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm">{{ form.testimonial_quote.value() or "" }}</textarea>
-            </div>
-            {{ input.render("Testimonial Author", "testimonial_author", value=form.testimonial_author.value() or "") }}
+                <div class="space-y-1">
+                    <label for="industry_type" class="block text-sm font-medium text-textMain">Business category</label>
+                    <select
+                        id="industry_type"
+                        name="industry_type"
+                        required
+                        class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm appearance-none"
+                    >
+                        {% for group_label, group_choices in industry_groups %}
+                        <optgroup label="{{ group_label }}">
+                            {% for value, label in group_choices %}
+                            <option value="{{ value }}" {% if (form.industry_type.value() or business.industry_type) == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endfor %}
+                    </select>
+                    {% if form.industry_type.errors %}<p class="text-xs text-red-500 mt-1">{{ form.industry_type.errors|join(', ') }}</p>{% endif %}
+                </div>
 
-            {{ btn.render(type="submit", text="Save Landing Content", cls="w-full justify-center") }}
-        </form>
-    {% endset %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {{ input.render("Public phone", "public_phone", value=form.public_phone.value() or "", required=True, errors=form.public_phone.errors|join(', ') if form.public_phone.errors else "") }}
+                    {{ input.render("Public email", "public_email", type="email", value=form.public_email.value() or "", errors=form.public_email.errors|join(', ') if form.public_email.errors else "") }}
+                </div>
+                {% if plan.show_public_email %}
+                <p class="text-xs text-textMuted -mt-2">Email is shown on your public listing ({{ plan.name }}).</p>
+                {% else %}
+                <p class="text-xs text-textMuted -mt-2">Email is saved for your records. Showing it on the public page unlocks on <strong>Pro+</strong>.</p>
+                {% endif %}
 
-    {{ card.render(title="Public Page Content", subtitle="This content appears on your business landing page.", content=form_content) }}
+                <div class="space-y-1">
+                    <label for="public_address" class="block text-sm font-medium text-textMain">Business address <span class="text-red-500">*</span></label>
+                    <textarea id="public_address" name="public_address" rows="2" required class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset {% if form.public_address.errors %}ring-red-500{% else %}ring-stone-300{% endif %} focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm">{{ form.public_address.value() or "" }}</textarea>
+                    {% if form.public_address.errors %}<p class="text-xs text-red-500 mt-1">{{ form.public_address.errors|join(', ') }}</p>{% endif %}
+                </div>
+
+                {% if website_enabled %}
+                {{ input.render("Website URL", "website_url", type="url", value=form.website_url.value() or "", placeholder="https://yourbusiness.com", errors=form.website_url.errors|join(', ') if form.website_url.errors else "") }}
+                <p class="text-xs text-textMuted -mt-2">Shown as a Website button on your public listing ({{ plan.name }}+).</p>
+                {% else %}
+                <div class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-3 text-sm text-textMuted">
+                    Website button unlocks on <strong>Pro</strong> and <strong>Premium</strong>.
+                    <a href="{% if dashboard_embed %}#{% else %}/auth/listing-plans/{% endif %}" {% if dashboard_embed %}hx-get="/auth/listing-plans/" hx-target="#main-content"{% endif %} class="font-semibold text-brand underline">Upgrade plan</a>
+                    to link your site.
+                </div>
+                <input type="hidden" name="website_url" value="{{ form.website_url.value() or business.website_url or '' }}">
+                {% endif %}
+
+                {# Keep other fields in POST so Alpine tab save still preserves them #}
+                <input type="hidden" name="hero_title" value="{{ form.hero_title.value() or '' }}">
+                <input type="hidden" name="hero_subtitle" value="{{ form.hero_subtitle.value() or '' }}">
+                <input type="hidden" name="hero_image_url" value="{{ form.hero_image_url.value() or '' }}">
+                <input type="hidden" name="map_embed_url" value="{{ form.map_embed_url.value() or '' }}">
+                <input type="hidden" name="testimonial_quote" value="{{ form.testimonial_quote.value() or '' }}">
+                <input type="hidden" name="testimonial_author" value="{{ form.testimonial_author.value() or '' }}">
+
+                {{ btn.render(type="submit", text="Save essentials & continue", cls="w-full justify-center") }}
+            </form>
+        {% endset %}
+        {{ card.render(title="Contact essentials", subtitle="Customers need these first to call or visit you.", content=form_content) }}
+    </div>
+
+    <div x-show="tab === 'hours'" x-cloak>
+        <div class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
+            <h3 class="text-lg font-semibold text-textMain">Opening hours</h3>
+            <p class="mt-1 mb-4 text-sm text-textMuted">Powers “Open now” on the directory. Defaults are Mon–Sat 10:00–19:00.</p>
+            {% include 'partials/_business_hours_editor.jinja' %}
+        </div>
+        {% if onboarding_mode %}
+        <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            Next: add priced services so customers can book online.
+            <a href="/catalog/services/" class="ml-1 font-semibold underline">Go to services →</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div x-show="tab === 'appearance'" x-cloak>
+        {% set appearance_content %}
+            <form
+                {% if dashboard_embed %}
+                hx-post="/auth/business-profile/"
+                hx-target="#main-content"
+                hx-swap="innerHTML"
+                {% else %}
+                method="post"
+                action="/auth/business-profile/{% if onboarding_mode %}?onboarding=1{% endif %}"
+                {% endif %}
+                class="space-y-4"
+            >
+                {% if not dashboard_embed %}
+                {{ csrf_input_html|safe }}
+                {% endif %}
+                <input type="hidden" name="name" value="{{ form.name.value() or business.name }}">
+                <input type="hidden" name="industry_type" value="{{ form.industry_type.value() or business.industry_type }}">
+                <input type="hidden" name="public_phone" value="{{ form.public_phone.value() or business.public_phone }}">
+                <input type="hidden" name="public_email" value="{{ form.public_email.value() or business.public_email }}">
+                <input type="hidden" name="public_address" value="{{ form.public_address.value() or business.public_address }}">
+                <input type="hidden" name="website_url" value="{{ form.website_url.value() or business.website_url or '' }}">
+                <input type="hidden" name="map_embed_url" value="{{ form.map_embed_url.value() or '' }}">
+                <input type="hidden" name="testimonial_quote" value="{{ form.testimonial_quote.value() or '' }}">
+                <input type="hidden" name="testimonial_author" value="{{ form.testimonial_author.value() or '' }}">
+
+                {{ input.render("Hero title", "hero_title", value=form.hero_title.value() or "") }}
+                <div class="space-y-1">
+                    <label for="hero_subtitle" class="block text-sm font-medium text-textMain">Hero subtitle</label>
+                    <textarea id="hero_subtitle" name="hero_subtitle" rows="3" class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm">{{ form.hero_subtitle.value() or "" }}</textarea>
+                </div>
+                {% if plan.custom_hero %}
+                {{ input.render("Hero image URL", "hero_image_url", type="url", value=form.hero_image_url.value() or "", placeholder="https://…") }}
+                <p class="text-xs text-textMuted -mt-2">Custom photo shows on your public page (Pro+).</p>
+                {% else %}
+                <div class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-3 text-sm text-textMuted">
+                    Custom hero image unlocks on <strong>Pro</strong> and <strong>Premium</strong>. Free listings use the default category photo.
+                    <a href="{% if dashboard_embed %}#{% else %}/auth/listing-plans/{% endif %}" {% if dashboard_embed %}hx-get="/auth/listing-plans/" hx-target="#main-content"{% endif %} class="font-semibold text-brand underline">Upgrade</a>
+                </div>
+                <input type="hidden" name="hero_image_url" value="{{ form.hero_image_url.value() or business.hero_image_url or '' }}">
+                {% endif %}
+                {{ btn.render(type="submit", text="Save appearance", cls="w-full justify-center") }}
+            </form>
+        {% endset %}
+        {{ card.render(title="Public appearance", subtitle="Shown at the top of your listing page.", content=appearance_content) }}
+    </div>
+
+    <div x-show="tab === 'trust'" x-cloak>
+        {% set trust_content %}
+            <form
+                {% if dashboard_embed %}
+                hx-post="/auth/business-profile/"
+                hx-target="#main-content"
+                hx-swap="innerHTML"
+                {% else %}
+                method="post"
+                action="/auth/business-profile/{% if onboarding_mode %}?onboarding=1{% endif %}"
+                {% endif %}
+                class="space-y-4"
+            >
+                {% if not dashboard_embed %}
+                {{ csrf_input_html|safe }}
+                {% endif %}
+                <input type="hidden" name="name" value="{{ form.name.value() or business.name }}">
+                <input type="hidden" name="industry_type" value="{{ form.industry_type.value() or business.industry_type }}">
+                <input type="hidden" name="public_phone" value="{{ form.public_phone.value() or business.public_phone }}">
+                <input type="hidden" name="public_email" value="{{ form.public_email.value() or business.public_email }}">
+                <input type="hidden" name="public_address" value="{{ form.public_address.value() or business.public_address }}">
+                <input type="hidden" name="website_url" value="{{ form.website_url.value() or business.website_url or '' }}">
+                <input type="hidden" name="hero_title" value="{{ form.hero_title.value() or '' }}">
+                <input type="hidden" name="hero_subtitle" value="{{ form.hero_subtitle.value() or '' }}">
+                <input type="hidden" name="hero_image_url" value="{{ form.hero_image_url.value() or '' }}">
+
+                {% if plan.show_map_embed or plan.show_testimonial %}
+                {% if plan.show_map_embed %}
+                {{ input.render("Google Map embed URL", "map_embed_url", type="url", value=form.map_embed_url.value() or "", placeholder="Optional iframe src URL") }}
+                {% else %}
+                <input type="hidden" name="map_embed_url" value="{{ form.map_embed_url.value() or business.map_embed_url or '' }}">
+                {% endif %}
+                {% if plan.show_testimonial %}
+                <div class="space-y-1">
+                    <label for="testimonial_quote" class="block text-sm font-medium text-textMain">Featured testimonial</label>
+                    <textarea id="testimonial_quote" name="testimonial_quote" rows="3" class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm">{{ form.testimonial_quote.value() or "" }}</textarea>
+                </div>
+                {{ input.render("Testimonial author", "testimonial_author", value=form.testimonial_author.value() or "") }}
+                {% else %}
+                <input type="hidden" name="testimonial_quote" value="{{ form.testimonial_quote.value() or business.testimonial_quote or '' }}">
+                <input type="hidden" name="testimonial_author" value="{{ form.testimonial_author.value() or business.testimonial_author or '' }}">
+                {% endif %}
+                {{ btn.render(type="submit", text="Save trust content", cls="w-full justify-center") }}
+                {% else %}
+                <input type="hidden" name="map_embed_url" value="{{ form.map_embed_url.value() or business.map_embed_url or '' }}">
+                <input type="hidden" name="testimonial_quote" value="{{ form.testimonial_quote.value() or business.testimonial_quote or '' }}">
+                <input type="hidden" name="testimonial_author" value="{{ form.testimonial_author.value() or business.testimonial_author or '' }}">
+                <div class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-3 text-sm text-textMuted">
+                    Map embed and customer testimonials unlock on <strong>Pro</strong> (₹999/yr) and <strong>Premium</strong>.
+                    <a href="{% if dashboard_embed %}#{% else %}/auth/listing-plans/{% endif %}" {% if dashboard_embed %}hx-get="/auth/listing-plans/" hx-target="#main-content"{% endif %} class="font-semibold text-brand underline">Upgrade plan</a>
+                    to build trust on your public page.
+                </div>
+                {% endif %}
+            </form>
+        {% endset %}
+        {{ card.render(title="Trust & map", subtitle="Pro+ — map embed and social proof on your public page.", content=trust_content) }}
+    </div>
 </div>

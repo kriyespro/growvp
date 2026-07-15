@@ -1,0 +1,65 @@
+{% extends 'control/base_control.jinja' %}
+
+{% block title %}Partners{% endblock %}
+{% block page_title %}Marketing partners{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+  <section class="rounded-xl border border-control-border bg-control-panel p-4">
+    <h2 class="text-sm font-semibold uppercase tracking-wide text-control-muted">Partners</h2>
+    <ul class="mt-4 space-y-3">
+      {% for p in partners %}
+      <li class="rounded-lg border border-control-border/80 p-3">
+        <p class="font-medium text-control-text">{{ p.email }}</p>
+        <p class="mt-1 text-xs text-control-muted">
+          Created {{ p.created_business_count }} · Assigned {{ p.assigned_business_count }}
+        </p>
+        {% if p.assigned_businesses.all() %}
+        <ul class="mt-2 space-y-1 text-xs text-control-muted">
+          {% for b in p.assigned_businesses.all()[:8] %}
+          <li class="flex items-center justify-between gap-2">
+            <span>{{ b.name }}</span>
+            <form method="post" action="{{ url('control:partner_unassign') }}">
+              {{ csrf_field(request) }}
+              <input type="hidden" name="partner_id" value="{{ p.id }}">
+              <input type="hidden" name="business_id" value="{{ b.id }}">
+              <button type="submit" class="text-control-danger hover:underline">Unassign</button>
+            </form>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </li>
+      {% else %}
+      <li class="text-sm text-control-muted">No marketing partners yet.</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="rounded-xl border border-control-border bg-control-panel p-4">
+    <h2 class="text-sm font-semibold uppercase tracking-wide text-control-muted">Assign partner → business</h2>
+    <form method="post" action="{{ url('control:partner_assign') }}" class="mt-4 space-y-3">
+      {{ csrf_field(request) }}
+      <div>
+        <label class="text-xs text-control-muted">Partner</label>
+        <select name="partner_id" required class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+          <option value="">Select…</option>
+          {% for p in partners %}
+          <option value="{{ p.id }}">{{ p.email }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="text-xs text-control-muted">Business</label>
+        <select name="business_id" required class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+          <option value="">Select…</option>
+          {% for b in businesses %}
+          <option value="{{ b.id }}">{{ b.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="rounded-md bg-control-link px-4 py-2 text-sm font-semibold text-white">Assign</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

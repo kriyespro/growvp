@@ -31,19 +31,21 @@ def checkout_modal(request, appointment_id):
         }
     )
     
-    # Keep invoice totals aligned with service pricing changes.
-    fields_to_update = []
-    if invoice.subtotal != subtotal:
-        invoice.subtotal = subtotal
-        fields_to_update.append('subtotal')
-    if invoice.tax_amount != tax:
-        invoice.tax_amount = tax
-        fields_to_update.append('tax_amount')
-    if invoice.total_amount != total:
-        invoice.total_amount = total
-        fields_to_update.append('total_amount')
-    if fields_to_update:
-        invoice.save(update_fields=fields_to_update)
+    # Keep invoice totals aligned with service pricing changes, but never
+    # rewrite a paid invoice's amounts after the fact.
+    if invoice.status != 'paid':
+        fields_to_update = []
+        if invoice.subtotal != subtotal:
+            invoice.subtotal = subtotal
+            fields_to_update.append('subtotal')
+        if invoice.tax_amount != tax:
+            invoice.tax_amount = tax
+            fields_to_update.append('tax_amount')
+        if invoice.total_amount != total:
+            invoice.total_amount = total
+            fields_to_update.append('total_amount')
+        if fields_to_update:
+            invoice.save(update_fields=fields_to_update)
 
     if request.method == 'POST' and request.POST.get('mark_paid') == '1':
         invoice.status = 'paid'

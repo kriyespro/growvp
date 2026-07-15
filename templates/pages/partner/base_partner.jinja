@@ -1,0 +1,30 @@
+{% extends 'base.jinja' %}
+
+{% block title %}Partner dashboard | SuratBazar{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block site_footer %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-stone-50">
+  <header class="border-b border-stone-200 bg-white">
+    <div class="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-brand">Marketing partner</p>
+        <h1 class="font-display text-lg font-bold text-textMain">Partner dashboard</h1>
+      </div>
+      <div class="flex items-center gap-2 text-sm">
+        <a href="/" class="font-semibold text-textMuted hover:text-brand">Directory</a>
+        <a href="/auth/logout/" class="font-semibold text-brand">Logout</a>
+      </div>
+    </div>
+    <nav class="mx-auto flex max-w-5xl gap-1 overflow-x-auto px-4 pb-2 sm:px-6">
+      <a href="/partner/" class="rounded-md px-3 py-1.5 text-sm font-semibold {% if nav == 'home' %}bg-brand/10 text-brand{% else %}text-textMuted hover:bg-stone-100{% endif %}">Home</a>
+      <a href="/partner/listings/" class="rounded-md px-3 py-1.5 text-sm font-semibold {% if nav == 'listings' %}bg-brand/10 text-brand{% else %}text-textMuted hover:bg-stone-100{% endif %}">Listings</a>
+      <a href="/leads/" class="rounded-md px-3 py-1.5 text-sm font-semibold {% if nav == 'enquiries' %}bg-brand/10 text-brand{% else %}text-textMuted hover:bg-stone-100{% endif %}">Enquiries</a>
+    </nav>
+  </header>
+  <main class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+    {% block partner_content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

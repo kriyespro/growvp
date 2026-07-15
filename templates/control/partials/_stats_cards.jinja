@@ -1,0 +1,38 @@
+<div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+  <article class="rounded-xl border border-control-border bg-control-panel p-4">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-control-muted">Total users</p>
+    <p class="mt-2 font-mono text-2xl font-semibold text-control-text">{{ stats.total_users }}</p>
+  </article>
+  <article class="rounded-xl border border-control-border bg-control-panel p-4">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-control-muted">Revenue (paid)</p>
+    <p class="mt-2 font-mono text-2xl font-semibold text-control-accent">₹{{ stats.total_revenue }}</p>
+  </article>
+  <article class="rounded-xl border border-control-border bg-control-panel p-4">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-control-muted">Signups today</p>
+    <p class="mt-2 font-mono text-2xl font-semibold text-control-link">{{ stats.signups_today }}</p>
+  </article>
+  <article class="rounded-xl border border-control-border bg-control-panel p-4">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-control-muted">Active sessions</p>
+    <p class="mt-2 font-mono text-2xl font-semibold text-control-warn">{{ stats.active_sessions }}</p>
+  </article>
+  <article class="rounded-xl border border-control-border bg-control-panel p-4">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-control-muted">Businesses</p>
+    <p class="mt-2 font-mono text-xl font-semibold">{{ stats.total_businesses }}</p>
+    <p class="mt-1 text-[11px] text-control-muted">{{ stats.paid_businesses }} paid · {{ stats.trial_businesses }} trial</p>
+  </article>
+  <article class="rounded-xl border border-control-border bg-control-panel p-4">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-control-muted">Bookings</p>
+    <p class="mt-2 font-mono text-xl font-semibold">{{ stats.bookings_total }}</p>
+    <p class="mt-1 text-[11px] text-control-muted">{{ stats.bookings_today }} created today</p>
+  </article>
+  <article class="rounded-xl border border-control-border bg-control-panel p-4">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-control-muted">Partners</p>
+    <p class="mt-2 font-mono text-xl font-semibold">{{ stats.partners }}</p>
+    <p class="mt-1 text-[11px] text-control-muted">{{ stats.partner_created_listings }} created · {{ stats.partner_assigned_listings }} assigned</p>
+  </article>
+  <article class="rounded-xl border border-control-border bg-control-panel p-4">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-control-muted">Enquiries</p>
+    <p class="mt-2 font-mono text-xl font-semibold">{{ stats.enquiries_total }}</p>
+    <p class="mt-1 text-[11px] text-control-muted">{{ stats.enquiries_open }} open · {{ stats.clients }} clients</p>
+  </article>
+</div>

@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from billing.models import Invoice
 from booking.models import Appointment
-from catalog.models import BusinessHours, Service, ServiceCategory
+from catalog.models import BusinessHours, Product, Service, ServiceCategory
 from crm.models import Customer
 from users.models import Business, User, UserProfile
 
@@ -19,6 +19,7 @@ class Command(BaseCommand):
         admin_profile, provider_profile = self._create_users(business)
         categories = self._create_categories(business)
         services = self._create_services(categories)
+        self._create_products(business)
         customers = self._create_customers(business)
         self._create_business_hours(business)
         appointments = self._create_appointments(
@@ -31,7 +32,7 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS("Demo seed completed successfully."))
         self.stdout.write(
-            f"Business: {business.name} (/b/{business.slug}/)"
+            f"Business: {business.name} (/b/{business.slug}/) · plan={business.listing_plan}"
         )
         self.stdout.write("Admin login: demo.admin@test.com / test1234")
         self.stdout.write("Staff login: demo.staff@test.com / test1234")
@@ -50,9 +51,12 @@ class Command(BaseCommand):
                 "hero_subtitle": "Book trusted services in minutes and get timely reminders.",
                 "public_phone": "+91 98765 43210",
                 "public_email": "hello@demoglowstudio.com",
-                "public_address": "21 Business Avenue, Ahmedabad",
+                "public_address": "21 Business Avenue, Vesu, Surat",
                 "testimonial_quote": "Smooth booking and zero scheduling confusion.",
                 "testimonial_author": "Ritika Sharma",
+                "profile_setup_completed": True,
+                "listing_plan": "pro",
+                "website_url": "https://demoglow.example.test",
             },
         )
         return business
@@ -65,10 +69,12 @@ class Command(BaseCommand):
                 "first_name": "Demo",
                 "last_name": "Admin",
                 "is_active": True,
+                "platform_role": "business",
             },
         )
         admin_user.set_password("test1234")
-        admin_user.save(update_fields=["password"])
+        admin_user.platform_role = "business"
+        admin_user.save()
 
         provider_user, _ = User.objects.update_or_create(
             email="demo.staff@test.com",
@@ -77,10 +83,12 @@ class Command(BaseCommand):
                 "first_name": "Demo",
                 "last_name": "Stylist",
                 "is_active": True,
+                "platform_role": "business",
             },
         )
         provider_user.set_password("test1234")
-        provider_user.save(update_fields=["password"])
+        provider_user.platform_role = "business"
+        provider_user.save()
 
         admin_profile, _ = UserProfile.objects.update_or_create(
             user=admin_user,
@@ -98,6 +106,9 @@ class Command(BaseCommand):
                 "phone": "+91 90000 20000",
             },
         )
+        if not business.created_by_id:
+            business.created_by = admin_user
+            business.save(update_fields=["created_by"])
         return admin_profile, provider_profile
 
     def _create_categories(self, business):
@@ -135,6 +146,24 @@ class Command(BaseCommand):
             )
             services.append(service)
         return services
+
+    def _create_products(self, business):
+        specs = [
+            ("Glow Hair Serum", "Lightweight leave-in serum for daily shine.", "449.00"),
+            ("Salon Membership Card", "5 visits — priority booking + 10% off retail.", "2499.00"),
+            ("Keratin Care Kit", "At-home keratin maintenance pack.", "999.00"),
+        ]
+        for name, description, price in specs:
+            Product.objects.update_or_create(
+                business=business,
+                name=name,
+                defaults={
+                    "description": description,
+                    "price": Decimal(price),
+                    "is_active": True,
+                    "buy_url": "",
+                },
+            )
 
     def _create_customers(self, business):
         customer_specs = [

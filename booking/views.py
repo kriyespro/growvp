@@ -15,7 +15,11 @@ def calendar_view(request):
         return HttpResponse("Unauthorized", status=401)
         
     business = profile.business
-    appointments = Appointment.objects.filter(business=business).order_by('-date', '-start_time')
+    appointments = (
+        Appointment.objects.filter(business=business)
+        .select_related('customer', 'service')
+        .order_by('-date', '-start_time')
+    )
     
     if request.method == 'POST':
         form = AppointmentForm(request.POST, business=business)
@@ -36,6 +40,7 @@ def calendar_view(request):
 from users.models import Business
 from catalog.models import Service
 from crm.models import Customer
+from core.plans import plan_hides_platform_branding
 
 @ensure_csrf_cookie
 def public_booking(request, business_id):
@@ -95,12 +100,29 @@ def _public_booking(request, business):
                         end_time=end_dt.time(),
                         status='confirmed'
                     )
-                    return render(request, 'pages/public/booking_success.jinja', {'business': business})
+                    return render(
+                        request,
+                        'pages/public/booking_success.jinja',
+                        {
+                            'business': business,
+                            'hide_platform_branding': plan_hides_platform_branding(
+                                business.listing_plan
+                            ),
+                        },
+                    )
         else:
             error_message = "Please fill all required fields."
+
+    selected_service_id = request.GET.get('service') or request.POST.get('service')
+    try:
+        selected_service_id = int(selected_service_id) if selected_service_id else None
+    except (TypeError, ValueError):
+        selected_service_id = None
 
     return render(request, 'pages/public/booking.jinja', {
         'business': business,
         'services': services,
+        'selected_service_id': selected_service_id,
         'error_message': error_message,
+        'hide_platform_branding': plan_hides_platform_branding(business.listing_plan),
     })

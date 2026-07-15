@@ -2,21 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SaaS Appointment Engine{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>{% block title %}SuratBazar | Find & book local businesses{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Find and book trusted local businesses in Surat — salons, clinics, opticals, pet care and more. Compare prices, hours, and book online.{% endblock %}">
+    <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
+    <link rel="canonical" href="{% block canonical %}{% if request is defined %}{{ request.build_absolute_uri(request.path) }}{% else %}/{% endif %}{% endblock %}">
+
+    {# Open Graph #}
+    <meta property="og:site_name" content="SuratBazar">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ self.meta_description() }}{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ self.canonical() }}{% endblock %}">
+    <meta property="og:locale" content="en_IN">
+    {% block og_image %}{% endblock %}
+
+    {# Twitter #}
+    <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ self.title() }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ self.meta_description() }}{% endblock %}">
+
+    <meta name="theme-color" content="#b45309">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        display: ['Fraunces', 'Georgia', 'serif'],
+                    },
                     colors: {
-                        creameBg: '#FDFBF7', /* Soft cream background */
-                        creameSurface: '#FFFFFF', /* White cards */
-                        brand: '#b45309', /* amber-700 for a warm, premium feel */
-                        brandHover: '#92400e', /* amber-800 */
-                        textMain: '#292524', /* stone-800 */
-                        textMuted: '#78716c' /* stone-500 */
+                        creameBg: '#FDFBF7',
+                        creameSurface: '#FFFFFF',
+                        brand: '#b45309',
+                        brandHover: '#92400e',
+                        textMain: '#292524',
+                        textMuted: '#78716c'
                     }
                 }
             }
@@ -31,11 +57,55 @@
         .htmx-request .htmx-indicator { display: inline-block; }
         .htmx-request.htmx-indicator { display: inline-block; }
         [x-cloak] { display: none !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @media (max-width: 640px) {
+            input[type="search"],
+            input[type="text"],
+            input[type="email"],
+            input[type="password"],
+            input[type="url"],
+            input[type="tel"],
+            input[type="number"],
+            input[type="date"],
+            input[type="time"],
+            select,
+            textarea {
+                font-size: 16px !important;
+            }
+        }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+        .mb-safe { margin-bottom: env(safe-area-inset-bottom, 0px); }
     </style>
+    {% block json_ld %}{% endblock %}
     {% block head %}{% endblock %}
 </head>
-<body class="bg-creameBg text-textMain font-sans min-h-screen flex flex-col">
+<body class="bg-creameBg text-textMain font-sans min-h-screen flex flex-col antialiased">
+    {% if request is defined and request.session.get('_control_impersonator_id') %}
+    <div class="sticky top-0 z-50 flex flex-wrap items-center justify-between gap-2 border-b border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-900">
+      <span>Viewing as <strong>{{ request.user.email }}</strong> (staff impersonation)</span>
+      <form method="post" action="/admin/stop-impersonate/">
+        {{ csrf_field(request) }}
+        <button type="submit" class="rounded-md bg-amber-600 px-3 py-1 text-xs font-bold text-white hover:bg-amber-700">Exit impersonation</button>
+      </form>
+    </div>
+    {% endif %}
     <script>
+        window.SB_IMG_PLACEHOLDER = "{{ placeholder_image }}";
+        window.sbImgFallback = function (img) {
+            if (!img) return;
+            var queue = (img.dataset.fallbacks || "").split("|").filter(Boolean);
+            var next = queue.shift();
+            if (next && next !== img.src) {
+                img.dataset.fallbacks = queue.join("|");
+                img.src = next;
+                return;
+            }
+            img.onerror = null;
+            if (img.src !== window.SB_IMG_PLACEHOLDER) {
+                img.src = window.SB_IMG_PLACEHOLDER;
+            }
+        };
         document.body.addEventListener('htmx:configRequest', (event) => {
             let match = document.cookie.match(new RegExp('(^| )csrftoken=([^;]+)'));
             if (match) {
@@ -46,5 +116,8 @@
     <main class="flex-grow flex flex-col items-stretch">
         {% block content %}{% endblock %}
     </main>
+    {% block site_footer %}
+    {% include 'partials/_site_footer.jinja' %}
+    {% endblock %}
 </body>
 </html>

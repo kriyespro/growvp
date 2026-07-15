@@ -1,0 +1,26 @@
+{# Visual industry picker — requires hidden input name="industry_type" via radio #}
+<div class="space-y-4" x-data="{ industry: '{{ selected|default('') }}' }">
+  {% for group_label, choices in industry_groups %}
+  <div>
+    <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-textMuted">{{ group_label }}</p>
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      {% for value, label in choices %}
+      <label class="cursor-pointer">
+        <input
+          type="radio"
+          name="industry_type"
+          value="{{ value }}"
+          class="peer sr-only"
+          {% if selected == value %}checked{% endif %}
+          @change="industry = '{{ value }}'"
+          required
+        >
+        <span class="flex min-h-[2.75rem] items-center justify-center rounded-lg border border-stone-300 bg-white px-2 py-2 text-center text-[11px] font-semibold leading-tight text-textMuted transition peer-checked:border-brand peer-checked:bg-brand/10 peer-checked:text-brand sm:text-xs">
+          {{ label }}
+        </span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div>

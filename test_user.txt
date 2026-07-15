@@ -1,29 +1,33 @@
-# Admin Test Credentials
+# Password for all seeded accounts: test1234
+
+# Super admin → /admin/
 email: admin@test.com
-password: test1234
-role: Business Admin
 
-# Regular Staff Credentials
-email: staff@test.com
-password: test1234
-role: Service Provider
-business: Test Business
+# Marketing partners → /partner/
+email: partner01@test.com   # owns Partner Glow Studio + Partner Care Dental
+email: partner02@test.com   # owns Partner Fit Hub; assigned Aura Glow, PawPalace
+email: partner03@test.com   # assigned SmileCare + Demo Glow Studio
 
-# Notes
-- Credentials are seeded in local DB.
-- Login URL: /auth/login/
-- Run demo seed command: python manage.py seed_demo_data
+# Clients → /account/  (enquiries at /leads/)
+email: client01@test.com
+email: client02@test.com
+email: client03@test.com
 
-# Demo Business (created by seed_demo_data)
-business_name: Demo Glow Studio
-public_landing: /b/demo-glow-studio/
-
-# Demo Business Admin
+# Business → /dashboard/
 email: demo.admin@test.com
-password: test1234
-role: Business Admin
-
-# Demo Business Staff
 email: demo.staff@test.com
-password: test1234
-role: Service Provider
+# Directory businesses: seed01.admin@test.com … seed20.admin@test.com
+
+# Partner public pages
+# /b/partner-glow-studio/
+# /b/partner-care-dental/
+# /b/partner-fit-hub/
+
+# Re-seed
+#   ./venv/bin/python manage.py seed_demo_data
+#   ./venv/bin/python manage.py seed_directory_businesses
+#   ./venv/bin/python manage.py seed_roles
+#   ./venv/bin/python manage.py seed_roles --reset   # wipe partner/client seed users first
+
+# Django admin backup: /sd/
+# Mission Control: /admin/

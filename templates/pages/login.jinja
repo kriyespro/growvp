@@ -3,11 +3,18 @@
 {% import 'components/button.jinja' as btn %}
 {% import 'components/card.jinja' as card %}
 
+{% block title %}Sign in | SuratBazar{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block meta_description %}Sign in to your SuratBazar business, partner, or client account.{% endblock %}
+
 {% block content %}
 <div class="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
     <div class="w-full max-w-md space-y-8">
-        <div>
-            <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-textMain">Sign in to your dashboard</h2>
+        <div class="text-center">
+            {% set logo_height = 'h-16' %}
+            {% set logo_class = 'mx-auto inline-flex' %}
+            {% include 'partials/_brand_logo.jinja' %}
+            <h2 class="mt-6 text-center text-2xl font-bold tracking-tight text-textMain sm:text-3xl">Sign in to your dashboard</h2>
             <p class="mt-2 text-center text-sm text-textMuted">Manage bookings, customers, and payments.</p>
         </div>
 
@@ -22,6 +29,10 @@
             <div class="mt-6">
                 {{ btn.render(type="submit", text="Sign in", cls="w-full justify-center") }}
             </div>
+            <p class="text-center text-sm text-textMuted">
+                New here?
+                <a href="/auth/register/" class="font-semibold text-brand hover:text-brandHover">List your business</a>
+            </p>
         </form>
         {% endset %}
 

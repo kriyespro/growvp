@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'booking',
     'crm',
     'billing',
+    'control',
+    'leads',
 ]
 
 MIDDLEWARE = [
@@ -108,6 +110,31 @@ DATABASES = {
 database_url = os.getenv('DATABASE_URL', '').strip()
 if database_url:
     DATABASES['default'] = dj_database_url.parse(database_url, conn_max_age=600, ssl_require=False)
+
+
+# Cache
+# https://docs.djangoproject.com/en/4.2/topics/cache/
+# Local-memory by default (zero infra). Set REDIS_URL to switch to Redis
+# (requires the `redis` package) once traffic justifies a shared cache —
+# LocMemCache is per-process, so cache busts only clear the worker that
+# handled the write until the entry's TTL expires on other workers.
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'suratbazar-cache',
+    }
+}
+
+redis_url = os.getenv('REDIS_URL', '').strip()
+if redis_url:
+    CACHES['default'] = {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': redis_url,
+    }
+
+# How long a directory listing query result is cached for, in seconds.
+DIRECTORY_CACHE_TTL = int(os.getenv('DIRECTORY_CACHE_TTL', '60'))
 
 
 # Password validation
@@ -176,6 +203,9 @@ if not DEBUG:
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
+
+# Public site URL for canonical/OG/sitemap (set in production, e.g. https://suratbazar.com)
+SITE_URL = os.getenv('SITE_URL', '').rstrip('/')
 
 # Auth redirects
 LOGIN_URL = '/auth/login/'

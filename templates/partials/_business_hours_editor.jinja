@@ -1,0 +1,33 @@
+<div id="business-hours-editor" class="space-y-4">
+  {% if saved %}
+  <div class="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">Opening hours saved.</div>
+  {% endif %}
+  <form
+    hx-post="/catalog/hours/{% if onboarding_mode %}?onboarding=1{% endif %}"
+    hx-target="#business-hours-editor"
+    hx-swap="outerHTML"
+    class="space-y-3"
+  >
+    {{ csrf_field(request) }}
+    <ul class="divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white overflow-hidden">
+      {% for row in hours %}
+      <li class="grid grid-cols-1 gap-3 px-4 py-3 sm:grid-cols-[7rem_1fr] sm:items-center" x-data="{ closed: {{ 'true' if row.is_closed else 'false' }} }">
+        <p class="text-sm font-semibold text-textMain">{{ row.get_day_of_week_display() }}</p>
+        <div class="flex flex-wrap items-center gap-3">
+          <label class="inline-flex items-center gap-2 text-xs font-semibold text-textMuted">
+            <input type="hidden" name="day_{{ row.day_of_week }}_closed" :value="closed ? '1' : '0'">
+            <input type="checkbox" class="rounded border-stone-300 text-brand focus:ring-brand" x-model="closed">
+            Closed
+          </label>
+          <div class="flex items-center gap-2" x-show="!closed">
+            <input type="time" name="day_{{ row.day_of_week }}_start" value="{{ row.start_time.strftime('%H:%M') if row.start_time else '10:00' }}" class="rounded-md border-0 bg-stone-50 py-2 px-3 text-sm text-textMain ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-brand">
+            <span class="text-xs text-textMuted">to</span>
+            <input type="time" name="day_{{ row.day_of_week }}_end" value="{{ row.end_time.strftime('%H:%M') if row.end_time else '19:00' }}" class="rounded-md border-0 bg-stone-50 py-2 px-3 text-sm text-textMain ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-brand">
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    <button type="submit" class="inline-flex w-full items-center justify-center rounded-md bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brandHover sm:w-auto">Save hours</button>
+  </form>
+</div>

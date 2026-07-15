@@ -1,0 +1,18 @@
+{% if not enquiries %}
+<p class="rounded-xl border border-dashed border-stone-300 bg-white p-8 text-center text-textMuted">No enquiries yet.</p>
+{% else %}
+<ul class="divide-y divide-stone-200 overflow-hidden rounded-xl border border-stone-200 bg-white">
+  {% for e in enquiries %}
+  <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+    <div class="min-w-0">
+      <a href="/leads/{{ e.id }}/" class="font-semibold text-textMain hover:text-brand">{{ e.subject or ('Enquiry #' ~ e.id) }}</a>
+      <p class="truncate text-xs text-textMuted">
+        {{ e.business.name }} · {{ e.client.email }} · {{ e.get_status_display() }}
+        · {{ e.message_count if e.message_count is defined else '' }} msgs
+      </p>
+    </div>
+    <a href="/leads/{{ e.id }}/" class="text-sm font-semibold text-brand">Open</a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}

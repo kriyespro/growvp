@@ -4,6 +4,11 @@ from django.middleware.csrf import get_token
 from jinja2 import Environment
 from markupsafe import Markup
 
+from core.image_defaults import placeholder_image_url
+from core.category_icons import footer_category_columns, hero_category_items
+from users.industries import INDUSTRY_GROUPS
+
+
 def environment(**options):
     env = Environment(**options)
 
@@ -16,7 +21,11 @@ def environment(**options):
     env.globals.update({
         'static': static,
         'url': reverse,
-        'csrf_input': csrf_input,
-        'csrf_token': csrf_token,
+        'csrf_field': csrf_input,
+        'csrf_token_value': csrf_token,
+        'industry_groups': INDUSTRY_GROUPS,
+        'hero_categories': hero_category_items(),
+        'footer_category_columns': footer_category_columns(),
+        'placeholder_image': placeholder_image_url(),
     })
     return env

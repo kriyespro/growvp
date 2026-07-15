@@ -1,0 +1,46 @@
+{% extends 'control/base_control.jinja' %}
+
+{% block title %}Users{% endblock %}
+{% block page_title %}User manager{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+  <form
+    class="flex flex-col gap-2 sm:flex-row sm:items-center"
+    hx-get="{{ url('control:users') }}"
+    hx-target="#user-rows"
+    hx-trigger="keyup changed delay:300ms from:#user-search, submit"
+    hx-indicator="#user-search-indicator"
+  >
+    <input
+      id="user-search"
+      type="search"
+      name="q"
+      value="{{ q or '' }}"
+      placeholder="Search email, name, business, phone…"
+      class="w-full rounded-md border border-control-border bg-control-panel px-3 py-2.5 text-sm text-control-text placeholder:text-control-muted focus:border-control-link focus:outline-none focus:ring-1 focus:ring-control-link sm:max-w-md"
+      autocomplete="off"
+    >
+    <span id="user-search-indicator" class="htmx-indicator text-xs text-control-muted">Searching…</span>
+  </form>
+
+  <div class="overflow-hidden rounded-xl border border-control-border bg-control-panel">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="border-b border-control-border bg-control-bg/50 text-[11px] uppercase tracking-wide text-control-muted">
+          <tr>
+            <th class="px-4 py-3 font-semibold">User</th>
+            <th class="px-4 py-3 font-semibold">Business</th>
+            <th class="px-4 py-3 font-semibold">Status</th>
+            <th class="px-4 py-3 font-semibold">Joined</th>
+            <th class="px-4 py-3 font-semibold text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="user-rows">
+          {% include 'control/partials/_user_rows.jinja' %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

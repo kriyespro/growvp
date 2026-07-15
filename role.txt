@@ -1,0 +1,15 @@
+role
+
+super_admin — Mission Control at /admin/
+  Sales (paid revenue, bookings), listing stats, partner stats, users, ban, impersonate, assign partners.
+
+marketing_partner — /partner/
+  Create listings (created_by) and manage assigned listings; enquiry inbox + replies.
+
+business — /dashboard/
+  Own listing: services, products, bookings, CRM, plans, enquiries.
+
+client — /account/
+  Register/login, send enquiry on a listing, message history in /leads/.
+
+Shop staff roles (admin/receptionist/provider) stay inside UserProfile for a Business — not platform roles.

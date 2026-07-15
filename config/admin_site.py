@@ -1,14 +1,14 @@
 from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count, Sum
+from django.db.models import Count, DecimalField, Sum, Value
 from django.db.models.functions import Coalesce
 
 
 class SuperuserAdminSite(AdminSite):
-    site_header = 'Grow Vyapaar Super Admin'
-    site_title = 'Grow Vyapaar Admin'
-    index_title = 'Platform Control Center'
+    site_header = 'SuratBazar Django Admin'
+    site_title = 'SuratBazar /sd'
+    index_title = 'Backup admin panel'
     index_template = 'admin/custom_index.html'
 
     def has_permission(self, request):
@@ -35,7 +35,10 @@ class SuperuserAdminSite(AdminSite):
         total_businesses = Business.objects.count()
         total_bookings = Appointment.objects.count()
         total_revenue = Invoice.objects.filter(status='paid').aggregate(
-            total=Coalesce(Sum('total_amount'), 0)
+            total=Coalesce(
+                Sum('total_amount'),
+                Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
+            )
         )['total']
         paid_businesses = Invoice.objects.filter(status='paid').aggregate(
             count=Count('business', distinct=True)

@@ -1,0 +1,12 @@
+<div class="space-y-4">
+  <div class="flex flex-col gap-1 border-b border-stone-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-textMain">Enquiries</h2>
+      <p class="mt-1 text-sm text-textMuted">
+        Messages from customers about your listing and products.
+      </p>
+    </div>
+    <p class="text-sm font-semibold text-textMuted">{{ enquiries|length }} total</p>
+  </div>
+  {% include 'partials/_enquiry_inbox.jinja' %}
+</div>

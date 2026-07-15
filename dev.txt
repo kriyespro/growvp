@@ -1,19 +1,51 @@
 # In Progress
-- Manual QA and production deployment prep
+- Manual QA multi-role dashboards
+
+# Completed (latest)
+- [DONE] Production ready: .env.prod (suratbazar.online, port 8998, IP 159.195.52.197),
+  docker-compose bind 127.0.0.1:8998, depoly.txt Nginx+SSL notes
+
+- [DONE] Perf: cached list_directory_businesses() (config.CACHES, LocMemCache
+  by default, REDIS_URL env to switch backend). Versioned cache key via
+  bust_directory_cache(), called from business profile/plan/services/hours
+  writes. DIRECTORY_CACHE_TTL setting (default 60s).
+- [DONE] Perf: fixed N+1s — booking calendar_view select_related, partners
+  admin list annotate+prefetch, businesses admin list count()->|length.
+  Deduped get_similar_businesses from re-running the full directory query.
+- [DONE] Bug fix: billing/checkout_modal no longer resyncs invoice totals to
+  current service price once invoice.status == 'paid' (GET-triggered price
+  overwrite on a paid invoice). Added regression test.
+
+- [DONE] Brand logo (transparent PNG) in header/footer — static/img/logo*.png
+
+- [DONE] Home category SVG icon strip + shared 4-column category footer on public pages
+
+- [DONE] Products + product enquiry on public listings; dashboard Products/Enquiries
+  panels visible; Demo Glow upgraded to Pro with sample products; Enquire CTA per product
+
+- [DONE] Programmatic SEO: /surat/ hub, /surat/<industry>/, /surat/<industry>/<area>/ —
+  collection meta + ItemList/Breadcrumb JSON-LD, sitemap + robots Allow,
+  home + listing internal links
+
+- [DONE] Bug fix: billing/checkout_modal no longer resyncs invoice totals to
+  current service price once invoice.status == 'paid' (GET-triggered price
+  overwrite on a paid invoice). Added regression test.
+
+- [DONE] SEO: meta/OG/canonical, LocalBusiness JSON-LD, robots.txt, sitemap.xml, noindex on private dashboards
+- [DONE] Seeded roles: seed_roles (+ demo + directory) — partners/clients/enquiries/assignments
+- [DONE] Multi-role marketplace: platform_role, partner/client/business/super_admin dashboards, enquiries
+- [DONE] Applied users.0007 + leads.0001; admin@test.com → super_admin
+- [DONE] Applied control.0001_admin_log; promoted admin@test.com to staff+superuser
+- [DONE] Mission Control app at /admin/ (dashboard, users, activity, ban/unban, impersonate)
+- [DONE] Django default admin kept as backup at /sd/
+
+- [DONE] Expanded Pro/Premium unlocks: map, testimonial, public email, share tools, custom hero, featured-service limits, card styles, hide branding
+- [DONE] Applied users.0006 + catalog.0005 (listing_plan, website_url, Product)
+- [DONE] Re-seeded directory with Free/Pro/Premium + sample products
 
 # Completed
 - Phase 1 initialization
 - Scaffolding apps and models
-- Added public booking validation for malformed date/time inputs
-- Added booking overlap guard to prevent double-booking slots
-- Added internal calendar overlap and time-range validation via AppointmentForm
-- Added unauthorized profile guard in billing checkout view
-- Added missing login page template for auth flow
-- Added secure login redirect validation to block unsafe external next URLs
-- Added CRM customer de-duplication by phone at business scope
-- Added invoice total synchronization and guarded mark-paid handling in checkout
-- Added service form validation for non-negative price and positive duration
-- Added regression tests for booking, catalog, users, CRM, and billing flows
-- Applied environment-based security defaults in settings
-- Verified deploy checks are clean with DJANGO_DEBUG=False
-- Seeded deterministic test credentials in local database
+- [DONE] Home page directory + listing UX
+- [DONE] Product listings + listing plans + pricing
+- [DONE] Mission Control + multi-role auth/dashboards/enquiries

@@ -1,0 +1,47 @@
+{% extends 'pages/partner/base_partner.jinja' %}
+{% import 'components/input.jinja' as input %}
+{% import 'components/button.jinja' as btn %}
+
+{% block partner_content %}
+<a href="/partner/listings/" class="text-sm font-semibold text-brand">← Listings</a>
+<div class="mt-3 flex flex-wrap items-center justify-between gap-2">
+  <h2 class="font-display text-2xl font-bold text-textMain">Edit {{ business.name }}</h2>
+  <a href="/b/{{ business.slug }}/" class="text-sm font-semibold text-brand">Public page ↗</a>
+</div>
+{% if saved %}
+<div class="mt-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">Saved.</div>
+{% endif %}
+<form method="post" class="mt-6 max-w-2xl space-y-4 rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
+  {{ csrf_field(request) }}
+  {{ input.render("Name", "name", required=True, value=form.name.value() or "") }}
+  <div class="space-y-1">
+    <label class="block text-sm font-medium">Category</label>
+    <select name="industry_type" class="block w-full rounded-md border-0 py-2.5 px-4 text-sm ring-1 ring-inset ring-stone-300">
+      {% for value, label in form.fields.industry_type.choices %}
+      <option value="{{ value }}" {% if form.industry_type.value() == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  {{ input.render("Hero title", "hero_title", value=form.hero_title.value() or "") }}
+  <div class="space-y-1">
+    <label class="block text-sm font-medium">Hero subtitle</label>
+    <textarea name="hero_subtitle" rows="2" class="block w-full rounded-md border-0 py-2.5 px-4 text-sm ring-1 ring-inset ring-stone-300">{{ form.hero_subtitle.value() or "" }}</textarea>
+  </div>
+  {{ input.render("Public phone", "public_phone", value=form.public_phone.value() or "") }}
+  {{ input.render("Public email", "public_email", type="email", value=form.public_email.value() or "") }}
+  <div class="space-y-1">
+    <label class="block text-sm font-medium">Address</label>
+    <textarea name="public_address" rows="2" class="block w-full rounded-md border-0 py-2.5 px-4 text-sm ring-1 ring-inset ring-stone-300">{{ form.public_address.value() or "" }}</textarea>
+  </div>
+  {% if website_enabled %}
+  {{ input.render("Website URL", "website_url", type="url", value=form.website_url.value() or "") }}
+  {% else %}
+  <input type="hidden" name="website_url" value="{{ form.website_url.value() or business.website_url or '' }}">
+  {% endif %}
+  <input type="hidden" name="hero_image_url" value="{{ form.hero_image_url.value() or '' }}">
+  <input type="hidden" name="map_embed_url" value="{{ form.map_embed_url.value() or '' }}">
+  <input type="hidden" name="testimonial_quote" value="{{ form.testimonial_quote.value() or '' }}">
+  <input type="hidden" name="testimonial_author" value="{{ form.testimonial_author.value() or '' }}">
+  {{ btn.render(type="submit", text="Save listing", cls="justify-center") }}
+</form>
+{% endblock %}

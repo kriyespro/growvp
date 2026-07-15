@@ -1,0 +1,63 @@
+{% extends 'control/base_control.jinja' %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div
+    id="control-stats"
+    hx-get="{{ url('control:stats_partial') }}"
+    hx-trigger="every 30s"
+    hx-swap="innerHTML"
+  >
+    {% include 'control/partials/_stats_cards.jinja' %}
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+    <section class="rounded-xl border border-control-border bg-control-panel p-4 sm:p-5">
+      <div class="mb-4 flex items-center justify-between gap-3">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-control-muted">Quick links</h2>
+      </div>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <a href="{{ url('control:users') }}" class="rounded-lg border border-control-border bg-control-bg/40 p-4 hover:border-control-link/50">
+          <p class="text-sm font-semibold text-control-text">User manager</p>
+          <p class="mt-1 text-xs text-control-muted">Search, ban, impersonate</p>
+        </a>
+        <a href="{{ url('control:partners') }}" class="rounded-lg border border-control-border bg-control-bg/40 p-4 hover:border-control-link/50">
+          <p class="text-sm font-semibold text-control-text">Partners</p>
+          <p class="mt-1 text-xs text-control-muted">Assign marketing partners</p>
+        </a>
+        <a href="{{ url('control:businesses') }}" class="rounded-lg border border-control-border bg-control-bg/40 p-4 hover:border-control-link/50">
+          <p class="text-sm font-semibold text-control-text">Listings</p>
+          <p class="mt-1 text-xs text-control-muted">All business listings</p>
+        </a>
+      </div>
+      <div class="mt-5 grid grid-cols-3 gap-3 text-center">
+        <div class="rounded-lg border border-control-border p-3">
+          <p class="font-mono text-lg font-semibold text-control-muted">{{ stats.plan_free }}</p>
+          <p class="text-[11px] uppercase tracking-wide text-control-muted">Free</p>
+        </div>
+        <div class="rounded-lg border border-control-border p-3">
+          <p class="font-mono text-lg font-semibold text-control-link">{{ stats.plan_pro }}</p>
+          <p class="text-[11px] uppercase tracking-wide text-control-muted">Pro</p>
+        </div>
+        <div class="rounded-lg border border-control-border p-3">
+          <p class="font-mono text-lg font-semibold text-control-warn">{{ stats.plan_premium }}</p>
+          <p class="text-[11px] uppercase tracking-wide text-control-muted">Premium</p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="rounded-xl border border-control-border bg-control-panel p-4 sm:p-5"
+      hx-get="{{ url('control:activity_partial') }}"
+      hx-trigger="every 30s"
+      hx-swap="innerHTML"
+    >
+      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-control-muted">Live activity</h2>
+      {% include 'control/partials/_activity_feed.jinja' %}
+    </section>
+  </div>
+</div>
+{% endblock %}

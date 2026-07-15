@@ -1,0 +1,17 @@
+{# Home hero: category icon strip (replaces headline + tagline) #}
+<nav aria-label="Browse by category" class="w-full">
+  <h1 class="sr-only">SuratBazar — find &amp; book local businesses in Surat</h1>
+  <div class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x snap-mandatory sm:mx-0 sm:grid sm:grid-cols-6 sm:gap-3 sm:overflow-visible lg:grid-cols-12">
+    {% for item in hero_categories %}
+    <a
+      href="{{ item.path }}"
+      class="snap-start flex w-[4.5rem] shrink-0 flex-col items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-1.5 py-2.5 text-center shadow-sm transition hover:border-brand/40 hover:bg-brand/5 sm:w-auto"
+    >
+      <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-orange-50 text-brand">
+        {{ item.icon|safe }}
+      </span>
+      <span class="text-[11px] font-semibold leading-tight text-textMain">{{ item.label }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</nav>

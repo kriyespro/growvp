@@ -1,0 +1,22 @@
+{% extends 'base.jinja' %}
+
+{% block title %}Listing Plans | {{ business.name }}{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block site_footer %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-stone-50">
+    <header class="border-b border-stone-200 bg-white/95 backdrop-blur">
+        <div class="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+            <h1 class="text-base font-semibold text-textMain sm:text-lg">{{ business.name }}</h1>
+            <a href="/dashboard/" class="text-sm font-semibold text-brand hover:text-brandHover">Back to Dashboard</a>
+        </div>
+    </header>
+
+    <section class="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <div class="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm sm:p-6">
+            {% include 'partials/_listing_plans.jinja' %}
+        </div>
+    </section>
+</div>
+{% endblock %}

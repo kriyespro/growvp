@@ -1,0 +1,29 @@
+{% extends 'base.jinja' %}
+
+{% block title %}My account | SuratBazar{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block site_footer %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-stone-50">
+  <header class="border-b border-stone-200 bg-white">
+    <div class="mx-auto flex max-w-3xl items-center justify-between px-4 py-3 sm:px-6">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-brand">Client</p>
+        <h1 class="text-lg font-bold text-textMain">My account</h1>
+      </div>
+      <div class="flex gap-3 text-sm">
+        <a href="/" class="font-semibold text-textMuted hover:text-brand">Directory</a>
+        <a href="/auth/logout/" class="font-semibold text-brand">Logout</a>
+      </div>
+    </div>
+    <nav class="mx-auto flex max-w-3xl gap-1 px-4 pb-2 sm:px-6">
+      <a href="/account/" class="rounded-md px-3 py-1.5 text-sm font-semibold {% if nav == 'home' %}bg-brand/10 text-brand{% else %}text-textMuted{% endif %}">Home</a>
+      <a href="/leads/" class="rounded-md px-3 py-1.5 text-sm font-semibold {% if nav == 'enquiries' %}bg-brand/10 text-brand{% else %}text-textMuted{% endif %}">Enquiries</a>
+    </nav>
+  </header>
+  <main class="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+    {% block account_content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

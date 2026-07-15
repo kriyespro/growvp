@@ -1,0 +1,26 @@
+{# Usage: {% include 'partials/_brand_logo.jinja' %}
+   Optional: logo_height, logo_variant ('full'|'mark'), logo_class #}
+{% set _h = logo_height if logo_height is defined else 'h-11' %}
+{% set _v = logo_variant if logo_variant is defined else 'full' %}
+{% set _c = logo_class if logo_class is defined else 'inline-flex shrink-0 items-center' %}
+<a href="/" class="{{ _c }}" aria-label="SuratBazar home">
+  {% if _v == 'mark' %}
+  <img
+    src="{{ static('img/logo-mark.png') }}"
+    alt="SuratBazar"
+    class="{{ _h }} w-auto"
+    width="96"
+    height="94"
+    decoding="async"
+  >
+  {% else %}
+  <img
+    src="{{ static('img/logo-web.png') }}"
+    alt="SuratBazar"
+    class="{{ _h }} w-auto"
+    width="180"
+    height="100"
+    decoding="async"
+  >
+  {% endif %}
+</a>

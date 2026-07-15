@@ -3,14 +3,32 @@
 {% import 'components/button.jinja' as btn %}
 
 <div class="space-y-6">
-    <div class="flex items-center justify-between border-b border-stone-200 pb-4">
-        <h2 class="text-2xl font-bold text-textMain">Service Catalog</h2>
+    <div class="flex flex-col gap-2 border-b border-stone-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-2xl font-bold text-textMain">Service Catalog</h2>
+            <p class="mt-1 text-sm text-textMuted">
+                {{ plan.name }} plan —
+                {% if remaining_service_slots is none %}
+                Unlimited active services
+                {% else %}
+                {{ remaining_service_slots }} of {{ plan.service_limit }} service slots left
+                {% endif %}
+            </p>
+        </div>
         <div class="flex space-x-3">
             <button hx-get="/catalog/categories/" hx-target="#main-content" class="inline-flex items-center rounded-md bg-stone-100 px-3 py-2 text-sm font-medium text-textMain shadow-sm border border-stone-200 hover:bg-stone-200 transition-colors">
                 Manage Categories
             </button>
         </div>
     </div>
+
+    {% if not can_add_service and not editing_service %}
+    <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        Service limit reached on {{ plan.name }}.
+        <a href="#" hx-get="/auth/listing-plans/" hx-target="#main-content" class="font-semibold underline">Upgrade plan</a>
+        to add more bookable services.
+    </div>
+    {% endif %}
 
     <!-- Main List & Form Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -42,13 +60,7 @@
                                     <p class="text-xs text-textMuted mt-1">{{ service.description or '-' }}</p>
                                 </td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">
-                                    {% if service.image %}
-                                        <img src="{{ service.image.url }}" alt="{{ service.name }}" class="h-10 w-10 rounded object-cover border border-stone-200">
-                                    {% elif service.image_url %}
-                                        <img src="{{ service.image_url }}" alt="{{ service.name }}" class="h-10 w-10 rounded object-cover border border-stone-200">
-                                    {% else %}
-                                        <span class="text-xs text-stone-400">No image</span>
-                                    {% endif %}
+                                    <img src="{{ service.public_image_url }}" alt="{{ service.name }}" class="h-10 w-10 rounded object-cover border border-stone-200 bg-stone-100" data-fallbacks="{{ service.image_fallbacks }}" onerror="sbImgFallback(this)">
                                 </td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">{{ service.category.name }}</td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">{{ service.duration_mins }}m</td>
@@ -106,6 +118,9 @@
                             </div>
                         </div>
                     {% else %}
+                        {% if not can_add_service and not editing_service %}
+                        <p class="text-sm text-textMuted">Upgrade your plan to add another service.</p>
+                        {% else %}
                         <div class="space-y-1">
                             <label class="block text-sm font-medium text-textMain">Category</label>
                             <select name="category" required class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm sm:leading-6 appearance-none">
@@ -148,6 +163,7 @@
                                 Cancel Editing
                             </button>
                         </div>
+                        {% endif %}
                         {% endif %}
                     {% endif %}
                 </form>

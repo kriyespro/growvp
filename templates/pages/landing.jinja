@@ -1,224 +1,164 @@
 {% extends 'base.jinja' %}
 
-{% block title %}DurgaOS | Appointment & Revenue Platform{% endblock %}
+{% block title %}SuratBazar | Find & book local businesses in Surat{% endblock %}
+{% block meta_description %}Find and book salons, clinics, opticals, pet care and more in Surat. See hours, prices, and book appointments online on SuratBazar.{% endblock %}
+{% block canonical %}{{ canonical_url }}{% endblock %}
+{% block json_ld %}
+<script type="application/ld+json">{{ website_json_ld|safe }}</script>
+{% endblock %}
 
 {% block content %}
-<div class="bg-gradient-to-b from-amber-50/40 to-creameBg" x-data="{ mobileMenuOpen: false }">
-  <header class="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between">
-      <a href="/" class="text-lg font-bold tracking-tight text-textMain">DurgaOS</a>
+<div class="relative min-h-screen overflow-x-hidden" x-data="{ mobileMenuOpen: false }">
+  <div class="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(ellipse_at_top,_rgba(180,83,9,0.10),_transparent_60%),linear-gradient(180deg,#fff7ed_0%,#FDFBF7_85%)]"></div>
+
+  <header class="relative z-30 border-b border-stone-200/70 bg-white/80 backdrop-blur sticky top-0">
+    <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
+      {% set logo_height = 'h-12 sm:h-14' %}
+      {% include 'partials/_brand_logo.jinja' %}
       <button
-        class="inline-flex items-center justify-center rounded-md border border-stone-300 bg-white p-2 text-textMain md:hidden"
+        class="inline-flex items-center justify-center rounded-md border border-stone-300 bg-white px-3 py-1.5 text-xs font-semibold text-textMain md:hidden"
         @click="mobileMenuOpen = !mobileMenuOpen"
         type="button"
         aria-label="Toggle navigation"
       >
-        <span class="text-xs font-semibold">Menu</span>
+        Menu
       </button>
+      <nav class="hidden items-center gap-3 md:flex">
+        <a href="/surat/" class="text-sm font-semibold text-textMuted hover:text-brand">Surat guide</a>
+        <a href="/pricing/" class="text-sm font-semibold text-textMuted hover:text-brand">Pricing</a>
+        {% if request.user.is_authenticated %}
+          <a href="/dashboard/" class="rounded-md bg-brand px-3.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-brandHover">Dashboard</a>
+        {% else %}
+          <a href="/auth/login/" class="text-sm font-semibold text-textMain hover:text-brand">Sign in</a>
+          <a href="/auth/register/" class="rounded-md bg-brand px-3.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-brandHover">List your business</a>
+        {% endif %}
+      </nav>
     </div>
-    <nav class="hidden items-center gap-6 pt-4 md:flex md:pt-0">
-      <a href="#features" class="text-sm font-medium text-textMuted hover:text-textMain">Features</a>
-      <a href="#industries" class="text-sm font-medium text-textMuted hover:text-textMain">Industries</a>
-      <a href="#pricing" class="text-sm font-medium text-textMuted hover:text-textMain">Pricing</a>
-      <div class="ml-auto flex items-center gap-3">
-        <a href="/auth/login/" class="text-sm font-semibold text-textMain hover:text-brand">Sign in</a>
-        <a href="/auth/register/" class="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brandHover">Start free</a>
-      </div>
-    </nav>
-    <nav x-show="mobileMenuOpen" x-cloak class="mt-3 space-y-2 rounded-lg border border-stone-200 bg-white p-3 md:hidden">
-      <a href="#features" class="block rounded-md px-3 py-2 text-sm font-medium text-textMain hover:bg-stone-50">Features</a>
-      <a href="#industries" class="block rounded-md px-3 py-2 text-sm font-medium text-textMain hover:bg-stone-50">Industries</a>
-      <a href="#pricing" class="block rounded-md px-3 py-2 text-sm font-medium text-textMain hover:bg-stone-50">Pricing</a>
-      <div class="grid grid-cols-2 gap-2 pt-2">
-        <a href="/auth/login/" class="inline-flex items-center justify-center rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-textMain">Sign in</a>
-        <a href="/auth/register/" class="inline-flex items-center justify-center rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white">Start free</a>
+    <nav x-show="mobileMenuOpen" x-cloak class="border-t border-stone-200 bg-white px-4 py-3 md:hidden">
+      <div class="grid grid-cols-2 gap-2">
+        <a href="/surat/" class="col-span-2 inline-flex items-center justify-center rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-textMain">Surat guide</a>
+        <a href="/pricing/" class="col-span-2 inline-flex items-center justify-center rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-textMain">Pricing</a>
+        {% if request.user.is_authenticated %}
+          <a href="/dashboard/" class="col-span-2 inline-flex items-center justify-center rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white">Dashboard</a>
+        {% else %}
+          <a href="/auth/login/" class="inline-flex items-center justify-center rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-textMain">Sign in</a>
+          <a href="/auth/register/" class="inline-flex items-center justify-center rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white">List business</a>
+        {% endif %}
       </div>
     </nav>
   </header>
 
-  <section class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 pb-14 pt-8 sm:px-6 lg:grid-cols-2 lg:items-center lg:px-8 lg:pb-24 lg:pt-16">
-    <div>
-      <p class="inline-flex rounded-full border border-amber-200 bg-amber-100/70 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-800">Built for growth-first businesses</p>
-      <h1 class="mt-4 text-3xl font-bold tracking-tight text-textMain sm:text-5xl lg:text-6xl">Fill your calendar, reduce no-shows, and increase repeat revenue.</h1>
-      <p class="mt-5 max-w-xl text-base leading-7 text-textMuted sm:text-lg">
-        An all-in-one appointment operating system for salons, clinics, optical stores, and pet care teams.
-        Manage bookings, customers, reminders, billing, and service performance from one dashboard.
+  <section class="relative z-10 mx-auto w-full max-w-7xl px-4 pt-5 pb-4 sm:px-6 sm:pt-6 lg:px-8">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+      <div class="min-w-0 flex-1">
+        {% include 'partials/_category_icon_strip.jinja' %}
+      </div>
+      {% if stats %}
+      <p class="shrink-0 text-xs font-medium text-textMuted sm:pt-2 sm:text-right">
+        <span class="font-semibold text-textMain">{{ stats.total }}</span> listed
+        {% if stats.open_now %}<span class="text-stone-300">·</span> <span class="font-semibold text-green-700">{{ stats.open_now }}</span> open now{% endif %}
       </p>
-      <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <a href="/auth/register/" class="inline-flex w-full items-center justify-center rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brandHover sm:w-auto">Create your account</a>
-        <a href="/auth/login/" class="inline-flex w-full items-center justify-center rounded-md border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-textMain hover:bg-stone-50 sm:w-auto">View dashboard</a>
-      </div>
-      <div class="mt-8 grid max-w-lg grid-cols-3 gap-2 text-center sm:gap-3">
-        <div class="rounded-lg border border-stone-200 bg-white p-3">
-          <p class="text-lg font-bold text-textMain">30%</p>
-          <p class="text-xs text-textMuted">Fewer no-shows</p>
-        </div>
-        <div class="rounded-lg border border-stone-200 bg-white p-3">
-          <p class="text-lg font-bold text-textMain">2x</p>
-          <p class="text-xs text-textMuted">Faster bookings</p>
-        </div>
-        <div class="rounded-lg border border-stone-200 bg-white p-3">
-          <p class="text-lg font-bold text-textMain">15h</p>
-          <p class="text-xs text-textMuted">Saved weekly</p>
-        </div>
-      </div>
+      {% endif %}
     </div>
-    <div class="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-      <p class="text-sm font-semibold text-textMain">Today at a glance</p>
-      <div class="mt-4 space-y-3">
-        <div class="rounded-lg border border-stone-200 p-4">
-          <p class="text-sm font-semibold text-textMain">Bookings</p>
-          <p class="mt-1 text-2xl font-bold text-textMain">42</p>
-          <p class="text-xs text-green-700">+18% vs yesterday</p>
+
+    <form
+      id="directory-form"
+      class="mt-4 rounded-xl border border-stone-200 bg-white p-2.5 shadow-sm sm:p-3"
+      hx-get="/directory/search/"
+      hx-trigger="keyup changed delay:300ms from:#directory-q, change from:#directory-sort, change from:select[name='industry'], change from:input[name='availability'], change from:input[name='bookable'], change from:input[name='verified']"
+      hx-target="#directory-results"
+      hx-indicator="#directory-loading"
+      hx-push-url="true"
+    >
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <label class="relative block flex-1">
+          <span class="sr-only">Search businesses</span>
+          <input
+            id="directory-q"
+            type="search"
+            name="q"
+            value="{{ q }}"
+            placeholder="Search name, service, or area…"
+            class="w-full rounded-lg border border-stone-300 bg-white px-3.5 py-3 text-base text-textMain placeholder:text-stone-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm"
+            autocomplete="off"
+          >
+        </label>
+        <div class="grid grid-cols-2 gap-2 sm:contents">
+        <label class="sm:w-44">
+          <span class="sr-only">Category</span>
+          <select
+            name="industry"
+            class="w-full rounded-lg border border-stone-300 bg-white px-3.5 py-3 text-base text-textMain focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm"
+          >
+            <option value="" {% if not industry %}selected{% endif %}>All categories</option>
+            {% for group_label, group_choices in industry_groups %}
+            <optgroup label="{{ group_label }}">
+              {% for value, label in group_choices %}
+              <option value="{{ value }}" {% if industry == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </optgroup>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="sm:w-44">
+          <span class="sr-only">Sort</span>
+          <select
+            id="directory-sort"
+            name="sort"
+            class="w-full rounded-lg border border-stone-300 bg-white px-3.5 py-3 text-base text-textMain focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm"
+          >
+            <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+            <option value="popular" {% if sort == 'popular' %}selected{% endif %}>Most booked</option>
+            <option value="name" {% if sort == 'name' %}selected{% endif %}>Name A–Z</option>
+            <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: low → high</option>
+            <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: high → low</option>
+          </select>
+        </label>
         </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div class="rounded-lg border border-stone-200 p-4">
-            <p class="text-xs text-textMuted">Revenue</p>
-            <p class="mt-1 text-lg font-bold text-textMain">Rs 38,450</p>
-          </div>
-          <div class="rounded-lg border border-stone-200 p-4">
-            <p class="text-xs text-textMuted">Repeat Clients</p>
-            <p class="mt-1 text-lg font-bold text-textMain">67%</p>
-          </div>
+      </div>
+
+      <div class="mt-2.5 flex flex-wrap items-center gap-2">
+        <label class="cursor-pointer">
+          <input type="checkbox" name="availability" value="open" class="peer sr-only" {% if availability == 'open' %}checked{% endif %}>
+          <span class="inline-flex min-h-9 items-center rounded-md border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-textMuted peer-checked:border-green-600 peer-checked:bg-green-600 peer-checked:text-white">Open now</span>
+        </label>
+        <label class="cursor-pointer">
+          <input type="checkbox" name="bookable" value="1" class="peer sr-only" {% if bookable == '1' %}checked{% endif %}>
+          <span class="inline-flex min-h-9 items-center rounded-md border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-textMuted peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white">Book online</span>
+        </label>
+        <label class="cursor-pointer">
+          <input type="checkbox" name="verified" value="1" class="peer sr-only" {% if verified == '1' %}checked{% endif %}>
+          <span class="inline-flex min-h-9 items-center rounded-md border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-textMuted peer-checked:border-sky-700 peer-checked:bg-sky-700 peer-checked:text-white">Verified</span>
+        </label>
+        {% if q or industry or availability or bookable or verified or (sort and sort != 'newest') %}
+        <a href="/" class="ml-auto text-[11px] font-semibold text-brand hover:text-brandHover">Clear</a>
+        {% endif %}
+        <span id="directory-loading" class="htmx-indicator ml-auto text-[11px] font-medium text-brand sm:ml-2">Updating…</span>
+      </div>
+    </form>
+  </section>
+
+  <section class="relative z-10 mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:px-8" id="directory-results">
+    {% include 'partials/_business_directory_results.jinja' %}
+  </section>
+
+  {% if industry_hub_rows %}
+  <section class="relative z-10 border-t border-stone-200 bg-white">
+    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 class="font-display text-xl font-bold text-textMain">Browse Surat by category</h2>
+          <p class="mt-1 text-sm text-textMuted">Indexable guides for each industry — great for search.</p>
         </div>
-        <div class="rounded-lg border border-stone-200 p-4">
-          <p class="text-xs text-textMuted">Upcoming</p>
-          <ul class="mt-2 space-y-2 text-sm text-textMain">
-            <li class="flex items-center justify-between"><span>Hair spa - Neha</span><span>11:00</span></li>
-            <li class="flex items-center justify-between"><span>Dental follow-up - Raj</span><span>12:30</span></li>
-            <li class="flex items-center justify-between"><span>Pet grooming - Bruno</span><span>14:00</span></li>
-          </ul>
-        </div>
+        <a href="/surat/" class="text-sm font-semibold text-brand hover:text-brandHover">Full Surat guide →</a>
+      </div>
+      <div class="mt-5 flex flex-wrap gap-2">
+        {% for row in industry_hub_rows %}
+        <a href="{{ row.path }}" class="rounded-md border border-stone-200 bg-stone-50 px-3 py-1.5 text-xs font-semibold text-textMain hover:border-brand/40">{{ row.seo_label }} · {{ row.count }}</a>
+        {% endfor %}
       </div>
     </div>
   </section>
+  {% endif %}
 </div>
-
-<section class="border-y border-stone-200 bg-white/70">
-  <div class="mx-auto grid w-full max-w-7xl grid-cols-2 gap-4 px-4 py-6 text-center sm:grid-cols-4 sm:px-6 lg:px-8">
-    <p class="text-xs font-semibold uppercase tracking-wider text-textMuted">Salon Chains</p>
-    <p class="text-xs font-semibold uppercase tracking-wider text-textMuted">Dental Clinics</p>
-    <p class="text-xs font-semibold uppercase tracking-wider text-textMuted">Optical Stores</p>
-    <p class="text-xs font-semibold uppercase tracking-wider text-textMuted">Pet Care Studios</p>
-  </div>
-</section>
-
-<section id="features" class="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-  <div class="max-w-2xl">
-    <h2 class="text-3xl font-bold tracking-tight text-textMain sm:text-4xl">Everything needed to run a modern appointment business</h2>
-    <p class="mt-3 text-base text-textMuted">Start with the essentials that directly drive revenue and retention, then scale with automation.</p>
-  </div>
-  <div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-    <article class="rounded-xl border border-stone-200 bg-white p-5">
-      <h3 class="text-base font-semibold text-textMain">Smart Booking Calendar</h3>
-      <p class="mt-2 text-sm text-textMuted">Real-time slot visibility, walk-ins, and online scheduling in one workflow.</p>
-    </article>
-    <article class="rounded-xl border border-stone-200 bg-white p-5">
-      <h3 class="text-base font-semibold text-textMain">Customer CRM</h3>
-      <p class="mt-2 text-sm text-textMuted">Store customer preferences, notes, history, and rebooking activity.</p>
-    </article>
-    <article class="rounded-xl border border-stone-200 bg-white p-5">
-      <h3 class="text-base font-semibold text-textMain">Service & Category Catalog</h3>
-      <p class="mt-2 text-sm text-textMuted">Organize services by category, pricing, duration, and active status.</p>
-    </article>
-    <article class="rounded-xl border border-stone-200 bg-white p-5">
-      <h3 class="text-base font-semibold text-textMain">Billing & Checkout</h3>
-      <p class="mt-2 text-sm text-textMuted">Complete appointments quickly and issue professional invoices.</p>
-    </article>
-    <article class="rounded-xl border border-stone-200 bg-white p-5">
-      <h3 class="text-base font-semibold text-textMain">Automated Reminders</h3>
-      <p class="mt-2 text-sm text-textMuted">Reduce no-shows with timely reminders and follow-up notifications.</p>
-    </article>
-    <article class="rounded-xl border border-stone-200 bg-white p-5">
-      <h3 class="text-base font-semibold text-textMain">Revenue Insights</h3>
-      <p class="mt-2 text-sm text-textMuted">Track daily sales, service performance, and repeat-customer metrics.</p>
-    </article>
-  </div>
-</section>
-
-<section id="industries" class="border-y border-stone-200 bg-white">
-  <div class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
-    <article class="rounded-lg border border-stone-200 p-5">
-      <h3 class="text-sm font-semibold text-textMain">Salons & Parlours</h3>
-      <p class="mt-2 text-sm text-textMuted">Boost stylist utilization and drive package sales.</p>
-    </article>
-    <article class="rounded-lg border border-stone-200 p-5">
-      <h3 class="text-sm font-semibold text-textMain">Dental Clinics</h3>
-      <p class="mt-2 text-sm text-textMuted">Track follow-ups and keep patient queues predictable.</p>
-    </article>
-    <article class="rounded-lg border border-stone-200 p-5">
-      <h3 class="text-sm font-semibold text-textMain">Optical Stores</h3>
-      <p class="mt-2 text-sm text-textMuted">Manage consultation slots and order-ready communication.</p>
-    </article>
-    <article class="rounded-lg border border-stone-200 p-5">
-      <h3 class="text-sm font-semibold text-textMain">Pet Care</h3>
-      <p class="mt-2 text-sm text-textMuted">Coordinate grooming and recurring wellness visits.</p>
-    </article>
-  </div>
-</section>
-
-<section class="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-    <div class="rounded-xl border border-stone-200 bg-white p-6">
-      <p class="text-xs font-semibold uppercase tracking-wide text-brand">Step 1</p>
-      <h3 class="mt-2 text-lg font-semibold text-textMain">Set up your services</h3>
-      <p class="mt-2 text-sm text-textMuted">Create categories, define duration and pricing, and publish your booking-ready catalog.</p>
-    </div>
-    <div class="rounded-xl border border-stone-200 bg-white p-6">
-      <p class="text-xs font-semibold uppercase tracking-wide text-brand">Step 2</p>
-      <h3 class="mt-2 text-lg font-semibold text-textMain">Accept bookings everywhere</h3>
-      <p class="mt-2 text-sm text-textMuted">Handle walk-ins, phone calls, and online bookings in a single calendar with clear availability.</p>
-    </div>
-    <div class="rounded-xl border border-stone-200 bg-white p-6">
-      <p class="text-xs font-semibold uppercase tracking-wide text-brand">Step 3</p>
-      <h3 class="mt-2 text-lg font-semibold text-textMain">Convert visits into revenue</h3>
-      <p class="mt-2 text-sm text-textMuted">Use billing, follow-ups, and customer history to increase repeat bookings and average spend.</p>
-    </div>
-  </div>
-</section>
-
-<section id="pricing" class="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-  <div class="rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
-    <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-center">
-      <div>
-        <h2 class="text-3xl font-bold tracking-tight text-textMain">Launch quickly with a practical starter plan</h2>
-        <p class="mt-3 text-sm text-textMuted">Perfect for single-location teams. Add more branches as you grow.</p>
-        <ul class="mt-5 space-y-2 text-sm text-textMain">
-          <li>- Unlimited bookings and customer records</li>
-          <li>- Catalog, CRM, calendar, and billing workflows</li>
-          <li>- HTMX-powered fast dashboard experience</li>
-        </ul>
-      </div>
-      <div class="rounded-xl border border-amber-200 bg-amber-50/40 p-6">
-        <p class="text-sm font-medium text-textMuted">Starter</p>
-        <p class="mt-2 text-4xl font-bold text-textMain">Rs 999<span class="text-base font-medium text-textMuted">/month</span></p>
-        <p class="mt-2 text-sm text-textMuted">14-day free trial. No setup fees.</p>
-        <a href="/auth/register/" class="mt-5 inline-flex w-full items-center justify-center rounded-md bg-brand px-4 py-3 text-sm font-semibold text-white hover:bg-brandHover">Start free trial</a>
-      </div>
-    </div>
-  </div>
-  <footer class="mt-10 border-t border-stone-200 pt-6 text-center text-sm text-textMuted">
-    Built for high-performing service businesses.
-  </footer>
-</section>
-
-<section class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6 lg:px-8">
-  <div class="rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
-    <h2 class="text-2xl font-bold tracking-tight text-textMain sm:text-3xl">Frequently asked questions</h2>
-    <div class="mt-6 space-y-4">
-      <div class="rounded-lg border border-stone-200 p-4">
-        <h3 class="text-sm font-semibold text-textMain">Can I use this for multiple branches?</h3>
-        <p class="mt-1 text-sm text-textMuted">Yes. Start with one branch and scale to more locations as your operations grow.</p>
-      </div>
-      <div class="rounded-lg border border-stone-200 p-4">
-        <h3 class="text-sm font-semibold text-textMain">Will my team need training?</h3>
-        <p class="mt-1 text-sm text-textMuted">Most teams get comfortable in one day because booking, CRM, and billing are connected in a single workflow.</p>
-      </div>
-      <div class="rounded-lg border border-stone-200 p-4">
-        <h3 class="text-sm font-semibold text-textMain">Can I test everything before launch?</h3>
-        <p class="mt-1 text-sm text-textMuted">Yes. Use demo seed data to validate catalog, customer, booking, dashboard, and billing flows end-to-end.</p>
-      </div>
-    </div>
-  </div>
-</section>
 {% endblock %}

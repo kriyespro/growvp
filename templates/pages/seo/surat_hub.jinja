@@ -1,0 +1,70 @@
+{% extends 'base.jinja' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block canonical %}{{ canonical_url }}{% endblock %}
+{% block json_ld %}
+<script type="application/ld+json">{{ breadcrumb_json_ld|safe }}</script>
+<script type="application/ld+json">{{ collection_json_ld|safe }}</script>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-stone-50">
+  <header class="border-b border-stone-200 bg-white">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2 sm:px-6">
+      {% set logo_height = 'h-12' %}
+      {% include 'partials/_brand_logo.jinja' %}
+      <nav class="flex items-center gap-3 text-sm">
+        <a href="/surat/" class="font-semibold text-brand">Surat guide</a>
+        <a href="/pricing/" class="font-semibold text-textMuted hover:text-brand">Pricing</a>
+        <a href="/auth/register/" class="rounded-md bg-brand px-3 py-1.5 font-semibold text-white hover:bg-brandHover">List business</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <nav class="text-xs font-medium text-textMuted" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-brand">Home</a>
+      <span class="mx-1.5 text-stone-300">/</span>
+      <span class="text-textMain">Surat</span>
+    </nav>
+
+    <h1 class="mt-4 font-display text-3xl font-bold tracking-tight text-textMain sm:text-4xl">{{ h1 }}</h1>
+    <p class="mt-2 max-w-2xl text-sm text-textMuted sm:text-base">
+      {{ total_listings }} listings across {{ industries|length }} categories. Pick a category or area to find places you can call or book.
+    </p>
+
+    <section class="mt-10">
+      <h2 class="font-display text-xl font-bold text-textMain">Browse by category</h2>
+      <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {% for row in industries %}
+        <a href="{{ row.path }}" class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-brand/40">
+          <p class="font-semibold text-textMain">{{ row.seo_label }}</p>
+          <p class="mt-1 text-xs text-textMuted">{{ row.count }} listing{% if row.count != 1 %}s{% endif %} in Surat</p>
+        </a>
+        {% else %}
+        <p class="text-sm text-textMuted">No listings yet. <a href="/auth/register/" class="font-semibold text-brand">Add your business</a>.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    {% if areas %}
+    <section class="mt-12">
+      <h2 class="font-display text-xl font-bold text-textMain">Popular areas</h2>
+      <p class="mt-1 text-sm text-textMuted">Open a category first, then refine by neighbourhood.</p>
+      <div class="mt-4 flex flex-wrap gap-2">
+        {% for area in areas %}
+        <span class="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-textMain">{{ area.label }} · {{ area.count }}</span>
+        {% endfor %}
+      </div>
+      {% if industries %}
+      <p class="mt-4 text-sm text-textMuted">
+        Example:
+        <a class="font-semibold text-brand hover:underline" href="/surat/{{ industries[0].key }}/{{ areas[0].slug }}/">{{ industries[0].seo_label }} in {{ areas[0].label }}</a>
+      </p>
+      {% endif %}
+    </section>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

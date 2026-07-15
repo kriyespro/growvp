@@ -1,0 +1,36 @@
+<tr id="user-row-{{ user.id }}" class="border-b border-control-border/70 last:border-0">
+  <td class="px-4 py-3">
+    <a href="{{ url('control:user_detail', kwargs={'pk': user.id}) }}" class="font-medium text-control-link hover:underline">{{ user.email }}</a>
+    <p class="mt-0.5 text-xs text-control-muted">
+      {% if user.is_superuser %}Superuser{% elif user.is_staff %}Staff{% else %}User{% endif %}
+      {% if user.profile %} · {{ user.profile.get_role_display() }}{% endif %}
+    </p>
+  </td>
+  <td class="px-4 py-3 text-control-muted">
+    {% if user.profile %}{{ user.profile.business.name }}{% else %}—{% endif %}
+  </td>
+  <td class="px-4 py-3">
+    {% if user.is_active %}
+    <span class="inline-flex rounded bg-control-accent/15 px-2 py-0.5 text-[11px] font-semibold text-control-accent">Active</span>
+    {% else %}
+    <span class="inline-flex rounded bg-control-danger/15 px-2 py-0.5 text-[11px] font-semibold text-control-danger">Banned</span>
+    {% endif %}
+  </td>
+  <td class="px-4 py-3 font-mono text-xs text-control-muted">{{ user.date_joined.strftime('%Y-%m-%d') }}</td>
+  <td class="px-4 py-3 text-right">
+    <div class="inline-flex flex-wrap justify-end gap-1.5">
+      <a href="{{ url('control:user_detail', kwargs={'pk': user.id}) }}" class="rounded border border-control-border px-2 py-1 text-[11px] font-semibold text-control-muted hover:text-white">View</a>
+      {% if user.is_active and not user.is_superuser %}
+      <form method="post" action="{{ url('control:user_ban', kwargs={'pk': user.id}) }}" hx-post="{{ url('control:user_ban', kwargs={'pk': user.id}) }}" hx-target="#user-row-{{ user.id }}" hx-swap="outerHTML" class="inline">
+        {{ csrf_field(request) }}
+        <button type="submit" class="rounded border border-control-danger/40 px-2 py-1 text-[11px] font-semibold text-control-danger hover:bg-control-danger/10">Ban</button>
+      </form>
+      {% elif not user.is_active %}
+      <form method="post" action="{{ url('control:user_unban', kwargs={'pk': user.id}) }}" hx-post="{{ url('control:user_unban', kwargs={'pk': user.id}) }}" hx-target="#user-row-{{ user.id }}" hx-swap="outerHTML" class="inline">
+        {{ csrf_field(request) }}
+        <button type="submit" class="rounded border border-control-accent/40 px-2 py-1 text-[11px] font-semibold text-control-accent hover:bg-control-accent/10">Unban</button>
+      </form>
+      {% endif %}
+    </div>
+  </td>
+</tr>

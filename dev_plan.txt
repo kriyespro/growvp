@@ -20,3 +20,12 @@ Phase 5: Security and Quality (Completed)
 - Production deploy checks clean with DJANGO_DEBUG=False
 - Added regression tests for booking, catalog, auth, CRM, and billing
 - Seeded deterministic test users for manual QA
+
+Phase 6: Mission Control (Completed)
+- Custom ops panel at /admin/; Django admin at /sd/
+- AdminLog applied
+
+Phase 7: Multi-role marketplace (Completed)
+- platform_role: super_admin | marketing_partner | business | client
+- Partner create/assign listings; client enquiries + messaging
+- Role dashboards: /admin/, /partner/, /dashboard/, /account/

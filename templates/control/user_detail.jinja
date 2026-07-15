@@ -1,0 +1,86 @@
+{% extends 'control/base_control.jinja' %}
+
+{% block title %}{{ target.email }}{% endblock %}
+{% block page_title %}User detail{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-5">
+  <a href="{{ url('control:users') }}" class="text-sm font-medium text-control-link hover:underline">← Back to users</a>
+
+  <section class="rounded-xl border border-control-border bg-control-panel p-5">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-semibold text-control-text">{{ target.email }}</h2>
+        <p class="mt-1 text-sm text-control-muted">
+          {% if target.is_superuser %}Superuser{% elif target.is_staff %}Staff{% else %}User{% endif %}
+          · {{ target.get_platform_role_display() }}
+          · Joined {{ target.date_joined.strftime('%d %b %Y') }}
+        </p>
+        <p class="mt-2">
+          {% if target.is_active %}
+          <span class="inline-flex rounded bg-control-accent/15 px-2 py-0.5 text-xs font-semibold text-control-accent">Active</span>
+          {% else %}
+          <span class="inline-flex rounded bg-control-danger/15 px-2 py-0.5 text-xs font-semibold text-control-danger">Banned</span>
+          {% endif %}
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        {% if target.is_active and not target.is_superuser and target.id != request.user.id %}
+        <form method="post" action="{{ url('control:impersonate', kwargs={'pk': target.id}) }}">
+          {{ csrf_field(request) }}
+          <button type="submit" class="rounded-md bg-control-link px-3 py-2 text-xs font-semibold text-white hover:opacity-90">Impersonate</button>
+        </form>
+        <form method="post" action="{{ url('control:user_ban', kwargs={'pk': target.id}) }}">
+          {{ csrf_field(request) }}
+          <button type="submit" class="rounded-md border border-control-danger/50 px-3 py-2 text-xs font-semibold text-control-danger">Ban</button>
+        </form>
+        {% elif not target.is_active %}
+        <form method="post" action="{{ url('control:user_unban', kwargs={'pk': target.id}) }}">
+          {{ csrf_field(request) }}
+          <button type="submit" class="rounded-md border border-control-accent/50 px-3 py-2 text-xs font-semibold text-control-accent">Unban</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+
+    <dl class="mt-6 grid grid-cols-1 gap-4 border-t border-control-border pt-5 text-sm sm:grid-cols-2">
+      <div>
+        <dt class="text-control-muted">Username</dt>
+        <dd class="mt-1 font-medium">{{ target.username }}</dd>
+      </div>
+      <div>
+        <dt class="text-control-muted">Name</dt>
+        <dd class="mt-1 font-medium">{{ target.get_full_name() or '—' }}</dd>
+      </div>
+      {% if target.profile %}
+      <div>
+        <dt class="text-control-muted">Role</dt>
+        <dd class="mt-1 font-medium">{{ target.profile.get_role_display() }}</dd>
+      </div>
+      <div>
+        <dt class="text-control-muted">Phone</dt>
+        <dd class="mt-1 font-medium">{{ target.profile.phone or '—' }}</dd>
+      </div>
+      <div>
+        <dt class="text-control-muted">Business</dt>
+        <dd class="mt-1 font-medium">{{ target.profile.business.name }}</dd>
+      </div>
+      <div>
+        <dt class="text-control-muted">Listing plan</dt>
+        <dd class="mt-1 font-medium">{{ target.profile.business.plan_label }}</dd>
+      </div>
+      <div>
+        <dt class="text-control-muted">Public page</dt>
+        <dd class="mt-1">
+          <a href="/b/{{ target.profile.business.slug }}/" target="_blank" class="text-control-link hover:underline">/b/{{ target.profile.business.slug }}/</a>
+        </dd>
+      </div>
+      {% else %}
+      <div class="sm:col-span-2">
+        <p class="text-control-muted">No business profile linked.</p>
+      </div>
+      {% endif %}
+    </dl>
+  </section>
+</div>
+{% endblock %}

@@ -2,6 +2,10 @@
 {% import 'components/input.jinja' as input %}
 {% import 'components/button.jinja' as btn %}
 
+{% block title %}Book appointment — {{ business.name }} | SuratBazar{% endblock %}
+{% block meta_description %}Book an appointment online at {{ business.name }}. Choose a service, pick a time, and confirm in minutes.{% endblock %}
+{% block robots %}index, follow{% endblock %}
+
 {% block content %}
 <div class="min-h-screen bg-stone-50 flex flex-col justify-center py-8 px-4 pb-24 sm:py-12 sm:px-6 lg:px-8">
     <div class="mx-auto w-full max-w-xl">
@@ -26,7 +30,7 @@
                     <select name="service" required class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-brand sm:text-sm appearance-none">
                         <option value="">-- Choose a Service --</option>
                         {% for s in services %}
-                            <option value="{{ s.id }}">{{ s.name }} (₹{{ s.price }} - {{ s.duration_mins }}m)</option>
+                            <option value="{{ s.id }}" {% if selected_service_id == s.id %}selected{% endif %}>{{ s.name }} (₹{{ s.price }} - {{ s.duration_mins }}m)</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -44,7 +48,9 @@
                 </div>
             </form>
         </div>
-        <p class="text-center text-xs text-stone-400 mt-6">Powered by our SaaS Engine</p>
+        {% if not hide_platform_branding %}
+        <p class="text-center text-xs text-stone-400 mt-6">Booked via SuratBazar</p>
+        {% endif %}
     </div>
 </div>
 <nav class="sm:hidden fixed bottom-0 inset-x-0 z-30 border-t border-stone-200 bg-white/95 backdrop-blur">

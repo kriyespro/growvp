@@ -1,0 +1,16 @@
+plans/
+*.pyc
+__pycache__/
+**/__pycache__/
+db.sqlite3
+.env
+.env.prod
+.env.local
+.env.*.local
+venv/
+.venv/
+media/
+staticfiles/
+*.sqlite3
+.DS_Store
+*.log

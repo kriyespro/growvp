@@ -1,0 +1,59 @@
+{% if open_now_featured %}
+<section class="mb-5">
+  <div class="mb-2 flex items-center justify-between gap-3">
+    <h2 class="text-sm font-semibold text-textMain">Open right now</h2>
+  </div>
+  <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:snap-none sm:px-0">
+    {% for business in open_now_featured %}
+    <a href="/b/{{ business.slug }}/" class="w-[70%] max-w-[14rem] shrink-0 snap-start overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm transition hover:border-brand/40 sm:w-52 sm:max-w-none">
+      <div class="relative h-24 overflow-hidden bg-stone-100">
+        <img src="{{ business.public_hero_image_url }}" alt="" class="h-full w-full object-cover" loading="lazy" data-fallbacks="{{ business.image_fallbacks }}" onerror="sbImgFallback(this)">
+        <span class="absolute bottom-1.5 left-1.5 rounded bg-green-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">{{ business.today_label }}</span>
+      </div>
+      <div class="px-2.5 py-2">
+        <p class="truncate text-sm font-semibold text-textMain">{{ business.name }}</p>
+        <p class="mt-0.5 truncate text-[11px] text-textMuted">{{ business.area_label or business.get_industry_type_display() }}{% if business.price_range_label %} · {{ business.price_range_label }}{% endif %}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+  <p class="text-sm text-textMuted">
+    {% if result_count == 0 %}
+      No businesses found
+    {% elif result_count == 1 %}
+      <span class="font-semibold text-textMain">1</span> business
+    {% else %}
+      Showing <span class="font-semibold text-textMain">{{ result_count }}</span> businesses
+    {% endif %}
+    {% if q %} matching “{{ q }}”{% endif %}
+    {% if industry %}
+      {% for value, label in industries %}
+        {% if value == industry %}· {{ label }}{% endif %}
+      {% endfor %}
+    {% endif %}
+    {% if availability == 'open' %}· Open now{% endif %}
+    {% if bookable == '1' %}· Bookable{% endif %}
+    {% if verified == '1' %}· Verified{% endif %}
+  </p>
+</div>
+
+{% if not businesses %}
+  <div class="rounded-2xl border border-dashed border-stone-300 bg-white/80 px-6 py-14 text-center">
+    <p class="font-display text-xl font-bold text-textMain">No matching businesses</p>
+    <p class="mt-2 text-sm text-textMuted">Clear filters or try another search.</p>
+    <div class="mt-6 flex flex-wrap justify-center gap-3">
+      <a href="/" class="inline-flex rounded-md border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-textMain hover:bg-stone-50">Clear filters</a>
+      <a href="/auth/register/" class="inline-flex rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brandHover">List your business</a>
+    </div>
+  </div>
+{% else %}
+  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+    {% for business in businesses %}
+      {% include 'partials/_business_card.jinja' %}
+    {% endfor %}
+  </div>
+{% endif %}

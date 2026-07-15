@@ -1,116 +1,358 @@
 {% extends 'base.jinja' %}
 
-{% block title %}{{ business.name }} | Book Appointment{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block canonical %}{{ canonical_url }}{% endblock %}
+{% block og_type %}website{% endblock %}
+{% block og_image %}
+<meta property="og:image" content="{{ og_image_url }}">
+<meta name="twitter:image" content="{{ og_image_url }}">
+{% endblock %}
+{% block json_ld %}
+<script type="application/ld+json">{{ breadcrumb_json_ld|safe }}</script>
+<script type="application/ld+json">{{ local_business_json_ld|safe }}</script>
+{% endblock %}
 
 {% block content %}
-<div class="bg-stone-50 min-h-screen pb-20">
+<div class="bg-stone-50 min-h-screen pb-24" x-data="{ copied: false }">
   <header class="sticky top-0 z-30 border-b border-stone-200 bg-white/95 backdrop-blur">
-    <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-      <p class="truncate text-sm font-semibold text-textMain">{{ business.name }}</p>
-      <a href="/booking/{{ business.slug }}/" class="inline-flex items-center justify-center rounded-md bg-brand px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brandHover sm:text-sm">
-        Book Now
-      </a>
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <div class="min-w-0">
+        <nav class="flex flex-wrap items-center gap-x-1.5 text-[11px] font-semibold text-textMuted" aria-label="Breadcrumb">
+          <a href="/" class="hover:text-brand">Home</a>
+          <span class="text-stone-300">/</span>
+          <a href="/surat/" class="hover:text-brand">Surat</a>
+          {% if seo_industry %}
+          <span class="text-stone-300">/</span>
+          <a href="/surat/{{ seo_industry }}/" class="hover:text-brand">{{ seo_industry_label }}</a>
+          {% endif %}
+          {% if seo_area_label and seo_area_slug and seo_industry %}
+          <span class="text-stone-300">/</span>
+          <a href="/surat/{{ seo_industry }}/{{ seo_area_slug }}/" class="hover:text-brand">{{ seo_area_label }}</a>
+          {% endif %}
+        </nav>
+        <p class="truncate text-sm font-semibold text-textMain">{{ business.name }}</p>
+      </div>
+      <div class="flex shrink-0 items-center gap-2">
+        {% if can_show_share_tools %}
+        <button
+          type="button"
+          class="hidden rounded-md border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-textMain hover:bg-stone-50 sm:inline-flex"
+          @click="navigator.clipboard.writeText(window.location.href); copied = true; setTimeout(() => copied = false, 1800)"
+        >
+          <span x-text="copied ? 'Copied' : 'Share'"></span>
+        </button>
+        {% endif %}
+        {% if is_bookable %}
+        <a href="/booking/{{ business.slug }}/" class="inline-flex items-center justify-center rounded-md bg-brand px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brandHover sm:text-sm">
+          Book Now
+        </a>
+        {% elif business.public_phone %}
+        <a href="tel:{{ business.public_phone }}" class="inline-flex items-center justify-center rounded-md bg-brand px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brandHover sm:text-sm">
+          Call
+        </a>
+        {% endif %}
+      </div>
     </div>
   </header>
 
-  <section class="px-4 pt-8 pb-12 sm:px-6 sm:pt-14 sm:pb-16 lg:px-8 bg-gradient-to-b from-brand/10 to-stone-50">
-    <div class="mx-auto max-w-6xl text-center">
-      <div class="inline-flex items-center rounded-full bg-brand/10 px-3 py-1 text-xs sm:text-sm text-brand ring-1 ring-brand/20">
-        {{ business.get_industry_type_display() }}
+  <section class="relative min-h-[16rem] overflow-hidden bg-stone-900 sm:min-h-[26rem]">
+    <img src="{{ business.public_hero_image_url }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-45" aria-hidden="true" data-fallbacks="{{ business.image_fallbacks }}" onerror="sbImgFallback(this)">
+    <div class="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/55 to-stone-900/20"></div>
+    <div class="relative mx-auto flex h-full max-w-6xl flex-col justify-end px-4 pb-6 pt-12 sm:px-6 sm:pb-12 sm:pt-16 lg:px-8">
+      <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <span class="inline-flex rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white ring-1 ring-white/30 sm:px-3 sm:text-xs">{{ business.get_industry_type_display() }}</span>
+        {% if is_featured_listing %}<span class="inline-flex rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-semibold text-white sm:px-3 sm:text-xs">Featured</span>{% elif has_pro_badge %}<span class="inline-flex rounded-full bg-indigo-600 px-2.5 py-1 text-[11px] font-semibold text-white sm:px-3 sm:text-xs">Pro</span>{% endif %}
+        {% if is_verified %}<span class="inline-flex rounded-full bg-sky-600 px-2.5 py-1 text-[11px] font-semibold text-white sm:px-3 sm:text-xs">Verified</span>{% endif %}
+        {% if is_open_now %}
+        <span class="inline-flex rounded-full bg-green-600 px-2.5 py-1 text-[11px] font-semibold text-white sm:px-3 sm:text-xs">{{ today_label }}</span>
+        {% elif today_status == 'closed' %}
+        <span class="inline-flex rounded-full bg-stone-700 px-2.5 py-1 text-[11px] font-semibold text-white sm:px-3 sm:text-xs">Closed today</span>
+        {% endif %}
       </div>
-      <h1 class="mt-4 text-3xl font-bold tracking-tight text-textMain sm:mt-6 sm:text-5xl lg:text-6xl">{{ business.hero_title or business.name }}</h1>
-      <p class="mt-4 text-base leading-7 text-textMuted max-w-3xl mx-auto sm:mt-6 sm:text-lg sm:leading-8">
-        {{ business.hero_subtitle or "Book trusted services online with transparent pricing and quick slot confirmation." }}
+      <h1 class="mt-3 max-w-3xl font-display text-2xl font-bold tracking-tight text-white sm:mt-4 sm:text-5xl">{{ business.hero_title or business.name }}</h1>
+      <p class="mt-2 max-w-2xl text-sm text-stone-200 sm:mt-3 sm:text-lg">
+        {{ business.hero_subtitle or "Transparent pricing and quick online booking." }}
       </p>
-      <div class="mt-6 mx-auto max-w-4xl overflow-hidden rounded-xl sm:rounded-2xl border border-stone-200 shadow-sm bg-white">
-        <img src="{{ business.public_hero_image_url }}" alt="{{ business.name }}" class="h-44 w-full object-cover sm:h-64 lg:h-80">
-      </div>
-      <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-x-6">
-        <a href="/booking/{{ business.slug }}/" class="w-full sm:w-auto rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brandHover text-center">
-          Book Appointment
-        </a>
+      <p class="mt-3 line-clamp-2 text-xs font-medium text-stone-200 sm:mt-4 sm:text-sm">
+        {% if price_range_label %}{{ price_range_label }} · {% endif %}
+        {{ service_count }} service{% if service_count != 1 %}s{% endif %}
+        {% if business.public_address %} · {{ business.public_address }}{% endif %}
+      </p>
+      {# Desktop CTAs — mobile uses sticky bottom bar #}
+      <div class="mt-7 hidden flex-col gap-3 sm:flex sm:flex-row sm:flex-wrap">
+        {% if is_bookable %}
+        <a href="/booking/{{ business.slug }}/" class="inline-flex items-center justify-center rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brandHover">Book appointment</a>
+        {% endif %}
         {% if business.public_phone %}
-        <a href="tel:{{ business.public_phone }}" class="w-full sm:w-auto rounded-md border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-textMain hover:bg-stone-50 text-center">
-          Call Now
-        </a>
+        <a href="tel:{{ business.public_phone }}" class="inline-flex items-center justify-center rounded-md border border-white/35 bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20">Call</a>
+        {% endif %}
+        {% if whatsapp_url %}
+        <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-md bg-green-600 px-5 py-3 text-sm font-semibold text-white hover:bg-green-500">WhatsApp</a>
+        {% endif %}
+        {% if can_show_website and public_website_url %}
+        <a href="{{ public_website_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-md border border-white/35 bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20">Website</a>
+        {% endif %}
+        <a href="/leads/new/{{ business.slug }}/" class="inline-flex items-center justify-center rounded-md border border-white/35 bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20">Send enquiry</a>
+        {% if maps_directions_url %}
+        <a href="{{ maps_directions_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-md border border-white/35 bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20">Directions</a>
         {% endif %}
       </div>
     </div>
   </section>
 
-  <section id="contact-location" class="mx-auto max-w-6xl px-4 pb-14 sm:px-6 sm:pb-20 lg:px-8">
-    <div class="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
-      <h2 class="text-xl font-bold text-textMain sm:text-2xl">Services & Pricing</h2>
-      <a href="/booking/{{ business.slug }}/" class="text-sm font-semibold text-brand hover:text-brandHover">Book Now</a>
-    </div>
-    {% if not services %}
-      <div class="rounded-xl border border-stone-200 bg-white p-6 sm:p-8 text-center text-textMuted">
-        Services will be listed soon.
-      </div>
-    {% else %}
-      <div class="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {% for service in services %}
-          <article class="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
-            {% if service.image %}
-              <img src="{{ service.image.url }}" alt="{{ service.name }}" class="h-40 w-full object-cover sm:h-44">
-            {% elif service.image_url %}
-              <img src="{{ service.image_url }}" alt="{{ service.name }}" class="h-40 w-full object-cover sm:h-44">
-            {% else %}
-              <img src="{{ business.default_public_image_url }}" alt="{{ service.name }}" class="h-40 w-full object-cover sm:h-44">
+  <div class="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-10 lg:px-8 lg:py-12">
+    <div class="min-w-0 space-y-10">
+      {% if popular_services %}
+      <section>
+        <h2 class="font-display text-2xl font-bold text-textMain">Featured services</h2>
+        <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 {% if popular_services|length > 2 %}lg:grid-cols-3{% endif %}">
+          {% for service in popular_services %}
+          <article class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+            <div class="flex items-start justify-between gap-3">
+              <h3 class="font-semibold text-textMain">{{ service.name }}</h3>
+              <span class="shrink-0 font-bold text-brand">₹{{ service.price }}</span>
+            </div>
+            <p class="mt-1 text-xs text-textMuted">{{ service.category.name }} · {{ service.duration_mins }} mins</p>
+            {% if is_bookable %}
+            <a href="/booking/{{ business.slug }}/?service={{ service.id }}" class="mt-3 inline-flex text-sm font-semibold text-brand hover:text-brandHover">Book this</a>
             {% endif %}
-            <div class="p-4 sm:p-5">
-              <div class="flex items-start justify-between gap-3">
-                <h3 class="text-base sm:text-lg font-semibold text-textMain">{{ service.name }}</h3>
-                <span class="text-base font-bold text-brand">₹{{ service.price }}</span>
+          </article>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
+      <section id="services" x-data="{ tab: 0 }">
+        <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="font-display text-2xl font-bold text-textMain">All services</h2>
+            {% if min_duration is not none and max_duration is not none %}
+            <p class="mt-1 text-sm text-textMuted">
+              {% if min_duration == max_duration %}About {{ min_duration }} mins each{% else %}{{ min_duration }}–{{ max_duration }} mins{% endif %}
+            </p>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if not services %}
+          <div class="rounded-xl border border-stone-200 bg-white p-6 text-center text-textMuted">
+            Services will be listed soon.{% if business.public_phone %} Call to inquire.{% endif %}
+          </div>
+        {% else %}
+          {% if category_groups|length > 1 %}
+          <div class="mb-5 flex flex-wrap gap-2">
+            <button type="button" @click="tab = 0" :class="tab === 0 ? 'bg-brand text-white border-brand' : 'bg-white text-textMuted border-stone-300'" class="rounded-full border px-3 py-1.5 text-xs font-semibold">All</button>
+            {% for group in category_groups %}
+            <button type="button" @click="tab = {{ group.index }}" :class="tab === {{ group.index }} ? 'bg-brand text-white border-brand' : 'bg-white text-textMuted border-stone-300'" class="rounded-full border px-3 py-1.5 text-xs font-semibold">{{ group.name }}</button>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <div class="space-y-3">
+            {% for group in category_groups %}
+              {% for service in group.services %}
+              <article class="flex flex-col gap-3 rounded-xl border border-stone-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between" x-show="tab === 0 || tab === {{ group.index }}">
+                <div class="flex min-w-0 flex-1 gap-3">
+                  <img
+                    src="{{ service.public_image_url }}"
+                    alt="{{ service.name }}"
+                    class="h-16 w-20 shrink-0 rounded-lg object-cover bg-stone-100"
+                    loading="lazy"
+                    data-fallbacks="{{ service.image_fallbacks }}"
+                    onerror="sbImgFallback(this)"
+                  >
+                  <div class="min-w-0">
+                    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                      <h3 class="text-base font-semibold text-textMain">{{ service.name }}</h3>
+                      <span class="text-base font-bold text-brand">₹{{ service.price }}</span>
+                    </div>
+                    <p class="mt-1 text-xs text-textMuted">{{ service.category.name }} · {{ service.duration_mins }} mins</p>
+                    {% if service.description %}
+                    <p class="mt-2 text-sm text-textMuted">{{ service.description }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+                {% if is_bookable %}
+                <a href="/booking/{{ business.slug }}/?service={{ service.id }}" class="inline-flex shrink-0 items-center justify-center rounded-md bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-800">
+                  Choose slot
+                </a>
+                {% endif %}
+              </article>
+              {% endfor %}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </section>
+
+      {% if products %}
+      <section id="products">
+        <h2 class="font-display text-2xl font-bold text-textMain">Products</h2>
+        <p class="mt-1 text-sm text-textMuted">Shop items available from this business.</p>
+        <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {% for product in products %}
+          <article class="flex gap-3 overflow-hidden rounded-xl border border-stone-200 bg-white p-3 shadow-sm">
+            <img src="{{ product.public_image_url }}" alt="" class="h-20 w-24 shrink-0 rounded-lg object-cover bg-stone-100" loading="lazy" data-fallbacks="{{ product.image_fallbacks }}" onerror="sbImgFallback(this)">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-start justify-between gap-2">
+                <h3 class="font-semibold text-textMain">{{ product.name }}</h3>
+                <span class="shrink-0 font-bold text-brand">₹{{ product.price }}</span>
               </div>
-              <p class="mt-1 text-xs text-textMuted">{{ service.category.name }} • {{ service.duration_mins }} mins</p>
-              <p class="mt-3 text-sm text-textMuted">{{ service.description or "Professional service with quality care." }}</p>
-              <a href="/booking/{{ business.slug }}/" class="mt-4 inline-flex w-full sm:w-auto items-center justify-center rounded-md bg-stone-100 px-3 py-2 text-sm font-semibold text-textMain hover:bg-stone-200">
-                Choose Slot
-              </a>
+              {% if product.description %}
+              <p class="mt-1 line-clamp-2 text-xs text-textMuted">{{ product.description }}</p>
+              {% endif %}
+              <div class="mt-2 flex flex-wrap items-center gap-3">
+                <a href="/leads/new/{{ business.slug }}/?product={{ product.id }}" class="inline-flex text-sm font-semibold text-brand hover:text-brandHover">Enquire</a>
+                {% if product.buy_url %}
+                <a href="{{ product.buy_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex text-sm font-semibold text-textMuted hover:text-brand">View / buy</a>
+                {% endif %}
+              </div>
             </div>
           </article>
-        {% endfor %}
-      </div>
-    {% endif %}
-  </section>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
 
-  {% if business.testimonial_quote %}
-  <section class="mx-auto max-w-4xl px-4 pb-8 sm:px-6 sm:pb-10 lg:px-8">
-    <div class="rounded-xl sm:rounded-2xl bg-white border border-stone-200 p-5 sm:p-8 text-center shadow-sm">
-      <p class="text-base sm:text-lg text-textMain italic">"{{ business.testimonial_quote }}"</p>
-      {% if business.testimonial_author %}
-      <p class="mt-4 text-sm font-semibold text-brand">- {{ business.testimonial_author }}</p>
+      {% if can_show_testimonial %}
+      <section>
+        <div class="rounded-2xl border border-stone-200 bg-white p-6 text-center shadow-sm sm:p-8">
+          <p class="font-display text-lg text-textMain italic sm:text-xl">"{{ business.testimonial_quote }}"</p>
+          {% if business.testimonial_author %}
+          <p class="mt-4 text-sm font-semibold text-brand">— {{ business.testimonial_author }}</p>
+          {% endif %}
+        </div>
+      </section>
+      {% endif %}
+
+      {% if similar_businesses %}
+      <section>
+        <h2 class="font-display text-2xl font-bold text-textMain">More like this</h2>
+        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {% for item in similar_businesses %}
+          <a href="/b/{{ item.slug }}/" class="flex gap-3 overflow-hidden rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition hover:border-brand/30">
+            <img src="{{ item.public_hero_image_url }}" alt="" class="h-20 w-24 shrink-0 rounded-lg object-cover bg-stone-100" loading="lazy" data-fallbacks="{{ item.image_fallbacks }}" onerror="sbImgFallback(this)">
+            <div class="min-w-0">
+              <p class="truncate font-semibold text-textMain">{{ item.name }}</p>
+              <p class="mt-1 truncate text-xs text-textMuted">{{ item.area_label or item.get_industry_type_display() }}{% if item.price_range_label %} · {{ item.price_range_label }}{% endif %}</p>
+              {% if item.is_open_now %}<p class="mt-1 text-xs font-semibold text-green-700">Open now</p>{% endif %}
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+      </section>
       {% endif %}
     </div>
-  </section>
-  {% endif %}
 
-  {% if business.public_phone or business.public_email or business.public_address or business.map_embed_url %}
-  <section class="mx-auto max-w-6xl px-4 pb-14 sm:px-6 sm:pb-20 lg:px-8">
-    <div class="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-      <div class="rounded-xl sm:rounded-2xl bg-white border border-stone-200 p-5 sm:p-6 shadow-sm">
-        <h3 class="text-lg sm:text-xl font-bold text-textMain mb-4">Contact & Location</h3>
-        {% if business.public_phone %}<p class="text-sm text-textMuted mb-2"><span class="font-semibold text-textMain">Phone:</span> <a class="hover:text-brand" href="tel:{{ business.public_phone }}">{{ business.public_phone }}</a></p>{% endif %}
-        {% if business.public_email %}<p class="text-sm text-textMuted mb-2"><span class="font-semibold text-textMain">Email:</span> <a class="hover:text-brand" href="mailto:{{ business.public_email }}">{{ business.public_email }}</a></p>{% endif %}
-        {% if business.public_address %}<p class="text-sm text-textMuted"><span class="font-semibold text-textMain">Address:</span> {{ business.public_address }}</p>{% endif %}
+    <aside class="space-y-4 lg:sticky lg:top-20 lg:self-start">
+      <div class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-textMuted">At a glance</p>
+        <dl class="mt-4 space-y-3 text-sm">
+          <div class="flex justify-between gap-3">
+            <dt class="text-textMuted">Status</dt>
+            <dd class="font-semibold {% if is_open_now %}text-green-700{% else %}text-textMain{% endif %}">{{ today_label }}</dd>
+          </div>
+          {% if price_range_label %}
+          <div class="flex justify-between gap-3">
+            <dt class="text-textMuted">Prices</dt>
+            <dd class="font-semibold text-brand">{{ price_range_label }}</dd>
+          </div>
+          {% endif %}
+          <div class="flex justify-between gap-3">
+            <dt class="text-textMuted">Services</dt>
+            <dd class="font-semibold text-textMain">{{ service_count }}</dd>
+          </div>
+          {% if products %}
+          <div class="flex justify-between gap-3">
+            <dt class="text-textMuted">Products</dt>
+            <dd class="font-semibold text-textMain">{{ products|length }}</dd>
+          </div>
+          {% endif %}
+          {% if booking_count > 0 %}
+          <div class="flex justify-between gap-3">
+            <dt class="text-textMuted">Bookings</dt>
+            <dd class="font-semibold text-textMain">{{ booking_count }}</dd>
+          </div>
+          {% endif %}
+          {% if member_since %}
+          <div class="flex justify-between gap-3">
+            <dt class="text-textMuted">Listed</dt>
+            <dd class="font-semibold text-textMain">{{ member_since.strftime('%b %Y') }}</dd>
+          </div>
+          {% endif %}
+        </dl>
+        {% if is_bookable %}
+        <a href="/booking/{{ business.slug }}/" class="mt-5 inline-flex w-full items-center justify-center rounded-md bg-brand px-4 py-3 text-sm font-semibold text-white hover:bg-brandHover">Book appointment</a>
+        {% endif %}
+        <a href="/leads/new/{{ business.slug }}/" class="mt-2 inline-flex w-full items-center justify-center rounded-md border border-stone-300 bg-white px-4 py-3 text-sm font-semibold text-textMain hover:bg-stone-50">Send enquiry</a>
       </div>
-      <div class="rounded-xl sm:rounded-2xl bg-white border border-stone-200 p-3 shadow-sm">
-        {% if business.map_embed_url %}
-        <iframe src="{{ business.map_embed_url }}" class="w-full h-52 sm:h-56 rounded-lg sm:rounded-xl border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        {% else %}
-        <div class="w-full h-52 sm:h-56 rounded-lg sm:rounded-xl bg-stone-100 flex items-center justify-center text-stone-400 text-sm">Map not configured</div>
+
+      {% if business_hours %}
+      <div id="hours" class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+        <h3 class="font-semibold text-textMain">Hours</h3>
+        <ul class="mt-3 divide-y divide-stone-100">
+          {% for row in business_hours %}
+          <li class="flex items-center justify-between gap-3 py-2 text-sm {% if today_hours and row.day_of_week == today_hours.day_of_week %}font-semibold{% endif %}">
+            <span class="text-textMain">{{ row.get_day_of_week_display() }}{% if today_hours and row.day_of_week == today_hours.day_of_week %} <span class="text-brand">· Today</span>{% endif %}</span>
+            {% if row.is_closed %}
+            <span class="text-red-600">Closed</span>
+            {% elif row.start_time and row.end_time %}
+            <span class="text-textMuted">{{ row.start_time.strftime('%H:%M') }}–{{ row.end_time.strftime('%H:%M') }}</span>
+            {% else %}
+            <span class="text-textMuted">—</span>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if business.public_phone or business.public_email or business.public_address %}
+      <div id="contact-location" class="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+        <h3 class="font-semibold text-textMain">Contact</h3>
+        <div class="mt-3 space-y-2 text-sm text-textMuted">
+          {% if business.public_phone %}<p><a class="font-medium text-textMain hover:text-brand" href="tel:{{ business.public_phone }}">{{ business.public_phone }}</a></p>{% endif %}
+          {% if can_show_public_email %}<p><a class="hover:text-brand" href="mailto:{{ business.public_email }}">{{ business.public_email }}</a></p>{% endif %}
+          {% if business.public_address %}<p>{{ business.public_address }}</p>{% endif %}
+        </div>
+        <div class="mt-4 flex flex-wrap gap-2">
+          {% if can_show_website and public_website_url %}
+          <a href="{{ public_website_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex rounded-md border border-brand bg-brand/5 px-3 py-2 text-xs font-semibold text-brand">Website</a>
+          {% endif %}
+          {% if whatsapp_url %}
+          <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex rounded-md border border-green-600 bg-green-50 px-3 py-2 text-xs font-semibold text-green-800">WhatsApp</a>
+          {% endif %}
+          {% if maps_directions_url %}
+          <a href="{{ maps_directions_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex rounded-md border border-stone-300 px-3 py-2 text-xs font-semibold text-textMain">Directions</a>
+          {% endif %}
+          {% if can_show_share_tools %}
+          <button
+            type="button"
+            class="inline-flex rounded-md border border-stone-300 px-3 py-2 text-xs font-semibold text-textMain"
+            @click="navigator.clipboard.writeText(window.location.href); copied = true; setTimeout(() => copied = false, 1800)"
+            x-text="copied ? 'Link copied' : 'Copy link'"
+          ></button>
+          {% endif %}
+        </div>
+        {% if can_show_map and public_map_embed_url %}
+        <iframe src="{{ public_map_embed_url }}" class="mt-4 h-40 w-full rounded-lg border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         {% endif %}
       </div>
-    </div>
-  </section>
-  {% endif %}
+      {% endif %}
+    </aside>
+  </div>
 </div>
-<nav class="sm:hidden fixed bottom-0 inset-x-0 z-30 border-t border-stone-200 bg-white/95 backdrop-blur">
-  <div class="grid grid-cols-3 gap-1 p-2">
-    <a href="/b/{{ business.slug }}/" class="flex items-center justify-center rounded-lg py-3 text-xs font-semibold text-textMain bg-stone-100">Home</a>
-    <a href="/booking/{{ business.slug }}/" class="flex items-center justify-center rounded-lg py-3 text-xs font-semibold text-textMain hover:bg-stone-100">Book</a>
-    <a href="#contact-location" class="flex items-center justify-center rounded-lg py-3 text-xs font-semibold text-textMain hover:bg-stone-100">Contact</a>
+
+<nav class="fixed inset-x-0 bottom-0 z-30 border-t border-stone-200 bg-white/95 p-3 pb-safe backdrop-blur sm:hidden">
+  <div class="grid grid-cols-2 gap-2">
+    {% if is_bookable %}
+    <a href="/booking/{{ business.slug }}/" class="inline-flex min-h-11 items-center justify-center rounded-md bg-brand px-3 py-3 text-sm font-semibold text-white">Book now</a>
+    {% elif business.public_phone %}
+    <a href="tel:{{ business.public_phone }}" class="inline-flex min-h-11 items-center justify-center rounded-md bg-brand px-3 py-3 text-sm font-semibold text-white">Call now</a>
+    {% else %}
+    <a href="#services" class="inline-flex min-h-11 items-center justify-center rounded-md bg-brand px-3 py-3 text-sm font-semibold text-white">Services</a>
+    {% endif %}
+    <a href="/leads/new/{{ business.slug }}/" class="inline-flex min-h-11 items-center justify-center rounded-md border border-stone-300 bg-white px-3 py-3 text-sm font-semibold text-textMain">Enquire</a>
   </div>
 </nav>
 {% endblock %}

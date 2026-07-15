@@ -1,0 +1,29 @@
+{% extends 'pages/partner/base_partner.jinja' %}
+
+{% block partner_content %}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <h2 class="font-display text-2xl font-bold text-textMain">Your listings</h2>
+  <a href="/partner/listings/new/" class="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brandHover">New listing</a>
+</div>
+{% if not listings %}
+<p class="rounded-xl border border-dashed border-stone-300 bg-white p-8 text-center text-textMuted">No listings yet. Create one for a local business.</p>
+{% else %}
+<ul class="divide-y divide-stone-200 overflow-hidden rounded-xl border border-stone-200 bg-white">
+  {% for b in listings %}
+  <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
+    <div>
+      <p class="font-semibold text-textMain">{{ b.name }}</p>
+      <p class="text-xs text-textMuted">
+        {{ b.get_industry_type_display() }}
+        {% if b.created_by_id == request.user.id %} · Created by you{% else %} · Assigned{% endif %}
+      </p>
+    </div>
+    <div class="flex gap-2">
+      <a href="/b/{{ b.slug }}/" class="rounded-md border border-stone-300 px-3 py-1.5 text-xs font-semibold">View</a>
+      <a href="/partner/listings/{{ b.id }}/edit/" class="rounded-md bg-brand/10 px-3 py-1.5 text-xs font-semibold text-brand">Edit</a>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

@@ -1,7 +1,7 @@
 services:
   web:
     build: .
-    container_name: sd_prasant_web
+    container_name: suratbazar_web
     restart: unless-stopped
     command: >
       sh -c "python manage.py migrate &&
@@ -11,27 +11,31 @@ services:
       - .env
     volumes:
       - .:/app
+      - media_data:/app/media
+      - static_data:/app/staticfiles
     ports:
-      - "127.0.0.1:8989:8000"
+      - "127.0.0.1:8998:8000"
     depends_on:
       db:
         condition: service_healthy
 
   db:
     image: postgres:16-alpine
-    container_name: sd_prasant_db
+    container_name: suratbazar_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-sd_prasant}
-      POSTGRES_USER: ${POSTGRES_USER:-sd_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sd_password}
+      POSTGRES_DB: ${POSTGRES_DB:-suratbazar_prod}
+      POSTGRES_USER: ${POSTGRES_USER:-sb_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sb_password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sd_user} -d ${POSTGRES_DB:-sd_prasant}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sb_user} -d ${POSTGRES_DB:-suratbazar_prod}"]
       interval: 5s
       timeout: 5s
       retries: 10
 
 volumes:
   postgres_data:
+  media_data:
+  static_data:

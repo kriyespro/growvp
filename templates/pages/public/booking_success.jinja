@@ -14,6 +14,9 @@
             <a href="/booking/{{ business.slug }}/" class="inline-flex w-full justify-center rounded-md bg-brand px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brandHover sm:w-auto">Book another appointment</a>
             <a href="/b/{{ business.slug }}/" class="text-sm font-medium text-textMuted hover:text-textMain">Back to {{ business.name }}</a>
         </div>
+        {% if not hide_platform_branding %}
+        <p class="mt-8 text-center text-xs text-stone-400">Booked via SuratBazar</p>
+        {% endif %}
     </div>
 </div>
 <nav class="sm:hidden fixed bottom-0 inset-x-0 z-30 border-t border-stone-200 bg-white/95 backdrop-blur">

@@ -1,0 +1,163 @@
+{% import 'components/card.jinja' as card %}
+{% import 'components/input.jinja' as input %}
+{% import 'components/button.jinja' as btn %}
+
+<div class="space-y-6">
+    <div class="flex flex-col gap-3 border-b border-stone-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-2xl font-bold text-textMain">Product listings</h2>
+            <p class="mt-1 text-sm text-textMuted">
+                {{ plan.name }} —
+                {% if not products_enabled %}
+                Products unlock on Pro
+                {% elif remaining_slots is none %}
+                Unlimited active products
+                {% else %}
+                {{ remaining_slots }} of {{ plan.product_limit }} slots left
+                {% endif %}
+                {% if business and business.slug %}
+                · <a href="/b/{{ business.slug }}/#products" target="_blank" class="font-semibold text-brand hover:text-brandHover">View on listing</a>
+                {% endif %}
+            </p>
+        </div>
+        <a
+            href="#"
+            hx-get="/auth/listing-plans/"
+            hx-target="#main-content"
+            hx-swap="innerHTML"
+            class="text-sm font-semibold text-brand hover:text-brandHover"
+        >Change listing plan</a>
+    </div>
+
+    {% if not products_enabled %}
+    <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        Product listings start on <strong>Pro</strong>. Free is for services &amp; bookings —
+        <a href="#" hx-get="/auth/listing-plans/" hx-target="#main-content" class="font-semibold underline">upgrade to Pro</a>
+        to sell products from your page.
+    </div>
+    {% elif not can_add_product and not editing_product %}
+    <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        You’ve hit the product limit on {{ plan.name }}.
+        <a href="#" hx-get="/auth/listing-plans/" hx-target="#main-content" class="font-semibold underline">Upgrade to Premium</a>
+        for unlimited products.
+    </div>
+    {% endif %}
+
+    {% if form_error %}
+    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        {% if form_error.get('__all__') %}{{ form_error.get('__all__')|join(' ') }}{% else %}Please fix the form errors below.{% endif %}
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div class="space-y-4 lg:col-span-2">
+            {% if not products %}
+                {{ card.render(content='<div class="text-center py-6 text-textMuted text-sm">No products yet. Add retail items customers can browse on your public listing.</div>') }}
+            {% else %}
+                <div class="overflow-hidden rounded-xl border border-stone-200 bg-creameSurface shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-stone-200">
+                            <thead class="bg-stone-50">
+                                <tr>
+                                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-textMain sm:pl-6">Product</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-textMain">Price</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-textMain">Status</th>
+                                    <th scope="col" class="px-3 py-3.5 text-right text-sm font-semibold text-textMain sm:pr-6">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-stone-200 bg-white">
+                                {% for product in products %}
+                                <tr>
+                                    <td class="py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                        <div class="flex items-start gap-3">
+                                            <img src="{{ product.public_image_url }}" alt="" class="h-12 w-12 rounded object-cover border border-stone-200 bg-stone-100" data-fallbacks="{{ product.image_fallbacks }}" onerror="sbImgFallback(this)">
+                                            <div>
+                                                <p class="font-medium text-textMain">{{ product.name }}</p>
+                                                <p class="mt-1 text-xs text-textMuted line-clamp-2">{{ product.description or '—' }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-textMuted">₹{{ product.price }}</td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm">
+                                        {% if product.is_active %}
+                                        <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Active</span>
+                                        {% else %}
+                                        <span class="inline-flex items-center rounded-md bg-stone-50 px-2 py-1 text-xs font-medium text-stone-600 ring-1 ring-inset ring-stone-500/10">Hidden</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-right text-sm sm:pr-6">
+                                        <div class="inline-flex items-center gap-2">
+                                            <button
+                                                hx-get="/catalog/products/?edit={{ product.id }}"
+                                                hx-target="#main-content"
+                                                hx-swap="innerHTML"
+                                                class="rounded-md border border-stone-300 bg-white px-2.5 py-1.5 text-xs font-medium text-textMain hover:bg-stone-50"
+                                            >Edit</button>
+                                            <button
+                                                hx-post="/catalog/products/{{ product.id }}/delete/"
+                                                hx-target="#main-content"
+                                                hx-swap="innerHTML"
+                                                hx-confirm="Delete this product?"
+                                                class="rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-100"
+                                            >Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="lg:col-span-1">
+            {% set form_content %}
+                <form
+                    hx-post="/catalog/products/{% if editing_product %}?edit={{ editing_product.id }}{% endif %}"
+                    hx-target="#main-content"
+                    hx-swap="innerHTML"
+                    class="space-y-4"
+                    enctype="multipart/form-data"
+                >
+                    {{ csrf_field(request) }}
+                    {% if not products_enabled %}
+                    <p class="text-sm text-textMuted">Upgrade to Pro to start listing products.</p>
+                    {% elif not can_add_product and not editing_product %}
+                    <p class="text-sm text-textMuted">Upgrade your plan to add another product.</p>
+                    {% else %}
+                    {{ input.render("Product name", "name", value=editing_product.name if editing_product else "", required=True) }}
+                    <div class="space-y-1">
+                        <label for="description" class="block text-sm font-medium text-textMain">Description</label>
+                        <textarea id="description" name="description" rows="3" class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm">{{ editing_product.description if editing_product else '' }}</textarea>
+                    </div>
+                    {{ input.render("Price", "price", type="number", value=editing_product.price if editing_product else "0.00", required=True) }}
+                    {{ input.render("Image URL", "image_url", type="url", value=editing_product.image_url if editing_product else "", placeholder="https://…") }}
+                    <div class="space-y-1">
+                        <label for="image" class="block text-sm font-medium text-textMain">Upload image</label>
+                        <input id="image" name="image" type="file" accept="image/*" class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-sm text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand">
+                    </div>
+                    {{ input.render("Buy / product link", "buy_url", type="url", value=editing_product.buy_url if editing_product else "", placeholder="Optional external link") }}
+                    <div class="relative flex items-start">
+                        <div class="flex h-6 items-center">
+                            <input id="is_active" name="is_active" type="checkbox" {% if not editing_product or editing_product.is_active %}checked{% endif %} class="h-4 w-4 rounded border-stone-300 text-brand focus:ring-brand">
+                        </div>
+                        <div class="ml-3 text-sm leading-6">
+                            <label for="is_active" class="font-medium text-textMain">Show on public listing</label>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        {{ btn.render(type="submit", text="Update product" if editing_product else "Save product", cls="w-full justify-center") }}
+                    </div>
+                    {% if editing_product %}
+                    <button hx-get="/catalog/products/" hx-target="#main-content" hx-swap="innerHTML" type="button" class="w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm font-semibold text-textMain hover:bg-stone-50">
+                        Cancel editing
+                    </button>
+                    {% endif %}
+                    {% endif %}
+                </form>
+            {% endset %}
+            {{ card.render(title="Edit product" if editing_product else "Add product", content=form_content) }}
+        </div>
+    </div>
+</div>
