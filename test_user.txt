@@ -17,6 +17,8 @@ email: client03@test.com
 email: demo.admin@test.com
 email: demo.staff@test.com
 # Directory businesses: seed01.admin@test.com … seed20.admin@test.com
+# Bulk realistic (200): bulk001.admin@test.com … bulk200.admin@test.com
+#   Example listing: /b/bulk-001-salon/
 
 # Partner public pages
 # /b/partner-glow-studio/
@@ -28,6 +30,8 @@ email: demo.staff@test.com
 #   ./venv/bin/python manage.py seed_directory_businesses
 #   ./venv/bin/python manage.py seed_roles
 #   ./venv/bin/python manage.py seed_roles --reset   # wipe partner/client seed users first
+#   ./venv/bin/python manage.py seed_bulk_directory --count 200
+#   ./venv/bin/python manage.py seed_bulk_directory --count 200 --reset
 
 # Django admin backup: /sd/
 # Mission Control: /admin/

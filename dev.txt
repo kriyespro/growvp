@@ -2,6 +2,9 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Bulk seed command seed_bulk_directory — 200 realistic Surat listings
+  (areas, industries, Free/Pro/Premium, services, hours, products)
+
 - [DONE] Production ready: .env.prod (suratbazar.online, port 8998, IP 159.195.52.197),
   docker-compose bind 127.0.0.1:8998, depoly.txt Nginx+SSL notes
 

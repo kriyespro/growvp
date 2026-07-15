@@ -25,9 +25,9 @@ sudo ufw enable
 2) Clone / sync project
 ==================================================
 
-sudo mkdir -p /srv/suratbazar
-sudo chown -R $USER:$USER /srv/suratbazar
-cd /srv/suratbazar
+# Install under root home (not /srv)
+mkdir -p /root/sd-sub
+cd /root/sd-sub
 # git clone <YOUR_REPO_URL> app
 cd app
 
@@ -59,7 +59,7 @@ server {
     client_max_body_size 20M;
 
     location /media/ {
-        alias /srv/suratbazar/app/media/;
+        alias /root/sd-sub/app/media/;
     }
 
     location / {
