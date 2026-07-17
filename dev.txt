@@ -2,6 +2,10 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Fix index migrations for prod — CREATE INDEX IF NOT EXISTS via
+  SeparateDatabaseAndState (booking/billing/crm/leads/users) so migrate
+  succeeds when indexes already exist from a partial apply
+
 - [DONE] Perf pass 2: capped booking calendar_view to latest 200 appointments;
   capped enquiries_for_user to latest 100 (ENQUIRY_INBOX_LIMIT); cached
   get_industry_facet_counts/get_area_facet_counts via existing directory
