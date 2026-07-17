@@ -2,6 +2,9 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Hero section upgrade — two-column layout, location badge, inline stats pills,
+  quick HTMX filters, prominent search + mosaic of featured listings (desktop)
+
 - [DONE] Home page upgrade — KPI stats strip, category icon grid (HTMX filter),
   popular areas chips, featured listings carousel, improved search card + hero,
   business-owner CTA, industry hub links; directory results polish

@@ -143,7 +143,7 @@ class BusinessDirectoryTests(TestCase):
 
     def test_directory_kpi_stats_present(self):
         response = self.client.get(reverse("landing"))
-        self.assertContains(response, "Listed")
+        self.assertContains(response, "listed")
         self.assertContains(response, "Open now")
         self.assertContains(response, "Book online")
 

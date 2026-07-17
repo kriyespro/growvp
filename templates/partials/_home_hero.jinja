@@ -1,0 +1,229 @@
+{# Home hero — headline, mosaic, stats, search #}
+<section class="relative z-10 mx-auto w-full max-w-7xl px-4 pt-5 pb-4 sm:px-6 sm:pt-7 lg:px-8">
+  <div class="grid items-center gap-8 lg:grid-cols-2 lg:gap-10 xl:gap-14">
+    {# Copy + search #}
+    <div class="min-w-0">
+      <div class="inline-flex items-center gap-2 rounded-full border border-brand/20 bg-white/90 px-3 py-1.5 text-xs font-semibold text-brand shadow-sm backdrop-blur">
+        <svg class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21s7-4.5 7-10a7 7 0 1 0-14 0c0 5.5 7 10 7 10Z"/><circle cx="12" cy="11" r="2.5"/></svg>
+        Surat, Gujarat
+      </div>
+
+      <h1 class="mt-4 font-display text-[2rem] font-bold leading-[1.12] tracking-tight text-textMain sm:text-4xl lg:text-[2.65rem] xl:text-5xl">
+        Find &amp; book trusted local businesses in
+        <span class="text-brand">Surat</span>
+      </h1>
+
+      <p class="mt-3 max-w-lg text-base leading-relaxed text-textMuted sm:text-lg">
+        {% if home_stats and home_stats.total %}
+        <span class="font-semibold text-textMain">{{ home_stats.total }}+</span> salons, clinics, gyms &amp; more —
+        {% else %}
+        Salons, clinics, gyms &amp; more —
+        {% endif %}
+        compare hours, prices, and book online in seconds.
+      </p>
+
+      {% if home_stats %}
+      <div class="mt-4 flex flex-wrap gap-2">
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white/90 px-3 py-1.5 text-xs font-semibold text-textMain shadow-sm">
+          <span class="h-1.5 w-1.5 rounded-full bg-stone-400"></span>
+          {{ home_stats.total }} listed
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-800">
+          <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+          {{ home_stats.open_now }} open now
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-brand">
+          {{ home_stats.bookable }} book online
+        </span>
+      </div>
+      {% endif %}
+
+      {# Quick filters #}
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button
+          type="button"
+          hx-get="/directory/search/?availability=open"
+          hx-target="#directory-results"
+          hx-indicator="#directory-loading"
+          hx-push-url="true"
+          hx-on::after-request="document.querySelector('#directory-form input[name=availability]').checked=true; document.getElementById('directory-results')?.scrollIntoView({behavior:'smooth', block:'start'})"
+          class="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-textMain shadow-sm transition hover:border-green-500/50 hover:bg-green-50 hover:text-green-800"
+        >
+          <svg class="h-3.5 w-3.5 text-green-600" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="4"/></svg>
+          Open now
+        </button>
+        <button
+          type="button"
+          hx-get="/directory/search/?bookable=1"
+          hx-target="#directory-results"
+          hx-indicator="#directory-loading"
+          hx-push-url="true"
+          hx-on::after-request="document.querySelector('#directory-form input[name=bookable]').checked=true; document.getElementById('directory-results')?.scrollIntoView({behavior:'smooth', block:'start'})"
+          class="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-textMain shadow-sm transition hover:border-brand/50 hover:bg-brand/5 hover:text-brand"
+        >
+          Book online
+        </button>
+        <button
+          type="button"
+          hx-get="/directory/search/?verified=1"
+          hx-target="#directory-results"
+          hx-indicator="#directory-loading"
+          hx-push-url="true"
+          hx-on::after-request="document.querySelector('#directory-form input[name=verified]').checked=true; document.getElementById('directory-results')?.scrollIntoView({behavior:'smooth', block:'start'})"
+          class="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-textMain shadow-sm transition hover:border-sky-600/50 hover:bg-sky-50 hover:text-sky-800"
+        >
+          Verified
+        </button>
+        <a href="#directory-results" class="inline-flex items-center gap-1 rounded-full px-3.5 py-2 text-xs font-semibold text-brand hover:text-brandHover">
+          Browse all →
+        </a>
+      </div>
+
+      {# Search card #}
+      <form
+        id="directory-form"
+        class="mt-5 rounded-2xl border border-stone-200/80 bg-white/95 p-3 shadow-xl shadow-stone-300/25 backdrop-blur-sm ring-1 ring-stone-900/5 sm:mt-6 sm:p-4"
+        hx-get="/directory/search/"
+        hx-trigger="keyup changed delay:300ms from:#directory-q, change from:#directory-sort, change from:select[name='industry'], change from:input[name='availability'], change from:input[name='bookable'], change from:input[name='verified']"
+        hx-target="#directory-results"
+        hx-indicator="#directory-loading"
+        hx-push-url="true"
+      >
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+          <label class="relative block flex-1">
+            <span class="sr-only">Search businesses</span>
+            <span class="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-brand/70">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"/></svg>
+            </span>
+            <input
+              id="directory-q"
+              type="search"
+              name="q"
+              value="{{ q }}"
+              placeholder="Try Vesu salon, dentist, gym…"
+              class="w-full rounded-xl border-2 border-stone-200 bg-stone-50/80 py-3.5 pl-11 pr-4 text-base font-medium text-textMain placeholder:font-normal placeholder:text-stone-400 focus:border-brand focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand/10 sm:py-3 sm:text-sm"
+              autocomplete="off"
+            >
+          </label>
+          <button
+            type="submit"
+            class="inline-flex shrink-0 items-center justify-center rounded-xl bg-brand px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-brand/25 transition hover:bg-brandHover sm:py-3"
+          >
+            Search
+          </button>
+        </div>
+
+        <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <label class="sm:col-span-2">
+            <span class="sr-only">Category</span>
+            <select
+              name="industry"
+              class="w-full rounded-lg border border-stone-200 bg-stone-50/50 px-3 py-2.5 text-sm text-textMain focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20"
+            >
+              <option value="" {% if not industry %}selected{% endif %}>All categories</option>
+              {% for group_label, group_choices in industry_groups %}
+              <optgroup label="{{ group_label }}">
+                {% for value, label in group_choices %}
+                <option value="{{ value }}" {% if industry == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </optgroup>
+              {% endfor %}
+            </select>
+          </label>
+          <label>
+            <span class="sr-only">Sort</span>
+            <select
+              id="directory-sort"
+              name="sort"
+              class="w-full rounded-lg border border-stone-200 bg-stone-50/50 px-3 py-2.5 text-sm text-textMain focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20"
+            >
+              <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+              <option value="popular" {% if sort == 'popular' %}selected{% endif %}>Most booked</option>
+              <option value="name" {% if sort == 'name' %}selected{% endif %}>Name A–Z</option>
+              <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price ↑</option>
+              <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price ↓</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-stone-100 pt-3">
+          <label class="cursor-pointer">
+            <input type="checkbox" name="availability" value="open" class="peer sr-only" {% if availability == 'open' %}checked{% endif %}>
+            <span class="inline-flex min-h-8 items-center rounded-full border border-stone-200 bg-white px-3 py-1 text-xs font-semibold text-textMuted transition peer-checked:border-green-600 peer-checked:bg-green-600 peer-checked:text-white">Open now</span>
+          </label>
+          <label class="cursor-pointer">
+            <input type="checkbox" name="bookable" value="1" class="peer sr-only" {% if bookable == '1' %}checked{% endif %}>
+            <span class="inline-flex min-h-8 items-center rounded-full border border-stone-200 bg-white px-3 py-1 text-xs font-semibold text-textMuted transition peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white">Book online</span>
+          </label>
+          <label class="cursor-pointer">
+            <input type="checkbox" name="verified" value="1" class="peer sr-only" {% if verified == '1' %}checked{% endif %}>
+            <span class="inline-flex min-h-8 items-center rounded-full border border-stone-200 bg-white px-3 py-1 text-xs font-semibold text-textMuted transition peer-checked:border-sky-700 peer-checked:bg-sky-700 peer-checked:text-white">Verified</span>
+          </label>
+          {% if q or industry or availability or bookable or verified or (sort and sort != 'newest') %}
+          <a href="/" class="ml-auto text-xs font-semibold text-brand hover:text-brandHover">Clear all</a>
+          {% endif %}
+          <span id="directory-loading" class="htmx-indicator ml-auto text-xs font-medium text-brand">Updating…</span>
+        </div>
+      </form>
+
+      {% include 'partials/_home_areas_strip.jinja' %}
+    </div>
+
+    {# Visual mosaic — desktop #}
+    <div class="relative hidden lg:block">
+      <div class="pointer-events-none absolute -right-6 -top-6 h-48 w-48 rounded-full bg-brand/10 blur-3xl"></div>
+      <div class="pointer-events-none absolute -bottom-4 -left-4 h-40 w-40 rounded-full bg-amber-200/40 blur-3xl"></div>
+
+      <div class="relative grid min-h-[22rem] grid-cols-12 grid-rows-6 gap-3 xl:min-h-[26rem]">
+        {% set mosaic = featured_businesses[:4] if featured_businesses else [] %}
+        {% if mosaic|length >= 1 %}
+        <a href="/b/{{ mosaic[0].slug }}/" class="group relative col-span-7 row-span-4 overflow-hidden rounded-2xl border border-white/80 shadow-lg shadow-stone-300/30">
+          <img src="{{ mosaic[0].public_hero_image_url }}" alt="{{ mosaic[0].name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="eager" data-fallbacks="{{ mosaic[0].image_fallbacks }}" onerror="sbImgFallback(this)">
+          <div class="absolute inset-0 bg-gradient-to-t from-stone-950/70 via-stone-950/10 to-transparent"></div>
+          <div class="absolute bottom-3 left-3 right-3">
+            <p class="truncate font-display text-lg font-bold text-white">{{ mosaic[0].name }}</p>
+            <p class="truncate text-xs text-white/80">{{ mosaic[0].area_label or mosaic[0].get_industry_type_display() }}</p>
+          </div>
+        </a>
+        {% else %}
+        <div class="col-span-7 row-span-4 overflow-hidden rounded-2xl border border-stone-200 bg-gradient-to-br from-orange-100 to-amber-50 shadow-lg"></div>
+        {% endif %}
+
+        {% if mosaic|length >= 2 %}
+        <a href="/b/{{ mosaic[1].slug }}/" class="group relative col-span-5 row-span-3 overflow-hidden rounded-2xl border border-white/80 shadow-md">
+          <img src="{{ mosaic[1].public_hero_image_url }}" alt="{{ mosaic[1].name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" data-fallbacks="{{ mosaic[1].image_fallbacks }}" onerror="sbImgFallback(this)">
+          <div class="absolute inset-0 bg-gradient-to-t from-stone-950/60 to-transparent"></div>
+          <p class="absolute bottom-2 left-2 right-2 truncate text-sm font-semibold text-white">{{ mosaic[1].name }}</p>
+        </a>
+        {% endif %}
+
+        {% if mosaic|length >= 3 %}
+        <a href="/b/{{ mosaic[2].slug }}/" class="group relative col-span-5 row-span-3 overflow-hidden rounded-2xl border border-white/80 shadow-md">
+          <img src="{{ mosaic[2].public_hero_image_url }}" alt="{{ mosaic[2].name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" data-fallbacks="{{ mosaic[2].image_fallbacks }}" onerror="sbImgFallback(this)">
+          <div class="absolute inset-0 bg-gradient-to-t from-stone-950/50 to-transparent"></div>
+        </a>
+        {% endif %}
+
+        {% if home_stats %}
+        <div class="col-span-7 row-span-2 flex items-stretch gap-3">
+          <div class="flex flex-1 flex-col justify-center rounded-2xl border border-stone-200/80 bg-white/95 p-4 shadow-md backdrop-blur">
+            <p class="text-[11px] font-bold uppercase tracking-wide text-textMuted">Live directory</p>
+            <p class="mt-1 font-display text-2xl font-bold text-textMain">{{ home_stats.total }}</p>
+            <p class="text-xs text-textMuted">businesses in Surat</p>
+          </div>
+          <div class="flex flex-1 flex-col justify-center rounded-2xl border border-green-200/80 bg-green-50/90 p-4 shadow-md">
+            <p class="text-[11px] font-bold uppercase tracking-wide text-green-800/70">Right now</p>
+            <p class="mt-1 font-display text-2xl font-bold text-green-800">{{ home_stats.open_now }}</p>
+            <p class="text-xs text-green-700/80">open for walk-ins</p>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {# Category strip — full width below hero grid #}
+  <div class="mt-8 border-t border-stone-200/60 pt-6 sm:mt-10">
+    {% include 'partials/_category_icon_strip.jinja' %}
+  </div>
+</section>
