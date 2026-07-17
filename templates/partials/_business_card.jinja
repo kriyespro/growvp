@@ -1,15 +1,15 @@
 <article class="group flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-lg {% if business.card_style == 'featured' %}border-amber-400 ring-2 ring-amber-200/80 hover:border-amber-500{% elif business.card_style == 'highlight' %}border-indigo-300 ring-1 ring-indigo-100 hover:border-indigo-400{% else %}border-stone-200 hover:border-brand/30{% endif %}">
   <a href="/b/{{ business.slug }}/" class="relative block aspect-[16/10] overflow-hidden bg-stone-100">
     <img
-      src="{{ business.public_hero_image_url|img_url(640) }}"
+      src="{{ business.public_hero_image_url|img_url(480) }}"
       {% set _srcset = business.public_hero_image_url|img_srcset %}
-      {% if _srcset %}srcset="{{ _srcset }}" sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 400px"{% endif %}
+      {% if _srcset %}srcset="{{ _srcset }}" sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 360px"{% endif %}
       alt="{{ business.name }}"
       class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
       loading="lazy"
       decoding="async"
-      width="640"
-      height="400"
+      width="480"
+      height="300"
       data-fallbacks="{{ business.image_fallbacks }}"
       onerror="sbImgFallback(this)"
     >

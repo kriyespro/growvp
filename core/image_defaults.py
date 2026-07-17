@@ -26,7 +26,7 @@ def first_usable_url(*candidates):
     return placeholder_image_url()
 
 
-def optimize_image_url(url: str, width: int = 640, quality: int = 60) -> str:
+def optimize_image_url(url: str, width: int = 480, quality: int = 45) -> str:
     """
     Shrink remote images for cards (Unsplash params). Leaves local/static URLs alone.
     """
@@ -45,6 +45,8 @@ def optimize_image_url(url: str, width: int = 640, quality: int = 60) -> str:
         query["fit"] = "crop"
         query["w"] = str(width)
         query["q"] = str(quality)
+        # Prefer modern formats when Unsplash supports fm=
+        query.setdefault("fm", "webp")
         # Drop oversized legacy params
         query.pop("h", None)
         return urlunsplit(
@@ -54,8 +56,12 @@ def optimize_image_url(url: str, width: int = 640, quality: int = 60) -> str:
     return cleaned
 
 
-def image_srcset(url: str, widths: tuple[int, ...] = (400, 640, 800), quality: int = 60) -> str:
-    """Responsive srcset for Unsplash (and pass-through for other hosts)."""
+def image_srcset(
+    url: str,
+    widths: tuple[int, ...] = (320, 480, 640),
+    quality: int = 45,
+) -> str:
+    """Responsive srcset for Unsplash (capped at 640w for card grids)."""
     if not url:
         return ""
     if "images.unsplash.com" not in url:

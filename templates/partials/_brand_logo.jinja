@@ -5,22 +5,28 @@
 {% set _c = logo_class if logo_class is defined else 'inline-flex shrink-0 items-center' %}
 <a href="/" class="{{ _c }}" aria-label="SuratBazar home">
   {% if _v == 'mark' %}
-  <img
-    src="{{ static('img/logo-mark.png') }}"
-    alt="SuratBazar"
-    class="{{ _h }} w-auto"
-    width="96"
-    height="94"
-    decoding="async"
-  >
+  <picture>
+    <source type="image/webp" srcset="/static/img/logo-mark.webp">
+    <img
+      src="/static/img/logo-mark.png"
+      alt="SuratBazar"
+      class="{{ _h }} w-auto"
+      width="88"
+      height="82"
+      decoding="async"
+    >
+  </picture>
   {% else %}
-  <img
-    src="{{ static('img/logo-web.png') }}"
-    alt="SuratBazar"
-    class="{{ _h }} w-auto"
-    width="180"
-    height="100"
-    decoding="async"
-  >
+  <picture>
+    <source type="image/webp" srcset="/static/img/logo-web.webp">
+    <img
+      src="/static/img/logo-web.png"
+      alt="SuratBazar"
+      class="{{ _h }} w-auto"
+      width="210"
+      height="154"
+      decoding="async"
+    >
+  </picture>
   {% endif %}
 </a>

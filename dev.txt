@@ -2,6 +2,9 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Image delivery — Unsplash q=45/fm=webp, srcset max 640w, tighter
+  sizes; logo WebP (~10KB) + smaller PNG for header
+
 - [DONE] Tailwind compiled build — static/css/app.css (~44KB minify), removed
   CDN from base + Mission Control; Docker multi-stage node build; npm run build:css
 
