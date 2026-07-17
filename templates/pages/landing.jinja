@@ -9,11 +9,8 @@
 
 {% block content %}
 <div class="relative min-h-screen overflow-x-hidden" x-data="{ mobileMenuOpen: false }">
-  {# Hero background #}
-  <div class="pointer-events-none absolute inset-x-0 top-0 h-[36rem] overflow-hidden">
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_50%_-20%,_rgba(180,83,9,0.16),_transparent_55%),linear-gradient(180deg,#fff7ed_0%,#FDFBF7_50%,transparent_100%)]"></div>
-    <div class="absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle_at_1px_1px,rgba(120,113,108,0.15)_1px,transparent_0)] [background-size:24px_24px]"></div>
-  </div>
+  {# Compact hero background #}
+  <div class="pointer-events-none absolute inset-x-0 top-0 h-[18rem] bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,_rgba(180,83,9,0.12),_transparent),linear-gradient(180deg,#fff7ed_0%,#FDFBF7_70%,transparent_100%)]"></div>
 
   <header class="relative z-30 border-b border-stone-200/60 bg-white/85 backdrop-blur-md sticky top-0">
     <div class="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
@@ -53,8 +50,6 @@
   </header>
 
   {% include 'partials/_home_hero.jinja' %}
-
-  {% include 'partials/_home_featured.jinja' %}
 
   <section class="relative z-10 mx-auto w-full max-w-7xl px-4 pb-8 sm:px-6 lg:px-8" id="directory-results">
     {% include 'partials/_business_directory_results.jinja' %}

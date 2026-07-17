@@ -12,6 +12,9 @@ from booking.models import Appointment
 
 class BusinessDirectoryTests(TestCase):
     def setUp(self):
+        from core.services import bust_directory_cache
+
+        bust_directory_cache()
         self.salon = Business.objects.create(
             name="Glow Salon",
             industry_type="salon",
@@ -146,6 +149,25 @@ class BusinessDirectoryTests(TestCase):
         self.assertContains(response, "listed")
         self.assertContains(response, "Open now")
         self.assertContains(response, "Book online")
+
+    def test_directory_results_capped_at_page_limit(self):
+        from core.services import bust_directory_cache
+        from core.views import DIRECTORY_LIST_LIMIT
+
+        for i in range(DIRECTORY_LIST_LIMIT + 5):
+            Business.objects.create(
+                name=f"Extra Shop {i}",
+                industry_type="salon",
+                timezone="Asia/Kolkata",
+                public_phone=f"9000000{i:03d}",
+                profile_setup_completed=True,
+            )
+        bust_directory_cache()
+        response = self.client.get(reverse("landing"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Showing")
+        self.assertContains(response, str(DIRECTORY_LIST_LIMIT))
+        self.assertContains(response, "Showing top")
 
 
 class PublicBusinessLandingTests(TestCase):

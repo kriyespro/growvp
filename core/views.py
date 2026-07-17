@@ -28,6 +28,9 @@ from core.services import (
     resolve_area_label,
 )
 
+# Home / HTMX directory: keep the page light (20–30 range)
+DIRECTORY_LIST_LIMIT = 24
+
 
 def _directory_context(request):
     query = request.GET.get("q", "")
@@ -44,6 +47,7 @@ def _directory_context(request):
         bookable=bookable,
         verified=verified,
     )
+    total_count = len(businesses)
     stats = get_directory_stats(businesses)
     open_now_featured = []
     if availability != "open":
@@ -54,9 +58,10 @@ def _directory_context(request):
                 -(b.booking_count or 0),
             )
         )
-        open_now_featured = open_candidates[:8]
+        open_now_featured = open_candidates[:4]
+    page_businesses = businesses[:DIRECTORY_LIST_LIMIT]
     return {
-        "businesses": businesses,
+        "businesses": page_businesses,
         "q": query,
         "industry": industry,
         "sort": sort,
@@ -65,7 +70,9 @@ def _directory_context(request):
         "verified": verified,
         "industries": industry_choices(),
         "industry_counts": get_industry_facet_counts(),
-        "result_count": len(businesses),
+        "result_count": len(page_businesses),
+        "total_count": total_count,
+        "list_limited": total_count > DIRECTORY_LIST_LIMIT,
         "stats": stats,
         "open_now_featured": open_now_featured,
     }
@@ -76,16 +83,16 @@ def landing(request):
     ctx = _directory_context(request)
     ctx["website_json_ld"] = website_json_ld(request)
     ctx["canonical_url"] = absolute_url("/", request)
-    ctx["industry_hub_rows"] = get_industry_hub_rows()[:12]
-    ctx["area_hub_rows"] = get_area_facet_counts()[:12]
+    ctx["industry_hub_rows"] = get_industry_hub_rows()[:8]
+    ctx["area_hub_rows"] = get_area_facet_counts()[:6]
     # Platform-wide KPIs (unfiltered) for hero strip
     all_listings = list_directory_businesses()
     ctx["home_stats"] = get_directory_stats(all_listings)
     featured = [b for b in all_listings if getattr(b, "is_featured_listing", False)]
-    if len(featured) < 4:
-        featured = all_listings[:6]
+    if len(featured) < 3:
+        featured = all_listings[:3]
     else:
-        featured = featured[:6]
+        featured = featured[:3]
     ctx["featured_businesses"] = featured
     return render(request, "pages/landing.jinja", ctx)
 

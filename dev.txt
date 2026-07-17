@@ -2,6 +2,9 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Compact home — DIRECTORY_LIST_LIMIT=24, slim hero (no mosaic/featured),
+  tighter categories/areas, “Showing X of Y” when capped
+
 - [DONE] Hero section upgrade — two-column layout, location badge, inline stats pills,
   quick HTMX filters, prominent search + mosaic of featured listings (desktop)
 
