@@ -269,3 +269,114 @@ def breadcrumb_json_ld(crumbs, request=None) -> str:
         "itemListElement": items,
     }
     return json.dumps(data, ensure_ascii=False)
+
+
+def build_sitemap_entries(request=None) -> list[dict]:
+    """
+    Public URLs for Google sitemap submission.
+    One lean DB pass for industry×area pages (avoids N area-facet scans).
+    """
+    from collections import Counter, defaultdict
+
+    from django.utils import timezone
+
+    from core.services import _discoverable_queryset, extract_area_label, get_industry_hub_rows
+    from users.models import Business
+
+    base = site_base_url(request)
+    today = timezone.localdate().isoformat()
+    entries: list[dict] = [
+        {"loc": f"{base}/", "changefreq": "daily", "priority": "1.0", "lastmod": today},
+        {"loc": f"{base}/pricing/", "changefreq": "weekly", "priority": "0.7", "lastmod": today},
+        {"loc": f"{base}/surat/", "changefreq": "daily", "priority": "0.9", "lastmod": today},
+    ]
+
+    for row in get_industry_hub_rows():
+        entries.append(
+            {
+                "loc": f"{base}/surat/{row['key']}/",
+                "changefreq": "daily",
+                "priority": "0.85",
+                "lastmod": today,
+            }
+        )
+
+    # industry → area_slug → count (single scan)
+    area_counts: dict[str, Counter] = defaultdict(Counter)
+    qs = (
+        _discoverable_queryset()
+        .prefetch_related(None)
+        .exclude(public_address="")
+        .values_list("industry_type", "public_address")
+    )
+    for industry_key, address in qs.iterator(chunk_size=500):
+        label = extract_area_label(address)
+        if not label:
+            continue
+        slug = area_to_slug(label)
+        if not slug:
+            continue
+        area_counts[industry_key][slug] += 1
+
+    for industry_key, counter in area_counts.items():
+        for area_slug, count in counter.items():
+            if count < 1:
+                continue
+            entries.append(
+                {
+                    "loc": f"{base}/surat/{industry_key}/{area_slug}/",
+                    "changefreq": "weekly",
+                    "priority": "0.75",
+                }
+            )
+
+    for business in (
+        Business.objects.filter(profile_setup_completed=True)
+        .only("slug", "created_at")
+        .order_by("slug")
+        .iterator(chunk_size=500)
+    ):
+        lastmod = (
+            business.created_at.date().isoformat()
+            if getattr(business, "created_at", None)
+            else today
+        )
+        entries.append(
+            {
+                "loc": f"{base}/b/{business.slug}/",
+                "changefreq": "weekly",
+                "priority": "0.8",
+                "lastmod": lastmod,
+            }
+        )
+        entries.append(
+            {
+                "loc": f"{base}/booking/{business.slug}/",
+                "changefreq": "weekly",
+                "priority": "0.6",
+                "lastmod": lastmod,
+            }
+        )
+
+    return entries
+
+
+def render_sitemap_xml(entries: list[dict]) -> str:
+    """Serialize sitemap entries to XML (urlset 0.9)."""
+    from xml.sax.saxutils import escape
+
+    lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ]
+    for item in entries:
+        lines.append("  <url>")
+        lines.append(f"    <loc>{escape(item['loc'])}</loc>")
+        if item.get("lastmod"):
+            lines.append(f"    <lastmod>{escape(item['lastmod'])}</lastmod>")
+        lines.append(f"    <changefreq>{escape(item['changefreq'])}</changefreq>")
+        lines.append(f"    <priority>{escape(item['priority'])}</priority>")
+        lines.append("  </url>")
+    lines.append("</urlset>")
+    return "\n".join(lines) + "\n"
+

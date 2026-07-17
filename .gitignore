@@ -11,6 +11,7 @@ venv/
 .venv/
 media/
 staticfiles/
+static/sitemap.xml
 *.sqlite3
 .DS_Store
 *.log

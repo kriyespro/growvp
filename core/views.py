@@ -196,70 +196,20 @@ def robots_txt(request):
 
 @require_GET
 def sitemap_xml(request):
-    from xml.sax.saxutils import escape
+    """Dynamic Google sitemap — cached to avoid cold-start timeouts."""
+    from django.conf import settings
+    from django.core.cache import cache
 
-    from users.models import Business
+    from core.seo import build_sitemap_entries, render_sitemap_xml, site_base_url
+    from core.services import _directory_cache_version
 
-    base = absolute_url("/", request).rstrip("/")
-    urls = [
-        {"loc": f"{base}/", "changefreq": "daily", "priority": "1.0"},
-        {"loc": f"{base}/pricing/", "changefreq": "weekly", "priority": "0.7"},
-        {"loc": f"{base}/surat/", "changefreq": "daily", "priority": "0.9"},
-    ]
-    for row in get_industry_hub_rows():
-        urls.append(
-            {
-                "loc": f"{base}/surat/{escape(row['key'])}/",
-                "changefreq": "daily",
-                "priority": "0.85",
-            }
-        )
-        for area in get_area_facet_counts(industry=row["key"]):
-            if area["count"] < 1:
-                continue
-            urls.append(
-                {
-                    "loc": f"{base}/surat/{escape(row['key'])}/{escape(area['slug'])}/",
-                    "changefreq": "weekly",
-                    "priority": "0.75",
-                }
-            )
-
-    for business in Business.objects.filter(profile_setup_completed=True).only(
-        "slug", "created_at"
-    ).order_by("slug"):
-        urls.append(
-            {
-                "loc": f"{base}/b/{escape(business.slug)}/",
-                "changefreq": "weekly",
-                "priority": "0.8",
-                "lastmod": business.created_at.date().isoformat()
-                if getattr(business, "created_at", None)
-                else None,
-            }
-        )
-        urls.append(
-            {
-                "loc": f"{base}/booking/{escape(business.slug)}/",
-                "changefreq": "weekly",
-                "priority": "0.6",
-            }
-        )
-
-    lines = [
-        '<?xml version="1.0" encoding="UTF-8"?>',
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    ]
-    for item in urls:
-        lines.append("  <url>")
-        lines.append(f"    <loc>{item['loc']}</loc>")
-        if item.get("lastmod"):
-            lines.append(f"    <lastmod>{item['lastmod']}</lastmod>")
-        lines.append(f"    <changefreq>{item['changefreq']}</changefreq>")
-        lines.append(f"    <priority>{item['priority']}</priority>")
-        lines.append("  </url>")
-    lines.append("</urlset>")
-    return HttpResponse("\n".join(lines), content_type="application/xml; charset=utf-8")
+    base = site_base_url(request)
+    cache_key = f"sitemap_xml_v2:{base}:v{_directory_cache_version()}"
+    body = cache.get(cache_key)
+    if body is None:
+        body = render_sitemap_xml(build_sitemap_entries(request))
+        cache.set(cache_key, body, getattr(settings, "DIRECTORY_CACHE_TTL", 60) * 10)
+    return HttpResponse(body, content_type="application/xml; charset=utf-8")
 
 
 def _collection_open_now(businesses, limit=8):
