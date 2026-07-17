@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    {# Inlined app CSS — removes HTML→CSS network chain (PageSpeed critical path) #}
+    <style id="app-css">{{ app_css()|safe }}</style>
     <title>{% block title %}SuratBazar | Find & book local businesses{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Find and book trusted local businesses in Surat — salons, clinics, opticals, pet care and more. Compare prices, hours, and book online.{% endblock %}">
     <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
@@ -28,7 +30,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://images.unsplash.com">
 
-    {# Non-blocking fonts — system stack paints first #}
+    {# Fonts after CSS — non-blocking, does not extend critical CSS chain #}
     <link
       rel="preload"
       as="style"
@@ -38,9 +40,6 @@
     <noscript>
       <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Fraunces:opsz,wght@9..144,600;700&display=swap" rel="stylesheet">
     </noscript>
-
-    {# Compiled Tailwind (no CDN) #}
-    <link rel="stylesheet" href="/static/css/app.css">
 
     <style>
         [x-cloak] { display: none !important; }

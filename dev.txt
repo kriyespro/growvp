@@ -2,6 +2,9 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Inline app.css in <head> (cached) — removes HTML→CSS critical-path
+  chain from PageSpeed network dependency tree
+
 - [DONE] Image delivery — Unsplash q=45/fm=webp, srcset max 640w, tighter
   sizes; logo WebP (~10KB) + smaller PNG for header
 

@@ -10,6 +10,7 @@ from core.image_defaults import (
     placeholder_image_url,
 )
 from core.category_icons import footer_category_columns, hero_category_items
+from core.static_assets import get_app_css_text
 from users.industries import INDUSTRY_GROUPS
 
 
@@ -22,11 +23,18 @@ def environment(**options):
     def csrf_token(request):
         return get_token(request)
 
+    def safe_static(path):
+        try:
+            return static(path)
+        except ValueError:
+            base = "/static"
+            return f"{base}/{path.lstrip('/')}"
+
     env.filters['img_url'] = optimize_image_url
     env.filters['img_srcset'] = image_srcset
 
     env.globals.update({
-        'static': static,
+        'static': safe_static,
         'url': reverse,
         'csrf_field': csrf_input,
         'csrf_token_value': csrf_token,
@@ -36,5 +44,6 @@ def environment(**options):
         'placeholder_image': placeholder_image_url(),
         'img_url': optimize_image_url,
         'img_srcset': image_srcset,
+        'app_css': get_app_css_text,
     })
     return env
