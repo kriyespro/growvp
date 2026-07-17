@@ -37,18 +37,18 @@ HERO_SHORT_LABELS = {
 
 # Keys shown on home icon strip (curated order)
 HERO_CATEGORY_KEYS = (
+    "restaurant",  # Food
+    "fashion",
+    "gym",
+    "coaching",  # Tuition
+    "optical",
     "salon",
     "spa",
     "grooming",
     "dentist",
     "clinic",
-    "optical",
-    "gym",
-    "restaurant",
     "pet",
-    "fashion",
     "photography",
-    "coaching",
 )
 
 # path d= ... for stroke icons (currentColor)

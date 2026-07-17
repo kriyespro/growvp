@@ -2,6 +2,8 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Reorder home categories — Food, Fashion, Gym, Tuition, Optical first
+
 - [DONE] Compact home — DIRECTORY_LIST_LIMIT=24, slim hero (no mosaic/featured),
   tighter categories/areas, “Showing X of Y” when capped
 
