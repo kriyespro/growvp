@@ -1,3 +1,14 @@
+# Build stage: compile Tailwind CSS
+FROM node:22-slim AS assets
+WORKDIR /build
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY tailwind.config.js ./
+COPY static/src ./static/src
+COPY templates ./templates
+RUN npm run build:css
+
+# App stage
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -14,6 +25,7 @@ COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r /app/requirements.txt
 
 COPY . /app
+COPY --from=assets /build/static/css/app.css /app/static/css/app.css
 
 RUN python manage.py collectstatic --noinput || true
 

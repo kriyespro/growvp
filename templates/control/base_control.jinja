@@ -8,33 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['IBM Plex Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-            mono: ['IBM Plex Mono', 'ui-monospace', 'monospace'],
-          },
-          colors: {
-            control: {
-              bg: '#0f1419',
-              panel: '#161b22',
-              border: '#30363d',
-              muted: '#8b949e',
-              text: '#e6edf3',
-              accent: '#3fb950',
-              warn: '#d29922',
-              danger: '#f85149',
-              link: '#58a6ff',
-            }
-          }
-        }
-      }
-    }
-  </script>
-  <script src="https://unpkg.com/htmx.org@1.9.11"></script>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <style>
+    html, body { font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif; }
+  </style>
+  <script src="/static/js/htmx.min.js" defer></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script>
     document.body.addEventListener('htmx:configRequest', (event) => {
@@ -44,9 +22,6 @@
   </script>
   <style>
     [x-cloak] { display: none !important; }
-    .htmx-indicator { display: none; }
-    .htmx-request .htmx-indicator { display: inline-block; }
-    .htmx-request.htmx-indicator { display: inline-block; }
   </style>
   {% block head %}{% endblock %}
 </head>

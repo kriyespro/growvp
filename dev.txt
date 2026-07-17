@@ -2,6 +2,9 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Tailwind compiled build — static/css/app.css (~44KB minify), removed
+  CDN from base + Mission Control; Docker multi-stage node build; npm run build:css
+
 - [DONE] Perf: PageSpeed pass — async Google Fonts, deferred local HTMX,
   critical CSS first paint, Unsplash w=640&q=60 + srcset on cards
   (Tailwind CDN still render-blocking; compile CSS is next)
