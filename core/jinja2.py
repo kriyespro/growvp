@@ -4,7 +4,11 @@ from django.middleware.csrf import get_token
 from jinja2 import Environment
 from markupsafe import Markup
 
-from core.image_defaults import placeholder_image_url
+from core.image_defaults import (
+    image_srcset,
+    optimize_image_url,
+    placeholder_image_url,
+)
 from core.category_icons import footer_category_columns, hero_category_items
 from users.industries import INDUSTRY_GROUPS
 
@@ -18,6 +22,9 @@ def environment(**options):
     def csrf_token(request):
         return get_token(request)
 
+    env.filters['img_url'] = optimize_image_url
+    env.filters['img_srcset'] = image_srcset
+
     env.globals.update({
         'static': static,
         'url': reverse,
@@ -27,5 +34,7 @@ def environment(**options):
         'hero_categories': hero_category_items(),
         'footer_category_columns': footer_category_columns(),
         'placeholder_image': placeholder_image_url(),
+        'img_url': optimize_image_url,
+        'img_srcset': image_srcset,
     })
     return env

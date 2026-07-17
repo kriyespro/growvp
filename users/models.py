@@ -71,24 +71,24 @@ class Business(models.Model):
     @property
     def default_public_image_url(self):
         defaults = {
-            "salon": "https://images.unsplash.com/photo-1690749138086-7422f71dc159?q=80&w=654&auto=format&fit=crop",
-            "spa": "https://images.unsplash.com/photo-1540555700474-0649585eb711?q=80&w=800&auto=format&fit=crop",
-            "grooming": "https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=800&auto=format&fit=crop",
-            "dentist": "https://images.unsplash.com/photo-1677026010083-78ec7f1b84ed?w=900&auto=format&fit=crop",
-            "clinic": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=800&auto=format&fit=crop",
-            "optical": "https://images.unsplash.com/photo-1574259406477-12687b0c497a?q=80&w=800&auto=format&fit=crop",
-            "physiotherapy": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=800&auto=format&fit=crop",
-            "gym": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop",
-            "yoga": "https://images.unsplash.com/photo-1545205597-3d9d02c29597?q=80&w=800&auto=format&fit=crop",
-            "restaurant": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop",
-            "bakery": "https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=800&auto=format&fit=crop",
-            "pet": "https://images.unsplash.com/photo-1517948430535-1e2469d314fe?q=80&w=800&auto=format&fit=crop",
-            "auto": "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=800&auto=format&fit=crop",
-            "photography": "https://images.unsplash.com/photo-1452587925148-ce544e57ee08?q=80&w=800&auto=format&fit=crop",
+            "salon": "https://images.unsplash.com/photo-1690749138086-7422f71dc159?auto=format&fit=crop&w=640&q=60",
+            "spa": "https://images.unsplash.com/photo-1540555700474-0649585eb711?auto=format&fit=crop&w=640&q=60",
+            "grooming": "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=640&q=60",
+            "dentist": "https://images.unsplash.com/photo-1677026010083-78ec7f1b84ed?auto=format&fit=crop&w=640&q=60",
+            "clinic": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=640&q=60",
+            "optical": "https://images.unsplash.com/photo-1574259406477-12687b0c497a?auto=format&fit=crop&w=640&q=60",
+            "physiotherapy": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=640&q=60",
+            "gym": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=640&q=60",
+            "yoga": "https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=640&q=60",
+            "restaurant": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=640&q=60",
+            "bakery": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=640&q=60",
+            "pet": "https://images.unsplash.com/photo-1517948430535-1e2469d314fe?auto=format&fit=crop&w=640&q=60",
+            "auto": "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=640&q=60",
+            "photography": "https://images.unsplash.com/photo-1452587925148-ce544e57ee08?auto=format&fit=crop&w=640&q=60",
         }
         return defaults.get(
             self.industry_type,
-            "https://images.unsplash.com/photo-1690749138086-7422f71dc159?q=80&w=654&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1690749138086-7422f71dc159?auto=format&fit=crop&w=640&q=60",
         )
 
     @property

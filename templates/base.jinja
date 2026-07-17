@@ -23,36 +23,36 @@
     <meta name="twitter:description" content="{% block twitter_description %}{{ self.meta_description() }}{% endblock %}">
 
     <meta name="theme-color" content="#b45309">
+
+    {# Early connections for critical third-parties #}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-                        display: ['Fraunces', 'Georgia', 'serif'],
-                    },
-                    colors: {
-                        creameBg: '#FDFBF7',
-                        creameSurface: '#FFFFFF',
-                        brand: '#b45309',
-                        brandHover: '#92400e',
-                        textMain: '#292524',
-                        textMuted: '#78716c'
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- HTMX -->
-    <script src="https://unpkg.com/htmx.org@1.9.11"></script>
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+
+    {# Non-blocking fonts — system stack paints first #}
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Fraunces:opsz,wght@9..144,600;700&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
+    >
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Fraunces:opsz,wght@9..144,600;700&display=swap" rel="stylesheet">
+    </noscript>
+
+    {# Critical CSS so first paint isn't blank while Tailwind loads #}
     <style>
+        :root { color-scheme: light; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #FDFBF7;
+            color: #292524;
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        img { max-width: 100%; height: auto; }
         .htmx-indicator { display: none; }
         .htmx-request .htmx-indicator { display: inline-block; }
         .htmx-request.htmx-indicator { display: inline-block; }
@@ -77,6 +77,29 @@
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
         .mb-safe { margin-bottom: env(safe-area-inset-bottom, 0px); }
     </style>
+
+    <!-- Tailwind CSS (CDN JIT — still needed until compiled build ships) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        display: ['Fraunces', 'Georgia', 'serif'],
+                    },
+                    colors: {
+                        creameBg: '#FDFBF7',
+                        creameSurface: '#FFFFFF',
+                        brand: '#b45309',
+                        brandHover: '#92400e',
+                        textMain: '#292524',
+                        textMuted: '#78716c'
+                    }
+                }
+            }
+        }
+    </script>
     {% block json_ld %}{% endblock %}
     {% block head %}{% endblock %}
 </head>
@@ -119,5 +142,9 @@
     {% block site_footer %}
     {% include 'partials/_site_footer.jinja' %}
     {% endblock %}
+
+    {# Deferred interactivity — not needed for first paint / LCP #}
+    <script src="/static/js/htmx.min.js" defer></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 </html>

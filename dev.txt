@@ -2,6 +2,10 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Perf: PageSpeed pass — async Google Fonts, deferred local HTMX,
+  critical CSS first paint, Unsplash w=640&q=60 + srcset on cards
+  (Tailwind CDN still render-blocking; compile CSS is next)
+
 - [DONE] Sitemap for Google — fast build_sitemap_entries (1 DB pass), cached
   /sitemap.xml, generate_sitemap management command → static/sitemap.xml
   Submit: https://suratbazar.online/sitemap.xml in Search Console

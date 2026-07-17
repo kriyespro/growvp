@@ -7,7 +7,7 @@
     {% for business in open_now_featured %}
     <a href="/b/{{ business.slug }}/" class="group w-[68%] max-w-[13rem] shrink-0 snap-start overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm transition hover:border-green-500/40 sm:w-auto sm:max-w-none">
       <div class="relative h-20 overflow-hidden bg-stone-100">
-        <img src="{{ business.public_hero_image_url }}" alt="" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" data-fallbacks="{{ business.image_fallbacks }}" onerror="sbImgFallback(this)">
+        <img src="{{ business.public_hero_image_url|img_url(480) }}" alt="" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" decoding="async" width="480" height="240" data-fallbacks="{{ business.image_fallbacks }}" onerror="sbImgFallback(this)">
         <span class="absolute bottom-1.5 left-1.5 rounded-full bg-green-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">{{ business.today_label }}</span>
       </div>
       <div class="px-2.5 py-2">
