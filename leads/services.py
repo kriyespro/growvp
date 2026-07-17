@@ -6,6 +6,9 @@ from users.models import User
 from users.services import businesses_for_user, user_can_manage_business
 
 
+ENQUIRY_INBOX_LIMIT = 100
+
+
 def enquiries_for_user(user):
     if not user or not user.is_authenticated:
         return Enquiry.objects.none()
@@ -13,19 +16,19 @@ def enquiries_for_user(user):
         return (
             Enquiry.objects.filter(client=user)
             .select_related("business", "client")
-            .annotate(message_count=Count("messages"))
+            .annotate(message_count=Count("messages"))[:ENQUIRY_INBOX_LIMIT]
         )
     if user.is_platform_super_admin or user.is_staff:
         return (
             Enquiry.objects.all()
             .select_related("business", "client")
-            .annotate(message_count=Count("messages"))
+            .annotate(message_count=Count("messages"))[:ENQUIRY_INBOX_LIMIT]
         )
     business_ids = businesses_for_user(user).values_list("id", flat=True)
     return (
         Enquiry.objects.filter(business_id__in=business_ids)
         .select_related("business", "client")
-        .annotate(message_count=Count("messages"))
+        .annotate(message_count=Count("messages"))[:ENQUIRY_INBOX_LIMIT]
     )
 
 

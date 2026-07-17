@@ -72,6 +72,9 @@
     <section class="mt-10">
       <h2 class="font-display text-xl font-bold text-textMain">All listings</h2>
       {% if businesses %}
+      {% if list_limited %}
+      <p class="mt-1 text-xs text-textMuted">Showing top {{ businesses|length }} of {{ total_count }} — refine with an area filter above.</p>
+      {% endif %}
       <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {% for business in businesses %}
         {% include 'partials/_business_card.jinja' %}

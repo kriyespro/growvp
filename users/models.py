@@ -44,6 +44,12 @@ class Business(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['industry_type']),
+            models.Index(fields=['profile_setup_completed']),
+        ]
+
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(self.name) or "business"

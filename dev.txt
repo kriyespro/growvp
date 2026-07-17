@@ -2,6 +2,19 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Perf pass 2: capped booking calendar_view to latest 200 appointments;
+  capped enquiries_for_user to latest 100 (ENQUIRY_INBOX_LIMIT); cached
+  get_industry_facet_counts/get_area_facet_counts via existing directory
+  cache versioning; capped /surat/<industry>/ and /surat/<industry>/<area>/
+  grid render to DIRECTORY_LIST_LIMIT (24) with "Showing X of Y" note,
+  stats/JSON-LD still computed off full result set.
+- [DONE] Perf: added Meta.indexes — Invoice(business,status,created_at),
+  Appointment(business,date)/(business,status)/(business,created_at),
+  Enquiry(business,status)/(client,status), Business(industry_type),
+  Business(profile_setup_completed), Customer(business,phone). Migrations
+  billing.0002, booking.0003, crm.0003, leads.0002, users.0008 — reviewed
+  (pure AddIndex, no data ops) and applied.
+
 - [DONE] Reorder home categories — Food, Fashion, Gym, Tuition, Optical first
 
 - [DONE] Compact home — DIRECTORY_LIST_LIMIT=24, slim hero (no mosaic/featured),

@@ -312,8 +312,10 @@ def surat_industry(request, industry):
         raise Http404("Unknown category")
 
     businesses = list_directory_businesses(industry=industry, sort="popular")
+    total_count = len(businesses)
+    page_businesses = businesses[:DIRECTORY_LIST_LIMIT]
     areas = get_area_facet_counts(industry=industry)
-    meta = collection_page_meta(industry_key=industry, count=len(businesses))
+    meta = collection_page_meta(industry_key=industry, count=total_count)
     path = f"/surat/{industry}/"
     canonical = absolute_url(path, request)
     crumbs = [
@@ -332,7 +334,9 @@ def surat_industry(request, industry):
             "industry_label": industry_seo_label(industry),
             "area_label": "",
             "area_slug": "",
-            "businesses": businesses,
+            "businesses": page_businesses,
+            "total_count": total_count,
+            "list_limited": total_count > DIRECTORY_LIST_LIMIT,
             "areas": areas,
             "related_industries": related,
             "stats": get_directory_stats(businesses),
@@ -377,8 +381,10 @@ def surat_industry_area(request, industry, area_slug):
     if not businesses:
         raise Http404("No listings in this area yet")
 
+    total_count = len(businesses)
+    page_businesses = businesses[:DIRECTORY_LIST_LIMIT]
     meta = collection_page_meta(
-        industry_key=industry, area_label=area_label, count=len(businesses)
+        industry_key=industry, area_label=area_label, count=total_count
     )
     path = f"/surat/{industry}/{area_slug}/"
     canonical = absolute_url(path, request)
@@ -401,7 +407,9 @@ def surat_industry_area(request, industry, area_slug):
             "industry_label": industry_seo_label(industry),
             "area_label": area_label,
             "area_slug": area_slug,
-            "businesses": businesses,
+            "businesses": page_businesses,
+            "total_count": total_count,
+            "list_limited": total_count > DIRECTORY_LIST_LIMIT,
             "areas": sibling_areas,
             "related_industries": [
                 row for row in get_industry_hub_rows() if row["key"] != industry

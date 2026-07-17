@@ -21,6 +21,13 @@ class Appointment(models.Model):
     end_time = models.TimeField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['business', 'date']),
+            models.Index(fields=['business', 'status']),
+            models.Index(fields=['business', 'created_at']),
+        ]
+
     def __str__(self):
         return f"{self.service.name} for {self.customer.first_name} on {self.date}"

@@ -369,12 +369,20 @@ def get_directory_stats(businesses):
 
 def get_industry_facet_counts():
     """Industry counts across all discoverable businesses (for filter chips)."""
+    cache_key = _directory_cache_key(kind="industry_facets")
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
     rows = (
         _discoverable_queryset()
         .values("industry_type")
         .annotate(c=Count("id", distinct=True))
     )
-    return {row["industry_type"]: row["c"] for row in rows}
+    result = {row["industry_type"]: row["c"] for row in rows}
+    ttl = getattr(settings, "DIRECTORY_CACHE_TTL", 60)
+    cache.set(cache_key, result, ttl)
+    return result
 
 
 def get_area_facet_counts(industry=""):
@@ -386,6 +394,12 @@ def get_area_facet_counts(industry=""):
 
     from core.seo import area_to_slug
 
+    industry = (industry or "").strip()
+    cache_key = _directory_cache_key(kind="area_facets", industry=industry)
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
     # Lean queryset — no prefetch (Django 5.1 forbids iterator() after prefetch
     # without chunk_size; we only need addresses for counting).
     qs = (
@@ -393,7 +407,6 @@ def get_area_facet_counts(industry=""):
         .prefetch_related(None)
         .values_list("public_address", flat=True)
     )
-    industry = (industry or "").strip()
     if industry and industry in dict(Business.INDUSTRY_CHOICES):
         qs = qs.filter(industry_type=industry)
 
@@ -411,6 +424,9 @@ def get_area_facet_counts(industry=""):
             continue
         rows.append({"label": label, "slug": slug, "count": count})
     rows.sort(key=lambda row: (-row["count"], row["label"].lower()))
+
+    ttl = getattr(settings, "DIRECTORY_CACHE_TTL", 60)
+    cache.set(cache_key, rows, ttl)
     return rows
 
 

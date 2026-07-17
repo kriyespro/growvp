@@ -26,6 +26,10 @@ class Enquiry(models.Model):
 
     class Meta:
         ordering = ["-updated_at"]
+        indexes = [
+            models.Index(fields=['business', 'status']),
+            models.Index(fields=['client', 'status']),
+        ]
 
     def __str__(self):
         return f"Enquiry #{self.pk} → {self.business.name}"

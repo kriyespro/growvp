@@ -9,6 +9,11 @@ class Customer(models.Model):
     email = models.EmailField(blank=True)
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['business', 'phone']),
+        ]
+
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.phone})"

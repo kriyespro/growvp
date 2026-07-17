@@ -18,7 +18,7 @@ def calendar_view(request):
     appointments = (
         Appointment.objects.filter(business=business)
         .select_related('customer', 'service')
-        .order_by('-date', '-start_time')
+        .order_by('-date', '-start_time')[:200]
     )
     
     if request.method == 'POST':
