@@ -77,7 +77,16 @@ def landing(request):
     ctx["website_json_ld"] = website_json_ld(request)
     ctx["canonical_url"] = absolute_url("/", request)
     ctx["industry_hub_rows"] = get_industry_hub_rows()[:12]
-    ctx["area_hub_rows"] = get_area_facet_counts()[:10]
+    ctx["area_hub_rows"] = get_area_facet_counts()[:12]
+    # Platform-wide KPIs (unfiltered) for hero strip
+    all_listings = list_directory_businesses()
+    ctx["home_stats"] = get_directory_stats(all_listings)
+    featured = [b for b in all_listings if getattr(b, "is_featured_listing", False)]
+    if len(featured) < 4:
+        featured = all_listings[:6]
+    else:
+        featured = featured[:6]
+    ctx["featured_businesses"] = featured
     return render(request, "pages/landing.jinja", ctx)
 
 

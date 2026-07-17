@@ -1,17 +1,20 @@
 {% if open_now_featured %}
-<section class="mb-5">
-  <div class="mb-2 flex items-center justify-between gap-3">
-    <h2 class="text-sm font-semibold text-textMain">Open right now</h2>
+<section class="mb-8">
+  <div class="mb-3 flex items-center justify-between gap-3">
+    <div>
+      <h2 class="font-display text-lg font-bold text-textMain">Open right now</h2>
+      <p class="text-xs text-textMuted sm:text-sm">Walk in or book while they’re open</p>
+    </div>
   </div>
-  <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:snap-none sm:px-0">
+  <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 lg:grid-cols-4">
     {% for business in open_now_featured %}
-    <a href="/b/{{ business.slug }}/" class="w-[70%] max-w-[14rem] shrink-0 snap-start overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm transition hover:border-brand/40 sm:w-52 sm:max-w-none">
-      <div class="relative h-24 overflow-hidden bg-stone-100">
-        <img src="{{ business.public_hero_image_url }}" alt="" class="h-full w-full object-cover" loading="lazy" data-fallbacks="{{ business.image_fallbacks }}" onerror="sbImgFallback(this)">
-        <span class="absolute bottom-1.5 left-1.5 rounded bg-green-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">{{ business.today_label }}</span>
+    <a href="/b/{{ business.slug }}/" class="group w-[72%] max-w-[15rem] shrink-0 snap-start overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm transition hover:border-green-500/40 hover:shadow-md sm:w-auto sm:max-w-none">
+      <div class="relative h-28 overflow-hidden bg-stone-100 sm:h-24">
+        <img src="{{ business.public_hero_image_url }}" alt="" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" data-fallbacks="{{ business.image_fallbacks }}" onerror="sbImgFallback(this)">
+        <span class="absolute bottom-2 left-2 rounded-full bg-green-600 px-2 py-0.5 text-[10px] font-semibold text-white shadow">{{ business.today_label }}</span>
       </div>
-      <div class="px-2.5 py-2">
-        <p class="truncate text-sm font-semibold text-textMain">{{ business.name }}</p>
+      <div class="px-3 py-2.5">
+        <p class="truncate text-sm font-semibold text-textMain group-hover:text-brand">{{ business.name }}</p>
         <p class="mt-0.5 truncate text-[11px] text-textMuted">{{ business.area_label or business.get_industry_type_display() }}{% if business.price_range_label %} · {{ business.price_range_label }}{% endif %}</p>
       </div>
     </a>
@@ -20,8 +23,10 @@
 </section>
 {% endif %}
 
-<div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-  <p class="text-sm text-textMuted">
+<div class="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 pb-4">
+  <div>
+    <h2 class="font-display text-lg font-bold text-textMain sm:text-xl">All listings</h2>
+    <p class="mt-0.5 text-sm text-textMuted">
     {% if result_count == 0 %}
       No businesses found
     {% elif result_count == 1 %}
@@ -38,7 +43,8 @@
     {% if availability == 'open' %}· Open now{% endif %}
     {% if bookable == '1' %}· Bookable{% endif %}
     {% if verified == '1' %}· Verified{% endif %}
-  </p>
+    </p>
+  </div>
 </div>
 
 {% if not businesses %}

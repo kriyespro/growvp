@@ -1,17 +1,26 @@
-{# Home hero: category icon strip (replaces headline + tagline) #}
+{# Category icons — tap to filter directory (HTMX) or open Surat guide #}
 <nav aria-label="Browse by category" class="w-full">
-  <h1 class="sr-only">SuratBazar — find &amp; book local businesses in Surat</h1>
-  <div class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x snap-mandatory sm:mx-0 sm:grid sm:grid-cols-6 sm:gap-3 sm:overflow-visible lg:grid-cols-12">
+  <div class="flex items-end justify-between gap-2">
+    <h2 class="font-display text-base font-bold text-textMain sm:text-lg">Browse by category</h2>
+    <a href="/surat/" class="shrink-0 text-xs font-semibold text-brand hover:text-brandHover sm:text-sm">All categories →</a>
+  </div>
+  <div class="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-12">
     {% for item in hero_categories %}
-    <a
-      href="{{ item.path }}"
-      class="snap-start flex w-[4.5rem] shrink-0 flex-col items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-1.5 py-2.5 text-center shadow-sm transition hover:border-brand/40 hover:bg-brand/5 sm:w-auto"
+    <button
+      type="button"
+      hx-get="/directory/search/?industry={{ item.key }}"
+      hx-target="#directory-results"
+      hx-indicator="#directory-loading"
+      hx-push-url="true"
+      hx-on::after-request="document.querySelector('#directory-form select[name=industry]').value='{{ item.key }}'; document.getElementById('directory-results')?.scrollIntoView({behavior:'smooth', block:'start'})"
+      class="group flex flex-col items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-1 py-2.5 text-center shadow-sm transition hover:border-brand/50 hover:bg-brand/5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-brand/30 {% if industry == item.key %}border-brand bg-brand/5 ring-2 ring-brand/20{% endif %}"
+      title="Filter: {{ item.label }}"
     >
-      <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-orange-50 text-brand">
+      <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-orange-50 to-amber-100 text-brand transition group-hover:scale-105 sm:h-10 sm:w-10">
         {{ item.icon|safe }}
       </span>
-      <span class="text-[11px] font-semibold leading-tight text-textMain">{{ item.label }}</span>
-    </a>
+      <span class="text-[10px] font-semibold leading-tight text-textMain sm:text-[11px]">{{ item.label }}</span>
+    </button>
     {% endfor %}
   </div>
 </nav>

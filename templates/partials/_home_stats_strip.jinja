@@ -1,0 +1,21 @@
+{# Platform KPI strip — uses home_stats (all listings, unfiltered) #}
+{% if home_stats %}
+<div class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+  <div class="rounded-xl border border-stone-200/80 bg-white/90 px-3 py-2.5 shadow-sm backdrop-blur sm:px-4 sm:py-3">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-textMuted">Listed</p>
+    <p class="mt-0.5 font-display text-xl font-bold text-textMain sm:text-2xl">{{ home_stats.total }}</p>
+  </div>
+  <div class="rounded-xl border border-green-200/80 bg-green-50/80 px-3 py-2.5 shadow-sm sm:px-4 sm:py-3">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-green-800/80">Open now</p>
+    <p class="mt-0.5 font-display text-xl font-bold text-green-800 sm:text-2xl">{{ home_stats.open_now }}</p>
+  </div>
+  <div class="rounded-xl border border-brand/20 bg-orange-50/80 px-3 py-2.5 shadow-sm sm:px-4 sm:py-3">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-brand/80">Book online</p>
+    <p class="mt-0.5 font-display text-xl font-bold text-brand sm:text-2xl">{{ home_stats.bookable }}</p>
+  </div>
+  <div class="rounded-xl border border-sky-200/80 bg-sky-50/80 px-3 py-2.5 shadow-sm sm:px-4 sm:py-3">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-sky-800/80">Verified</p>
+    <p class="mt-0.5 font-display text-xl font-bold text-sky-900 sm:text-2xl">{{ home_stats.verified }}</p>
+  </div>
+</div>
+{% endif %}

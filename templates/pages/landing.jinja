@@ -9,152 +9,187 @@
 
 {% block content %}
 <div class="relative min-h-screen overflow-x-hidden" x-data="{ mobileMenuOpen: false }">
-  <div class="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(ellipse_at_top,_rgba(180,83,9,0.10),_transparent_60%),linear-gradient(180deg,#fff7ed_0%,#FDFBF7_85%)]"></div>
+  {# Hero gradient #}
+  <div class="pointer-events-none absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,_rgba(180,83,9,0.14),_transparent),linear-gradient(180deg,#fff7ed_0%,#FDFBF7_55%,transparent_100%)]"></div>
 
-  <header class="relative z-30 border-b border-stone-200/70 bg-white/80 backdrop-blur sticky top-0">
-    <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
-      {% set logo_height = 'h-12 sm:h-14' %}
+  <header class="relative z-30 border-b border-stone-200/60 bg-white/85 backdrop-blur-md sticky top-0">
+    <div class="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
+      {% set logo_height = 'h-11 sm:h-12' %}
       {% include 'partials/_brand_logo.jinja' %}
       <button
-        class="inline-flex items-center justify-center rounded-md border border-stone-300 bg-white px-3 py-1.5 text-xs font-semibold text-textMain md:hidden"
+        class="inline-flex items-center justify-center rounded-lg border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-textMain md:hidden"
         @click="mobileMenuOpen = !mobileMenuOpen"
         type="button"
         aria-label="Toggle navigation"
       >
         Menu
       </button>
-      <nav class="hidden items-center gap-3 md:flex">
-        <a href="/surat/" class="text-sm font-semibold text-textMuted hover:text-brand">Surat guide</a>
-        <a href="/pricing/" class="text-sm font-semibold text-textMuted hover:text-brand">Pricing</a>
+      <nav class="hidden items-center gap-2 md:flex">
+        <a href="/surat/" class="rounded-lg px-3 py-2 text-sm font-semibold text-textMuted hover:bg-stone-100 hover:text-brand">Surat guide</a>
+        <a href="/pricing/" class="rounded-lg px-3 py-2 text-sm font-semibold text-textMuted hover:bg-stone-100 hover:text-brand">Pricing</a>
         {% if request.user.is_authenticated %}
-          <a href="/dashboard/" class="rounded-md bg-brand px-3.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-brandHover">Dashboard</a>
+          <a href="/dashboard/" class="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brandHover">Dashboard</a>
         {% else %}
-          <a href="/auth/login/" class="text-sm font-semibold text-textMain hover:text-brand">Sign in</a>
-          <a href="/auth/register/" class="rounded-md bg-brand px-3.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-brandHover">List your business</a>
+          <a href="/auth/login/" class="rounded-lg px-3 py-2 text-sm font-semibold text-textMain hover:text-brand">Sign in</a>
+          <a href="/auth/register/" class="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brandHover">List your business</a>
         {% endif %}
       </nav>
     </div>
     <nav x-show="mobileMenuOpen" x-cloak class="border-t border-stone-200 bg-white px-4 py-3 md:hidden">
       <div class="grid grid-cols-2 gap-2">
-        <a href="/surat/" class="col-span-2 inline-flex items-center justify-center rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-textMain">Surat guide</a>
-        <a href="/pricing/" class="col-span-2 inline-flex items-center justify-center rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-textMain">Pricing</a>
+        <a href="/surat/" class="col-span-2 inline-flex items-center justify-center rounded-lg border border-stone-300 px-3 py-2.5 text-sm font-semibold text-textMain">Surat guide</a>
+        <a href="/pricing/" class="col-span-2 inline-flex items-center justify-center rounded-lg border border-stone-300 px-3 py-2.5 text-sm font-semibold text-textMain">Pricing</a>
         {% if request.user.is_authenticated %}
-          <a href="/dashboard/" class="col-span-2 inline-flex items-center justify-center rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white">Dashboard</a>
+          <a href="/dashboard/" class="col-span-2 inline-flex items-center justify-center rounded-lg bg-brand px-3 py-2.5 text-sm font-semibold text-white">Dashboard</a>
         {% else %}
-          <a href="/auth/login/" class="inline-flex items-center justify-center rounded-md border border-stone-300 px-3 py-2 text-sm font-semibold text-textMain">Sign in</a>
-          <a href="/auth/register/" class="inline-flex items-center justify-center rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white">List business</a>
+          <a href="/auth/login/" class="inline-flex items-center justify-center rounded-lg border border-stone-300 px-3 py-2.5 text-sm font-semibold text-textMain">Sign in</a>
+          <a href="/auth/register/" class="inline-flex items-center justify-center rounded-lg bg-brand px-3 py-2.5 text-sm font-semibold text-white">List business</a>
         {% endif %}
       </div>
     </nav>
   </header>
 
-  <section class="relative z-10 mx-auto w-full max-w-7xl px-4 pt-5 pb-4 sm:px-6 sm:pt-6 lg:px-8">
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-      <div class="min-w-0 flex-1">
-        {% include 'partials/_category_icon_strip.jinja' %}
-      </div>
-      {% if stats %}
-      <p class="shrink-0 text-xs font-medium text-textMuted sm:pt-2 sm:text-right">
-        <span class="font-semibold text-textMain">{{ stats.total }}</span> listed
-        {% if stats.open_now %}<span class="text-stone-300">·</span> <span class="font-semibold text-green-700">{{ stats.open_now }}</span> open now{% endif %}
+  {# Hero #}
+  <section class="relative z-10 mx-auto w-full max-w-7xl px-4 pt-6 pb-2 sm:px-6 sm:pt-8 lg:px-8">
+    <div class="max-w-2xl">
+      <p class="text-xs font-bold uppercase tracking-widest text-brand">Surat · Gujarat</p>
+      <h1 class="mt-2 font-display text-3xl font-bold tracking-tight text-textMain sm:text-4xl lg:text-[2.75rem] lg:leading-tight">
+        Find &amp; book local businesses in Surat
+      </h1>
+      <p class="mt-2 max-w-xl text-base text-textMuted sm:text-lg">
+        Salons, clinics, gyms, restaurants and more — compare hours, prices, and book online.
       </p>
-      {% endif %}
     </div>
 
+    <div class="mt-5 sm:mt-6">
+      {% include 'partials/_home_stats_strip.jinja' %}
+    </div>
+
+    <div class="mt-6 sm:mt-8">
+      {% include 'partials/_category_icon_strip.jinja' %}
+    </div>
+
+    {% include 'partials/_home_areas_strip.jinja' %}
+
+    {# Search card #}
     <form
       id="directory-form"
-      class="mt-4 rounded-xl border border-stone-200 bg-white p-2.5 shadow-sm sm:p-3"
+      class="mt-6 rounded-2xl border border-stone-200/80 bg-white p-3 shadow-lg shadow-stone-200/40 sm:mt-8 sm:p-4"
       hx-get="/directory/search/"
       hx-trigger="keyup changed delay:300ms from:#directory-q, change from:#directory-sort, change from:select[name='industry'], change from:input[name='availability'], change from:input[name='bookable'], change from:input[name='verified']"
       hx-target="#directory-results"
       hx-indicator="#directory-loading"
       hx-push-url="true"
     >
-      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <p class="mb-3 text-sm font-semibold text-textMain">Search the directory</p>
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-stretch">
         <label class="relative block flex-1">
           <span class="sr-only">Search businesses</span>
+          <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-stone-400">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"/></svg>
+          </span>
           <input
             id="directory-q"
             type="search"
             name="q"
             value="{{ q }}"
-            placeholder="Search name, service, or area…"
-            class="w-full rounded-lg border border-stone-300 bg-white px-3.5 py-3 text-base text-textMain placeholder:text-stone-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm"
+            placeholder="Name, service, or area — e.g. Vesu, haircut…"
+            class="w-full rounded-xl border border-stone-300 bg-stone-50/50 py-3 pl-10 pr-3.5 text-base text-textMain placeholder:text-stone-400 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm"
             autocomplete="off"
           >
         </label>
         <div class="grid grid-cols-2 gap-2 sm:contents">
-        <label class="sm:w-44">
-          <span class="sr-only">Category</span>
-          <select
-            name="industry"
-            class="w-full rounded-lg border border-stone-300 bg-white px-3.5 py-3 text-base text-textMain focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm"
-          >
-            <option value="" {% if not industry %}selected{% endif %}>All categories</option>
-            {% for group_label, group_choices in industry_groups %}
-            <optgroup label="{{ group_label }}">
-              {% for value, label in group_choices %}
-              <option value="{{ value }}" {% if industry == value %}selected{% endif %}>{{ label }}</option>
+          <label class="sm:w-40">
+            <span class="sr-only">Category</span>
+            <select
+              name="industry"
+              class="w-full rounded-xl border border-stone-300 bg-stone-50/50 px-3 py-3 text-base text-textMain focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm"
+            >
+              <option value="" {% if not industry %}selected{% endif %}>All categories</option>
+              {% for group_label, group_choices in industry_groups %}
+              <optgroup label="{{ group_label }}">
+                {% for value, label in group_choices %}
+                <option value="{{ value }}" {% if industry == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </optgroup>
               {% endfor %}
-            </optgroup>
-            {% endfor %}
-          </select>
-        </label>
-        <label class="sm:w-44">
-          <span class="sr-only">Sort</span>
-          <select
-            id="directory-sort"
-            name="sort"
-            class="w-full rounded-lg border border-stone-300 bg-white px-3.5 py-3 text-base text-textMain focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm"
-          >
-            <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
-            <option value="popular" {% if sort == 'popular' %}selected{% endif %}>Most booked</option>
-            <option value="name" {% if sort == 'name' %}selected{% endif %}>Name A–Z</option>
-            <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: low → high</option>
-            <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: high → low</option>
-          </select>
-        </label>
+            </select>
+          </label>
+          <label class="sm:w-40">
+            <span class="sr-only">Sort</span>
+            <select
+              id="directory-sort"
+              name="sort"
+              class="w-full rounded-xl border border-stone-300 bg-stone-50/50 px-3 py-3 text-base text-textMain focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm"
+            >
+              <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+              <option value="popular" {% if sort == 'popular' %}selected{% endif %}>Most booked</option>
+              <option value="name" {% if sort == 'name' %}selected{% endif %}>Name A–Z</option>
+              <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: low → high</option>
+              <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: high → low</option>
+            </select>
+          </label>
         </div>
       </div>
 
-      <div class="mt-2.5 flex flex-wrap items-center gap-2">
+      <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-stone-100 pt-3">
+        <span class="text-[11px] font-semibold uppercase tracking-wide text-textMuted">Filters</span>
         <label class="cursor-pointer">
           <input type="checkbox" name="availability" value="open" class="peer sr-only" {% if availability == 'open' %}checked{% endif %}>
-          <span class="inline-flex min-h-9 items-center rounded-md border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-textMuted peer-checked:border-green-600 peer-checked:bg-green-600 peer-checked:text-white">Open now</span>
+          <span class="inline-flex min-h-9 items-center rounded-full border border-stone-300 bg-white px-3.5 py-1.5 text-xs font-semibold text-textMuted transition peer-checked:border-green-600 peer-checked:bg-green-600 peer-checked:text-white">Open now</span>
         </label>
         <label class="cursor-pointer">
           <input type="checkbox" name="bookable" value="1" class="peer sr-only" {% if bookable == '1' %}checked{% endif %}>
-          <span class="inline-flex min-h-9 items-center rounded-md border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-textMuted peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white">Book online</span>
+          <span class="inline-flex min-h-9 items-center rounded-full border border-stone-300 bg-white px-3.5 py-1.5 text-xs font-semibold text-textMuted transition peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white">Book online</span>
         </label>
         <label class="cursor-pointer">
           <input type="checkbox" name="verified" value="1" class="peer sr-only" {% if verified == '1' %}checked{% endif %}>
-          <span class="inline-flex min-h-9 items-center rounded-md border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-textMuted peer-checked:border-sky-700 peer-checked:bg-sky-700 peer-checked:text-white">Verified</span>
+          <span class="inline-flex min-h-9 items-center rounded-full border border-stone-300 bg-white px-3.5 py-1.5 text-xs font-semibold text-textMuted transition peer-checked:border-sky-700 peer-checked:bg-sky-700 peer-checked:text-white">Verified</span>
         </label>
         {% if q or industry or availability or bookable or verified or (sort and sort != 'newest') %}
-        <a href="/" class="ml-auto text-[11px] font-semibold text-brand hover:text-brandHover">Clear</a>
+        <a href="/" class="ml-auto text-xs font-semibold text-brand hover:text-brandHover">Clear all</a>
         {% endif %}
-        <span id="directory-loading" class="htmx-indicator ml-auto text-[11px] font-medium text-brand sm:ml-2">Updating…</span>
+        <span id="directory-loading" class="htmx-indicator ml-auto text-xs font-medium text-brand">Updating…</span>
       </div>
     </form>
   </section>
 
-  <section class="relative z-10 mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:px-8" id="directory-results">
+  {% include 'partials/_home_featured.jinja' %}
+
+  <section class="relative z-10 mx-auto w-full max-w-7xl px-4 pb-8 sm:px-6 lg:px-8" id="directory-results">
     {% include 'partials/_business_directory_results.jinja' %}
   </section>
 
+  {# Business owner CTA #}
+  <section class="relative z-10 border-y border-stone-200 bg-gradient-to-r from-amber-50 to-orange-50/50">
+    <div class="mx-auto flex max-w-7xl flex-col items-start justify-between gap-4 px-4 py-8 sm:flex-row sm:items-center sm:px-6 lg:px-8">
+      <div>
+        <h2 class="font-display text-xl font-bold text-textMain">Own a business in Surat?</h2>
+        <p class="mt-1 text-sm text-textMuted">List free — add services, hours, and take bookings online in minutes.</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <a href="/pricing/" class="inline-flex items-center justify-center rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-textMain hover:bg-stone-50">Compare plans</a>
+        <a href="/auth/register/" class="inline-flex items-center justify-center rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brandHover">List your business free</a>
+      </div>
+    </div>
+  </section>
+
   {% if industry_hub_rows %}
-  <section class="relative z-10 border-t border-stone-200 bg-white">
+  <section class="relative z-10 bg-white">
     <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div class="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 class="font-display text-xl font-bold text-textMain">Browse Surat by category</h2>
-          <p class="mt-1 text-sm text-textMuted">Indexable guides for each industry — great for search.</p>
+          <h2 class="font-display text-xl font-bold text-textMain">Explore Surat by industry</h2>
+          <p class="mt-1 text-sm text-textMuted">SEO-friendly guides for every category — book or call directly.</p>
         </div>
         <a href="/surat/" class="text-sm font-semibold text-brand hover:text-brandHover">Full Surat guide →</a>
       </div>
-      <div class="mt-5 flex flex-wrap gap-2">
+      <div class="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
         {% for row in industry_hub_rows %}
-        <a href="{{ row.path }}" class="rounded-md border border-stone-200 bg-stone-50 px-3 py-1.5 text-xs font-semibold text-textMain hover:border-brand/40">{{ row.seo_label }} · {{ row.count }}</a>
+        <a href="{{ row.path }}" class="flex items-center justify-between rounded-xl border border-stone-200 bg-stone-50/80 px-3 py-2.5 text-sm font-semibold text-textMain transition hover:border-brand/40 hover:bg-white hover:shadow-sm">
+          <span class="truncate pr-2">{{ row.seo_label }}</span>
+          <span class="shrink-0 rounded-full bg-white px-2 py-0.5 text-[11px] font-bold text-brand">{{ row.count }}</span>
+        </a>
         {% endfor %}
       </div>
     </div>

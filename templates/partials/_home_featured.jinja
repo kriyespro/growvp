@@ -1,0 +1,18 @@
+{% if featured_businesses and not (q or industry or availability or bookable or verified) %}
+<section class="relative z-10 mx-auto w-full max-w-7xl px-4 pb-6 sm:px-6 lg:px-8">
+  <div class="mb-3 flex items-end justify-between gap-3">
+    <div>
+      <h2 class="font-display text-lg font-bold text-textMain sm:text-xl">Featured in Surat</h2>
+      <p class="mt-0.5 text-sm text-textMuted">Premium listings with online booking</p>
+    </div>
+    <a href="/?sort=popular#directory-results" class="text-sm font-semibold text-brand hover:text-brandHover">View all →</a>
+  </div>
+  <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+    {% for business in featured_businesses[:6] %}
+    <div class="w-[85%] max-w-sm shrink-0 snap-start sm:w-auto sm:max-w-none">
+      {% include 'partials/_business_card.jinja' %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}

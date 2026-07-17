@@ -2,6 +2,10 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Home page upgrade — KPI stats strip, category icon grid (HTMX filter),
+  popular areas chips, featured listings carousel, improved search card + hero,
+  business-owner CTA, industry hub links; directory results polish
+
 - [DONE] Bulk seed command seed_bulk_directory — 200 realistic Surat listings
   (areas, industries, Free/Pro/Premium, services, hours, products)
 
