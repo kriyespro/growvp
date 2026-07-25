@@ -93,15 +93,13 @@ class Business(models.Model):
 
     @property
     def public_hero_image_url(self):
+        """Prefer saved hero_image_url on all plans; fall back to category default."""
         from core.image_defaults import first_usable_url
-        from core.plans import plan_allows_custom_hero
 
-        if plan_allows_custom_hero(self.listing_plan):
-            return first_usable_url(
-                self.hero_image_url,
-                self.default_public_image_url,
-            )
-        return self.default_public_image_url
+        return first_usable_url(
+            self.hero_image_url,
+            self.default_public_image_url,
+        )
 
     @property
     def image_fallbacks(self):

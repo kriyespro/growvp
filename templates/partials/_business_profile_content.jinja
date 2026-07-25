@@ -177,15 +177,12 @@
                     <label for="hero_subtitle" class="block text-sm font-medium text-textMain">Hero subtitle</label>
                     <textarea id="hero_subtitle" name="hero_subtitle" rows="3" class="block w-full rounded-md border-0 bg-white py-2.5 px-4 text-textMain shadow-sm ring-1 ring-inset ring-stone-300 focus:ring-2 focus:ring-inset focus:ring-brand sm:text-sm">{{ form.hero_subtitle.value() or "" }}</textarea>
                 </div>
-                {% if plan.custom_hero %}
-                {{ input.render("Hero image URL", "hero_image_url", type="url", value=form.hero_image_url.value() or "", placeholder="https://…") }}
-                <p class="text-xs text-textMuted -mt-2">Custom photo shows on your public page (Pro+).</p>
-                {% else %}
-                <div class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-3 text-sm text-textMuted">
-                    Custom hero image unlocks on <strong>Pro</strong> and <strong>Premium</strong>. Free listings use the default category photo.
-                    <a href="{% if dashboard_embed %}#{% else %}/auth/listing-plans/{% endif %}" {% if dashboard_embed %}hx-get="/auth/listing-plans/" hx-target="#main-content"{% endif %} class="font-semibold text-brand underline">Upgrade</a>
+                {{ input.render("Listing photo URL", "hero_image_url", type="url", value=form.hero_image_url.value() or "", placeholder="https://…") }}
+                <p class="text-xs text-textMuted -mt-2">Shown on the home directory and your public listing page. Use a direct image link (JPG/PNG/WebP).</p>
+                {% if business.public_hero_image_url %}
+                <div class="overflow-hidden rounded-lg border border-stone-200 bg-stone-50">
+                  <img src="{{ business.public_hero_image_url|img_url(480) }}" alt="Current listing photo" class="h-36 w-full object-cover" loading="lazy" decoding="async" data-fallbacks="{{ business.image_fallbacks }}" onerror="sbImgFallback(this)">
                 </div>
-                <input type="hidden" name="hero_image_url" value="{{ form.hero_image_url.value() or business.hero_image_url or '' }}">
                 {% endif %}
                 {{ btn.render(type="submit", text="Save appearance", cls="w-full justify-center") }}
             </form>

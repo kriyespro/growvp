@@ -2,6 +2,10 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Fix listing photo on home — Free plans can set hero_image_url;
+  public_hero_image_url always uses saved photo; appearance + partner edit
+  show Listing photo URL with preview
+
 - [DONE] Inline app.css in <head> (cached) — removes HTML→CSS critical-path
   chain from PageSpeed network dependency tree
 

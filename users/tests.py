@@ -49,8 +49,39 @@ class AuthViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         business.refresh_from_db()
         self.assertEqual(business.hero_title, "Luxury Care at Glow Spa")
+        self.assertEqual(business.hero_image_url, "https://example.com/hero.jpg")
+        self.assertEqual(business.public_hero_image_url, "https://example.com/hero.jpg")
         self.assertEqual(business.public_email, "hello@glowspa.com")
         self.assertTrue(business.profile_setup_completed)
+
+    def test_free_plan_custom_hero_shows_on_home_directory(self):
+        from core.services import bust_directory_cache
+        from catalog.models import ServiceCategory, Service
+
+        business = Business.objects.create(
+            name="Photo Shop Free",
+            industry_type="salon",
+            timezone="Asia/Kolkata",
+            public_phone="9111111111",
+            public_address="Vesu, Surat",
+            hero_image_url="https://cdn.example.com/my-shop.jpg",
+            listing_plan="free",
+            profile_setup_completed=True,
+        )
+        category = ServiceCategory.objects.create(business=business, name="Hair")
+        Service.objects.create(
+            category=category,
+            name="Cut",
+            duration_mins=30,
+            price="199.00",
+            is_active=True,
+        )
+        bust_directory_cache()
+        self.assertEqual(business.public_hero_image_url, "https://cdn.example.com/my-shop.jpg")
+        response = self.client.get(reverse("landing"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "cdn.example.com/my-shop.jpg")
+        self.assertContains(response, "Photo Shop Free")
 
     def test_listing_plan_can_be_updated(self):
         business = Business.objects.create(

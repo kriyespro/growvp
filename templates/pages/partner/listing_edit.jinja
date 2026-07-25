@@ -27,6 +27,11 @@
     <label class="block text-sm font-medium">Hero subtitle</label>
     <textarea name="hero_subtitle" rows="2" class="block w-full rounded-md border-0 py-2.5 px-4 text-sm ring-1 ring-inset ring-stone-300">{{ form.hero_subtitle.value() or "" }}</textarea>
   </div>
+  {{ input.render("Listing photo URL", "hero_image_url", type="url", value=form.hero_image_url.value() or "", placeholder="https://…") }}
+  <p class="text-xs text-textMuted -mt-2">Shown on the home directory and public listing. Use a direct image URL.</p>
+  {% if business.public_hero_image_url %}
+  <img src="{{ business.public_hero_image_url|img_url(480) }}" alt="" class="h-32 w-full rounded-lg object-cover border border-stone-200" loading="lazy">
+  {% endif %}
   {{ input.render("Public phone", "public_phone", value=form.public_phone.value() or "") }}
   {{ input.render("Public email", "public_email", type="email", value=form.public_email.value() or "") }}
   <div class="space-y-1">
@@ -38,7 +43,6 @@
   {% else %}
   <input type="hidden" name="website_url" value="{{ form.website_url.value() or business.website_url or '' }}">
   {% endif %}
-  <input type="hidden" name="hero_image_url" value="{{ form.hero_image_url.value() or '' }}">
   <input type="hidden" name="map_embed_url" value="{{ form.map_embed_url.value() or '' }}">
   <input type="hidden" name="testimonial_quote" value="{{ form.testimonial_quote.value() or '' }}">
   <input type="hidden" name="testimonial_author" value="{{ form.testimonial_author.value() or '' }}">
