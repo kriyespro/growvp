@@ -74,17 +74,26 @@
     {% endif %}
     <script>
         window.SB_IMG_PLACEHOLDER = "{{ placeholder_image }}";
+        window.SB_IMG_DEFAULT = "/static/img/listing-default.webp";
         window.sbImgFallback = function (img) {
             if (!img) return;
+            // Clear srcset so the browser does not keep a broken remote candidate
+            img.removeAttribute("srcset");
+            img.removeAttribute("sizes");
             var queue = (img.dataset.fallbacks || "").split("|").filter(Boolean);
             var next = queue.shift();
-            if (next && next !== img.src) {
+            if (next && next !== img.getAttribute("src")) {
                 img.dataset.fallbacks = queue.join("|");
                 img.src = next;
                 return;
             }
             img.onerror = null;
-            if (img.src !== window.SB_IMG_PLACEHOLDER) {
+            var localDefault = window.SB_IMG_DEFAULT;
+            if (img.getAttribute("src") !== localDefault) {
+                img.src = localDefault;
+                return;
+            }
+            if (img.getAttribute("src") !== window.SB_IMG_PLACEHOLDER) {
                 img.src = window.SB_IMG_PLACEHOLDER;
             }
         };

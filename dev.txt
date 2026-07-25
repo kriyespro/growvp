@@ -2,6 +2,9 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Fix broken listing images — optical Unsplash 404; local
+  listing-default.webp/jpg; clear srcset on onerror fallback; empty alt on cards
+
 - [DONE] Fix listing photo on home — Free plans can set hero_image_url;
   public_hero_image_url always uses saved photo; appearance + partner edit
   show Listing photo URL with preview

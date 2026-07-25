@@ -83,6 +83,18 @@ class AuthViewTests(TestCase):
         self.assertContains(response, "cdn.example.com/my-shop.jpg")
         self.assertContains(response, "Photo Shop Free")
 
+    def test_missing_hero_uses_local_default_image(self):
+        business = Business.objects.create(
+            name="No Photo Optical",
+            industry_type="optical",
+            timezone="Asia/Kolkata",
+            hero_image_url="",
+            listing_plan="free",
+            profile_setup_completed=True,
+        )
+        self.assertTrue(business.public_hero_image_url.endswith("listing-default.webp"))
+        self.assertIn("listing-default", business.image_fallbacks)
+
     def test_listing_plan_can_be_updated(self):
         business = Business.objects.create(
             name="Glow Spa",

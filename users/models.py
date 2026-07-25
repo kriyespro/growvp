@@ -70,30 +70,14 @@ class Business(models.Model):
 
     @property
     def default_public_image_url(self):
-        defaults = {
-            "salon": "https://images.unsplash.com/photo-1690749138086-7422f71dc159?auto=format&fit=crop&w=480&q=45&fm=webp",
-            "spa": "https://images.unsplash.com/photo-1540555700474-0649585eb711?auto=format&fit=crop&w=480&q=45&fm=webp",
-            "grooming": "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=480&q=45&fm=webp",
-            "dentist": "https://images.unsplash.com/photo-1677026010083-78ec7f1b84ed?auto=format&fit=crop&w=480&q=45&fm=webp",
-            "clinic": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=480&q=45&fm=webp",
-            "optical": "https://images.unsplash.com/photo-1574259406477-12687b0c497a?auto=format&fit=crop&w=480&q=45&fm=webp",
-            "physiotherapy": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=480&q=45&fm=webp",
-            "gym": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=480&q=45&fm=webp",
-            "yoga": "https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=480&q=45&fm=webp",
-            "restaurant": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=480&q=45&fm=webp",
-            "bakery": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=480&q=45&fm=webp",
-            "pet": "https://images.unsplash.com/photo-1517948430535-1e2469d314fe?auto=format&fit=crop&w=480&q=45&fm=webp",
-            "auto": "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=480&q=45&fm=webp",
-            "photography": "https://images.unsplash.com/photo-1452587925148-ce544e57ee08?auto=format&fit=crop&w=480&q=45&fm=webp",
-        }
-        return defaults.get(
-            self.industry_type,
-            "https://images.unsplash.com/photo-1690749138086-7422f71dc159?auto=format&fit=crop&w=480&q=45&fm=webp",
-        )
+        """Stable local default — remote Unsplash IDs often 404 (e.g. optical)."""
+        from core.image_defaults import listing_default_image_url
+
+        return listing_default_image_url()
 
     @property
     def public_hero_image_url(self):
-        """Prefer saved hero_image_url on all plans; fall back to category default."""
+        """Prefer saved hero_image_url; fall back to on-site default image."""
         from core.image_defaults import first_usable_url
 
         return first_usable_url(
@@ -103,16 +87,22 @@ class Business(models.Model):
 
     @property
     def image_fallbacks(self):
-        from core.image_defaults import placeholder_image_url
+        """Chain for onerror: category/local default → jpg → svg placeholder."""
+        from core.image_defaults import (
+            listing_default_image_url,
+            listing_default_jpg_url,
+            placeholder_image_url,
+        )
 
         primary = self.public_hero_image_url
-        default = self.default_public_image_url
-        placeholder = placeholder_image_url()
         urls = []
-        if primary != default:
-            urls.append(default)
-        if placeholder not in urls and placeholder != primary:
-            urls.append(placeholder)
+        for candidate in (
+            listing_default_image_url(),
+            listing_default_jpg_url(),
+            placeholder_image_url(),
+        ):
+            if candidate and candidate != primary and candidate not in urls:
+                urls.append(candidate)
         return "|".join(urls)
 
     @property

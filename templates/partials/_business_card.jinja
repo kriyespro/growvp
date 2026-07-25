@@ -4,8 +4,8 @@
       src="{{ business.public_hero_image_url|img_url(480) }}"
       {% set _srcset = business.public_hero_image_url|img_srcset %}
       {% if _srcset %}srcset="{{ _srcset }}" sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 360px"{% endif %}
-      alt="{{ business.name }}"
-      class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+      alt=""
+      class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04] bg-stone-100"
       loading="lazy"
       decoding="async"
       width="480"
