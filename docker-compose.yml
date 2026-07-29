@@ -1,7 +1,7 @@
 services:
   web:
     build: .
-    container_name: suratbazar_web
+    container_name: growvyapaar_web
     restart: unless-stopped
     command: >
       sh -c "python manage.py migrate &&
@@ -21,7 +21,7 @@ services:
 
   db:
     image: postgres:16-alpine
-    container_name: suratbazar_db
+    container_name: growvyapaar_db
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-suratbazar_prod}
@@ -36,6 +36,12 @@ services:
       retries: 10
 
 volumes:
+  # Reuse the existing production DB volume (created by older "app" compose project).
+  # Do NOT remove app_postgres_data — that is where listings/users live.
   postgres_data:
+    external: true
+    name: app_postgres_data
   media_data:
+    external: true
+    name: app_media_data
   static_data:
