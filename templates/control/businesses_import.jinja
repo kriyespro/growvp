@@ -1,0 +1,77 @@
+{% extends 'control/base_control.jinja' %}
+
+{% block title %}Import listings{% endblock %}
+{% block page_title %}Import listings{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <a href="{{ url('control:businesses') }}" class="text-xs font-semibold text-control-link hover:underline">← Businesses</a>
+    <p class="mt-1 text-sm text-control-muted">CSV, Excel (.xlsx), or public Google Sheet. Max 200 rows. Plans from sheet are applied.</p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <a href="{{ url('control:businesses_import_sample') }}?format=csv" class="rounded-md border border-control-border px-3 py-2 text-xs font-semibold text-control-muted hover:text-white">Sample CSV</a>
+    <a href="{{ url('control:businesses_import_sample') }}?format=xlsx" class="rounded-md border border-control-border px-3 py-2 text-xs font-semibold text-control-muted hover:text-white">Sample Excel</a>
+  </div>
+</div>
+
+<div class="mb-6 rounded-xl border border-control-border bg-control-panel p-4 text-sm text-control-muted">
+  <p class="font-semibold text-control-text">Google Sheets</p>
+  <ol class="mt-2 list-decimal space-y-1 pl-5">
+    <li>Use the sample sheet columns; set <code class="text-control-accent">hero_image_url</code> for listing photos.</li>
+    <li>Share → Anyone with the link → Viewer.</li>
+    <li>Paste the sheet URL below (edit or share link both work).</li>
+  </ol>
+  <p class="mt-3 text-xs">Columns: {{ columns|join(', ') }}</p>
+</div>
+
+{% if error %}
+<div class="mb-4 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">{{ error }}</div>
+{% endif %}
+
+{% if result %}
+<div class="mb-6 rounded-xl border border-control-border bg-control-panel p-4">
+  <p class="font-semibold text-control-text">
+    Created {{ result.created_count }}
+    {% if result.error_count %} · {{ result.error_count }} errors{% endif %}
+  </p>
+  {% if result.created %}
+  <ul class="mt-3 max-h-40 space-y-1 overflow-y-auto text-sm text-emerald-400">
+    {% for row in result.created %}
+    <li>Row {{ row.row_number }}: <a class="underline" href="/b/{{ row.slug }}/" target="_blank">{{ row.name }}</a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if result.errors %}
+  <ul class="mt-3 max-h-40 space-y-1 overflow-y-auto text-sm text-red-300">
+    {% for row in result.errors %}
+    <li>Row {{ row.row_number }}{% if row.name %} ({{ row.name }}){% endif %}: {{ row.error }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="space-y-5 rounded-xl border border-control-border bg-control-panel p-5">
+  {{ csrf_field(request) }}
+  {% if form.non_field_errors() %}
+  <div class="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+    {% for e in form.non_field_errors() %}{{ e }}{% endfor %}
+  </div>
+  {% endif %}
+
+  <div>
+    <label class="block text-sm font-semibold" for="id_file">CSV or Excel</label>
+    <input id="id_file" type="file" name="file" accept=".csv,.tsv,.xlsx,.xlsm,.txt" class="mt-1 block w-full text-sm text-control-muted">
+  </div>
+
+  <p class="text-center text-xs uppercase tracking-wide text-control-muted">or</p>
+
+  <div>
+    <label class="block text-sm font-semibold" for="id_google_sheet_url">Google Sheet URL</label>
+    <input id="id_google_sheet_url" type="url" name="google_sheet_url" value="{{ form.google_sheet_url.value() or '' }}" placeholder="https://docs.google.com/spreadsheets/d/…" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+  </div>
+
+  <button type="submit" class="rounded-md bg-control-accent px-4 py-2 text-sm font-semibold text-black hover:opacity-90">Import listings</button>
+</form>
+{% endblock %}

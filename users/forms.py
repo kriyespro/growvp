@@ -136,3 +136,44 @@ class ListingPlanForm(forms.Form):
 class AssignPartnerForm(forms.Form):
     partner_id = forms.IntegerField()
     business_id = forms.IntegerField()
+
+
+class ListingImportForm(forms.Form):
+    """CSV / Excel upload or Google Sheets URL."""
+
+    file = forms.FileField(
+        required=False,
+        label="CSV or Excel file",
+        help_text="Accepts .csv, .xlsx",
+    )
+    google_sheet_url = forms.CharField(
+        required=False,
+        label="Google Sheet URL",
+        widget=forms.URLInput(
+            attrs={"placeholder": "https://docs.google.com/spreadsheets/d/…"}
+        ),
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        uploaded = cleaned.get("file")
+        sheet_url = (cleaned.get("google_sheet_url") or "").strip()
+        cleaned["google_sheet_url"] = sheet_url
+        has_file = bool(uploaded and getattr(uploaded, "name", None))
+        if not has_file and not sheet_url:
+            raise forms.ValidationError(
+                "Upload a CSV/Excel file or paste a Google Sheet URL."
+            )
+        if has_file and sheet_url:
+            raise forms.ValidationError(
+                "Use either a file upload or a Google Sheet URL, not both."
+            )
+        if has_file:
+            name = uploaded.name.lower()
+            if not name.endswith((".csv", ".tsv", ".xlsx", ".xlsm", ".txt")):
+                raise forms.ValidationError(
+                    "Unsupported file type. Use .csv or .xlsx."
+                )
+            if uploaded.size and uploaded.size > 5 * 1024 * 1024:
+                raise forms.ValidationError("File too large (max 5 MB).")
+        return cleaned

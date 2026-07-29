@@ -1,0 +1,82 @@
+{% extends 'pages/partner/base_partner.jinja' %}
+
+{% block partner_content %}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <a href="/partner/listings/" class="text-xs font-semibold text-brand hover:underline">← Listings</a>
+    <h2 class="mt-1 font-display text-2xl font-bold text-textMain">Import listings</h2>
+    <p class="mt-1 text-sm text-textMuted">Upload CSV/Excel or paste a Google Sheet URL. Max 200 rows.</p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <a href="/partner/listings/import/sample/?format=csv" class="rounded-md border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-textMain hover:bg-stone-50">Sample CSV</a>
+    <a href="/partner/listings/import/sample/?format=xlsx" class="rounded-md border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-textMain hover:bg-stone-50">Sample Excel</a>
+  </div>
+</div>
+
+<div class="mb-6 rounded-xl border border-stone-200 bg-white p-5 text-sm text-textMuted">
+  <p class="font-semibold text-textMain">How to use Google Sheets</p>
+  <ol class="mt-2 list-decimal space-y-1 pl-5">
+    <li>Download the sample CSV/Excel and open it in Google Sheets (or copy the columns).</li>
+    <li>Fill one row per listing. Include <code class="rounded bg-stone-100 px-1">hero_image_url</code> for photos.</li>
+    <li>Share → <strong>Anyone with the link</strong> → Viewer.</li>
+    <li>Paste the sheet URL below and import.</li>
+  </ol>
+  <p class="mt-3 text-xs">Columns: {{ columns|join(', ') }}</p>
+  <p class="mt-1 text-xs">Partner imports use plan <strong>free</strong>. Category values: salon, dentist, optical, gym, restaurant, …</p>
+</div>
+
+{% if error %}
+<div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ error }}</div>
+{% endif %}
+
+{% if result %}
+<div class="mb-6 rounded-xl border border-stone-200 bg-white p-5">
+  <p class="font-semibold text-textMain">
+    Imported {{ result.created_count }} listing{% if result.created_count != 1 %}s{% endif %}
+    {% if result.error_count %} · {{ result.error_count }} row error{% if result.error_count != 1 %}s{% endif %}{% endif %}
+  </p>
+  {% if result.created %}
+  <ul class="mt-3 max-h-48 space-y-1 overflow-y-auto text-sm">
+    {% for row in result.created %}
+    <li class="text-emerald-700">
+      Row {{ row.row_number }}: <a class="font-semibold underline" href="/b/{{ row.slug }}/">{{ row.name }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if result.errors %}
+  <ul class="mt-3 max-h-48 space-y-1 overflow-y-auto text-sm text-red-700">
+    {% for row in result.errors %}
+    <li>Row {{ row.row_number }}{% if row.name %} ({{ row.name }}){% endif %}: {{ row.error }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="space-y-5 rounded-xl border border-stone-200 bg-white p-5">
+  {{ csrf_field(request) }}
+  {% if form.non_field_errors() %}
+  <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+    {% for e in form.non_field_errors() %}{{ e }}{% endfor %}
+  </div>
+  {% endif %}
+
+  <div>
+    <label class="block text-sm font-semibold text-textMain" for="id_file">CSV or Excel file</label>
+    <input id="id_file" type="file" name="file" accept=".csv,.tsv,.xlsx,.xlsm,.txt" class="mt-1 block w-full text-sm text-textMuted file:mr-3 file:rounded-md file:border-0 file:bg-brand/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-brand">
+  </div>
+
+  <div class="relative text-center text-xs font-semibold uppercase tracking-wide text-textMuted">
+    <span class="bg-white px-2">or</span>
+    <div class="absolute inset-x-0 top-1/2 -z-10 border-t border-stone-200"></div>
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold text-textMain" for="id_google_sheet_url">Google Sheet URL</label>
+    <input id="id_google_sheet_url" type="url" name="google_sheet_url" value="{{ form.google_sheet_url.value() or '' }}" placeholder="https://docs.google.com/spreadsheets/d/…" class="mt-1 w-full rounded-md border border-stone-300 px-3 py-2 text-sm">
+  </div>
+
+  <button type="submit" class="rounded-md bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brandHover">Import listings</button>
+</form>
+{% endblock %}

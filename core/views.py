@@ -17,11 +17,13 @@ from core.seo import (
     website_json_ld,
 )
 from core.services import (
+    count_directory_businesses,
     get_area_facet_counts,
     get_business_listing_context,
     get_directory_stats,
     get_industry_facet_counts,
     get_industry_hub_rows,
+    get_platform_directory_stats,
     get_similar_businesses,
     industry_choices,
     list_directory_businesses,
@@ -39,6 +41,18 @@ def _directory_context(request):
     availability = request.GET.get("availability", "")
     bookable = request.GET.get("bookable", "")
     verified = request.GET.get("verified", "")
+
+    total_count = count_directory_businesses(
+        query=query,
+        industry=industry,
+        bookable=bookable,
+        verified=verified,
+    )
+    # Hydrate only what we render (+ a few extras for open-now rail).
+    hydrate_limit = DIRECTORY_LIST_LIMIT + 8
+    if (availability or "").strip() == "open":
+        hydrate_limit = max(hydrate_limit, 48)
+
     businesses = list_directory_businesses(
         query=query,
         industry=industry,
@@ -46,8 +60,12 @@ def _directory_context(request):
         availability=availability,
         bookable=bookable,
         verified=verified,
+        candidate_limit=hydrate_limit,
     )
-    total_count = len(businesses)
+    if (availability or "").strip() == "open":
+        # Open filter is applied after hydrate — use filtered length as total.
+        total_count = len(businesses)
+
     stats = get_directory_stats(businesses)
     open_now_featured = []
     if availability != "open":
@@ -85,12 +103,11 @@ def landing(request):
     ctx["canonical_url"] = absolute_url("/", request)
     ctx["industry_hub_rows"] = get_industry_hub_rows()[:8]
     ctx["area_hub_rows"] = get_area_facet_counts()[:6]
-    # Platform-wide KPIs (unfiltered) for hero strip
-    all_listings = list_directory_businesses()
-    ctx["home_stats"] = get_directory_stats(all_listings)
-    featured = [b for b in all_listings if getattr(b, "is_featured_listing", False)]
+    # Cheap platform KPIs — no second full-directory hydrate
+    ctx["home_stats"] = get_platform_directory_stats()
+    featured = [b for b in ctx["businesses"] if getattr(b, "is_featured_listing", False)]
     if len(featured) < 3:
-        featured = all_listings[:3]
+        featured = list(ctx["businesses"][:3])
     else:
         featured = featured[:3]
     ctx["featured_businesses"] = featured
@@ -261,8 +278,10 @@ def surat_industry(request, industry):
     if industry not in dict(Business.INDUSTRY_CHOICES):
         raise Http404("Unknown category")
 
-    businesses = list_directory_businesses(industry=industry, sort="popular")
-    total_count = len(businesses)
+    businesses = list_directory_businesses(
+        industry=industry, sort="popular", candidate_limit=DIRECTORY_LIST_LIMIT + 8
+    )
+    total_count = count_directory_businesses(industry=industry)
     page_businesses = businesses[:DIRECTORY_LIST_LIMIT]
     areas = get_area_facet_counts(industry=industry)
     meta = collection_page_meta(industry_key=industry, count=total_count)
@@ -289,7 +308,7 @@ def surat_industry(request, industry):
             "list_limited": total_count > DIRECTORY_LIST_LIMIT,
             "areas": areas,
             "related_industries": related,
-            "stats": get_directory_stats(businesses),
+            "stats": get_directory_stats(page_businesses),
             "open_now_featured": _collection_open_now(businesses),
             "page_title": meta["title"],
             "meta_description": meta["description"],
@@ -299,7 +318,7 @@ def surat_industry(request, industry):
                 name=meta["h1"],
                 description=meta["description"],
                 url=canonical,
-                businesses=businesses,
+                businesses=page_businesses,
                 request=request,
             ),
             "breadcrumb_json_ld": breadcrumb_json_ld(crumbs, request),
@@ -325,13 +344,19 @@ def surat_industry_area(request, industry, area_slug):
     if not area_label:
         raise Http404("Unknown area")
 
+    total_count = count_directory_businesses(industry=industry, area_slug=area_slug)
+    if total_count == 0:
+        raise Http404("No listings in this area yet")
+
     businesses = list_directory_businesses(
-        industry=industry, area_slug=area_slug, sort="popular"
+        industry=industry,
+        area_slug=area_slug,
+        sort="popular",
+        candidate_limit=max(DIRECTORY_LIST_LIMIT + 8, min(total_count, 64)),
     )
     if not businesses:
         raise Http404("No listings in this area yet")
 
-    total_count = len(businesses)
     page_businesses = businesses[:DIRECTORY_LIST_LIMIT]
     meta = collection_page_meta(
         industry_key=industry, area_label=area_label, count=total_count
@@ -364,7 +389,7 @@ def surat_industry_area(request, industry, area_slug):
             "related_industries": [
                 row for row in get_industry_hub_rows() if row["key"] != industry
             ][:8],
-            "stats": get_directory_stats(businesses),
+            "stats": get_directory_stats(page_businesses),
             "open_now_featured": _collection_open_now(businesses),
             "page_title": meta["title"],
             "meta_description": meta["description"],
@@ -374,7 +399,7 @@ def surat_industry_area(request, industry, area_slug):
                 name=meta["h1"],
                 description=meta["description"],
                 url=canonical,
-                businesses=businesses,
+                businesses=page_businesses,
                 request=request,
             ),
             "breadcrumb_json_ld": breadcrumb_json_ld(crumbs, request),

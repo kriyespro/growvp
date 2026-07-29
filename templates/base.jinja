@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    {# Inlined app CSS — removes HTML→CSS network chain (PageSpeed critical path) #}
-    <style id="app-css">{{ app_css()|safe }}</style>
+    {# Cached stylesheet — avoids re-shipping ~45KB CSS inside every HTML response #}
+    <link rel="preload" href="{{ static('css/app.css') }}" as="style">
+    <link rel="stylesheet" href="{{ static('css/app.css') }}">
     <title>{% block title %}SuratBazar | Find & book local businesses{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Find and book trusted local businesses in Surat — salons, clinics, opticals, pet care and more. Compare prices, hours, and book online.{% endblock %}">
     <meta name="robots" content="{% block robots %}index, follow{% endblock %}">

@@ -280,7 +280,7 @@ def build_sitemap_entries(request=None) -> list[dict]:
 
     from django.utils import timezone
 
-    from core.services import _discoverable_queryset, extract_area_label, get_industry_hub_rows
+    from core.services import _lean_discoverable_queryset, extract_area_label, get_industry_hub_rows
     from users.models import Business
 
     base = site_base_url(request)
@@ -301,11 +301,10 @@ def build_sitemap_entries(request=None) -> list[dict]:
             }
         )
 
-    # industry → area_slug → count (single scan)
+    # industry → area_slug → count (single lean scan)
     area_counts: dict[str, Counter] = defaultdict(Counter)
     qs = (
-        _discoverable_queryset()
-        .prefetch_related(None)
+        _lean_discoverable_queryset()
         .exclude(public_address="")
         .values_list("industry_type", "public_address")
     )

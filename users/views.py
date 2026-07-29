@@ -21,10 +21,18 @@ from users.forms import (
     BusinessLandingForm,
     ListingPlanForm,
     PartnerListingForm,
+    ListingImportForm,
 )
 from users.models import User, Business, UserProfile
 from users.services import home_url_for_user, create_partner_listing, businesses_for_partner
 from users.access import require_platform_role, assert_can_manage_business
+from users.listing_import import (
+    IMPORT_COLUMNS,
+    build_sample_csv,
+    build_sample_xlsx,
+    import_listing_rows,
+    load_rows_from_source,
+)
 
 
 @ensure_csrf_cookie
@@ -369,6 +377,71 @@ def partner_listing_edit(request, pk):
             "plan": get_plan_config(business.listing_plan),
             "nav": "listings",
             "csrf_input_html": f'<input type="hidden" name="csrfmiddlewaretoken" value="{get_token(request)}">',
+        },
+    )
+
+
+@require_platform_role("marketing_partner")
+@ensure_csrf_cookie
+def partner_listing_import(request):
+    form = ListingImportForm()
+    result = None
+    error = None
+    if request.method == "POST":
+        form = ListingImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                headers, body = load_rows_from_source(
+                    uploaded_file=form.cleaned_data.get("file"),
+                    google_sheet_url=form.cleaned_data.get("google_sheet_url") or "",
+                )
+                result = import_listing_rows(
+                    request.user,
+                    headers,
+                    body,
+                    allow_paid_plans=False,
+                )
+                form = ListingImportForm()
+            except ValueError as exc:
+                error = str(exc)
+    return render(
+        request,
+        "pages/partner/listing_import.jinja",
+        {
+            "form": form,
+            "result": result,
+            "error": error,
+            "columns": IMPORT_COLUMNS,
+            "nav": "listings",
+        },
+    )
+
+
+@require_platform_role("marketing_partner")
+@require_http_methods(["GET"])
+def partner_listing_import_sample(request):
+    fmt = (request.GET.get("format") or "csv").strip().lower()
+    if fmt in ("xlsx", "excel", "xls"):
+        data = build_sample_xlsx()
+        return HttpResponse(
+            data,
+            content_type=(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ),
+            headers={
+                "Content-Disposition": (
+                    'attachment; filename="suratbazar-listings-sample.xlsx"'
+                ),
+            },
+        )
+    data = build_sample_csv()
+    return HttpResponse(
+        data,
+        content_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": (
+                'attachment; filename="suratbazar-listings-sample.csv"'
+            ),
         },
     )
 

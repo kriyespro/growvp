@@ -178,6 +178,89 @@ def businesses_list(request):
 
 
 @control_login_required
+def businesses_import(request):
+    from users.forms import ListingImportForm
+    from users.listing_import import (
+        IMPORT_COLUMNS,
+        import_listing_rows,
+        load_rows_from_source,
+    )
+
+    form = ListingImportForm()
+    result = None
+    error = None
+    if request.method == "POST":
+        form = ListingImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                headers, body = load_rows_from_source(
+                    uploaded_file=form.cleaned_data.get("file"),
+                    google_sheet_url=form.cleaned_data.get("google_sheet_url") or "",
+                )
+                result = import_listing_rows(
+                    request.user,
+                    headers,
+                    body,
+                    allow_paid_plans=True,
+                )
+                services.log_admin_action(
+                    request.user,
+                    "other",
+                    (
+                        f"Imported listings: {result.created_count} created, "
+                        f"{result.error_count} errors"
+                    ),
+                    request=request,
+                )
+                form = ListingImportForm()
+            except ValueError as exc:
+                error = str(exc)
+    return render(
+        request,
+        "control/businesses_import.jinja",
+        _control_context(
+            request,
+            nav="businesses",
+            form=form,
+            result=result,
+            error=error,
+            columns=IMPORT_COLUMNS,
+        ),
+    )
+
+
+@control_login_required
+@require_GET
+def businesses_import_sample(request):
+    from users.listing_import import build_sample_csv, build_sample_xlsx
+
+    fmt = (request.GET.get("format") or "csv").strip().lower()
+    if fmt in ("xlsx", "excel", "xls"):
+        data = build_sample_xlsx()
+        return HttpResponse(
+            data,
+            content_type=(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ),
+            headers={
+                "Content-Disposition": (
+                    'attachment; filename="suratbazar-listings-sample.xlsx"'
+                ),
+            },
+        )
+    data = build_sample_csv()
+    return HttpResponse(
+        data,
+        content_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": (
+                'attachment; filename="suratbazar-listings-sample.csv"'
+            ),
+        },
+    )
+
+
+@control_login_required
 @require_GET
 def partners_list(request):
     from users.models import Business

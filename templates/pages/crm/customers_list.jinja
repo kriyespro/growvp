@@ -15,7 +15,7 @@
             {% if not customers %}
                 {{ card.render(content='<div class="text-center py-6 text-textMuted text-sm">No customers found.</div>') }}
             {% else %}
-                <div class="bg-creameSurface rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                <div class="bg-creameSurface rounded-xl shadow-sm border border-stone-200 overflow-x-auto">
                     <table class="min-w-full divide-y divide-stone-200">
                         <thead class="bg-stone-50">
                             <tr>

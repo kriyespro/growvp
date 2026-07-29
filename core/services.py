@@ -5,13 +5,16 @@ from urllib.parse import quote_plus
 
 from django.conf import settings
 from django.core.cache import cache
-from django.db.models import Count, Max, Min, Prefetch, Q
+from django.db.models import Count, Exists, Max, Min, OuterRef, Q
 from django.utils import timezone
 
 from users.models import Business
 
 
 DIRECTORY_CACHE_VERSION_KEY = "directory_cache_version"
+# Cap rows hydrated for directory cards (full count uses lean COUNT).
+DIRECTORY_HYDRATE_CAP = 48
+DIRECTORY_OPEN_SCAN_CAP = 120
 
 
 def _directory_cache_version():
@@ -114,22 +117,25 @@ def evaluate_open_status(hours_row, now_time=None):
     return False, "closed", f"Closed · was {start_label}–{end_label}"
 
 
-def _discoverable_queryset():
-    from catalog.models import Service, ServiceCategory
+def _lean_discoverable_queryset():
+    """Discoverable businesses without heavy service/appointment annotations.
 
-    prefetch_categories = Prefetch(
-        "categories",
-        queryset=ServiceCategory.objects.prefetch_related(
-            Prefetch(
-                "services",
-                queryset=Service.objects.filter(is_active=True)
-                .select_related("category")
-                .order_by("name"),
-                to_attr="active_services_list",
-            )
-        ),
+    Used for COUNT/facets/platform KPIs — much cheaper than _discoverable_queryset.
+    """
+    from catalog.models import Service
+
+    has_active_service = Exists(
+        Service.objects.filter(category__business_id=OuterRef("pk"), is_active=True)
+    )
+    return (
+        Business.objects.filter(profile_setup_completed=True)
+        .filter(has_active_service | ~Q(public_phone=""))
+        .distinct()
     )
 
+
+def _discoverable_queryset():
+    """Annotated queryset for directory cards (prices, service counts, hours)."""
     return (
         Business.objects.annotate(
             service_count=Count(
@@ -163,7 +169,8 @@ def _discoverable_queryset():
                 | ~Q(public_phone="")
             )
         )
-        .prefetch_related(prefetch_categories, "hours")
+        # Categories + hours only — skip nested service prefetch (was the N×M cost).
+        .prefetch_related("categories", "hours")
         .distinct()
     )
 
@@ -208,23 +215,14 @@ def _hydrate_directory_business(business, today_weekday, now_time):
     business.maps_directions_url = maps_directions_url(business.public_address)
     business.is_bookable = (business.service_count or 0) > 0
 
-    # Collect active services from prefetch (may be nested under categories)
-    services = []
-    seen_ids = set()
-    for category in business.categories.all():
-        for service in getattr(category, "active_services_list", []) or []:
-            if service.id not in seen_ids:
-                seen_ids.add(service.id)
-                services.append(service)
-
-    business.top_services = [s.name for s in services[:3]]
+    # Category names as chips (no nested service prefetch).
     category_names = []
-    for service in services:
-        name = service.category.name
-        if name not in category_names:
-            category_names.append(name)
-        if len(category_names) >= 4:
+    for category in business.categories.all():
+        if category.name not in category_names:
+            category_names.append(category.name)
+        if len(category_names) >= 3:
             break
+    business.top_services = category_names
     business.category_names = category_names
     business.area_label = extract_area_label(business.public_address)
     return business
@@ -267,48 +265,44 @@ def list_directory_businesses(
     used by callers like get_similar_businesses that only need a few rows
     and don't require exhaustive correctness across the full result set.
 
-    Results are cached for settings.DIRECTORY_CACHE_TTL seconds — this is
-    the most-hit query in the app (home directory + every business's
-    "similar businesses" widget), and it's expensive: several aggregates
-    plus a nested category/service/hours prefetch, hydrated in Python.
+    When candidate_limit is omitted, a safe hydrate cap is applied so home /
+    HTMX never materializes the full directory (use count_directory_businesses
+    for totals). Area + open-now filters raise the scan cap.
+
+    Results are cached for settings.DIRECTORY_CACHE_TTL seconds.
     """
+    # Resolve hydrate cap early so it is part of the cache key.
+    area_slug = (area_slug or "").strip().lower()
+    availability = (availability or "").strip()
+    if candidate_limit is None:
+        if area_slug:
+            candidate_limit = DIRECTORY_OPEN_SCAN_CAP
+        elif availability == "open":
+            candidate_limit = DIRECTORY_OPEN_SCAN_CAP
+        else:
+            candidate_limit = DIRECTORY_HYDRATE_CAP
+
     cache_key = _directory_cache_key(
         query=(query or "").strip(),
         industry=(industry or "").strip(),
         sort=(sort or "newest").strip(),
-        availability=(availability or "").strip(),
+        availability=availability,
         bookable=(bookable or "").strip(),
         verified=(verified or "").strip(),
-        area_slug=(area_slug or "").strip().lower(),
+        area_slug=area_slug,
         candidate_limit=candidate_limit or "",
     )
     cached = cache.get(cache_key)
     if cached is not None:
         return cached
 
-    queryset = _discoverable_queryset()
-
-    query = (query or "").strip()
-    if query:
-        queryset = queryset.filter(
-            Q(name__icontains=query)
-            | Q(hero_title__icontains=query)
-            | Q(hero_subtitle__icontains=query)
-            | Q(public_address__icontains=query)
-            | Q(public_phone__icontains=query)
-            | Q(categories__services__name__icontains=query)
-            | Q(categories__name__icontains=query)
-        ).distinct()
-
-    industry = (industry or "").strip()
-    if industry and industry in dict(Business.INDUSTRY_CHOICES):
-        queryset = queryset.filter(industry_type=industry)
-
-    if (bookable or "").strip() in ("1", "true", "yes"):
-        queryset = queryset.filter(service_count__gt=0)
-
-    if (verified or "").strip() in ("1", "true", "yes"):
-        queryset = queryset.filter(profile_setup_completed=True)
+    queryset = _apply_directory_filters(
+        _discoverable_queryset(),
+        query=query,
+        industry=industry,
+        bookable=bookable,
+        verified=verified,
+    )
 
     sort = (sort or "newest").strip()
     if sort == "name":
@@ -333,7 +327,6 @@ def list_directory_businesses(
         _hydrate_directory_business(b, today_weekday, now_time) for b in queryset
     ]
 
-    area_slug = (area_slug or "").strip().lower()
     if area_slug:
         businesses = [
             b
@@ -341,7 +334,7 @@ def list_directory_businesses(
             if area_slug_for_address(b.public_address) == area_slug
         ]
 
-    if (availability or "").strip() == "open":
+    if availability == "open":
         businesses = [b for b in businesses if b.is_open_now]
 
     # Premium → Pro → Free placement, then keep selected queryset sort as tiebreaker.
@@ -352,6 +345,87 @@ def list_directory_businesses(
     ttl = getattr(settings, "DIRECTORY_CACHE_TTL", 60)
     cache.set(cache_key, result, ttl)
     return result
+
+
+def _apply_directory_filters(queryset, *, query="", industry="", bookable="", verified=""):
+    query = (query or "").strip()
+    if query:
+        queryset = queryset.filter(
+            Q(name__icontains=query)
+            | Q(hero_title__icontains=query)
+            | Q(hero_subtitle__icontains=query)
+            | Q(public_address__icontains=query)
+            | Q(public_phone__icontains=query)
+            | Q(categories__services__name__icontains=query)
+            | Q(categories__name__icontains=query)
+        ).distinct()
+
+    industry = (industry or "").strip()
+    if industry and industry in dict(Business.INDUSTRY_CHOICES):
+        queryset = queryset.filter(industry_type=industry)
+
+    if (bookable or "").strip() in ("1", "true", "yes"):
+        from catalog.models import Service
+
+        queryset = queryset.filter(
+            Exists(
+                Service.objects.filter(
+                    category__business_id=OuterRef("pk"), is_active=True
+                )
+            )
+        )
+
+    if (verified or "").strip() in ("1", "true", "yes"):
+        queryset = queryset.filter(profile_setup_completed=True).exclude(
+            public_phone=""
+        ).exclude(public_address="")
+
+    return queryset
+
+
+def count_directory_businesses(
+    query="",
+    industry="",
+    bookable="",
+    verified="",
+    area_slug="",
+):
+    """Cheap COUNT for directory totals (no hydrate / nested prefetch)."""
+    area_slug = (area_slug or "").strip().lower()
+    cache_key = _directory_cache_key(
+        kind="directory_count",
+        query=(query or "").strip(),
+        industry=(industry or "").strip(),
+        bookable=(bookable or "").strip(),
+        verified=(verified or "").strip(),
+        area_slug=area_slug,
+    )
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    queryset = _apply_directory_filters(
+        _lean_discoverable_queryset(),
+        query=query,
+        industry=industry,
+        bookable=bookable,
+        verified=verified,
+    )
+
+    if area_slug:
+        # Area is derived from address — must inspect addresses (values only).
+        count = 0
+        for address in queryset.values_list("public_address", flat=True).iterator(
+            chunk_size=500
+        ):
+            if area_slug_for_address(address) == area_slug:
+                count += 1
+    else:
+        count = queryset.count()
+
+    ttl = getattr(settings, "DIRECTORY_CACHE_TTL", 60)
+    cache.set(cache_key, count, ttl)
+    return count
 
 
 def get_directory_stats(businesses):
@@ -367,6 +441,58 @@ def get_directory_stats(businesses):
     }
 
 
+def get_platform_directory_stats():
+    """Cached platform-wide KPIs for the home hero (no full directory hydrate)."""
+    from catalog.models import BusinessHours, Service
+
+    cache_key = _directory_cache_key(kind="platform_stats")
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    qs = _lean_discoverable_queryset()
+    total = qs.count()
+    has_service = Exists(
+        Service.objects.filter(category__business_id=OuterRef("pk"), is_active=True)
+    )
+    bookable = qs.filter(has_service).count()
+    verified = (
+        qs.filter(has_service)
+        .exclude(public_phone="")
+        .exclude(public_address="")
+        .count()
+    )
+    industries = (
+        qs.order_by()
+        .values("industry_type")
+        .distinct()
+        .count()
+    )
+
+    today_weekday = timezone.localdate().weekday()
+    now_time = timezone.localtime().time()
+    open_now = 0
+    hours_qs = BusinessHours.objects.filter(
+        day_of_week=today_weekday,
+        business_id__in=qs.values("id"),
+    ).only("business_id", "is_closed", "start_time", "end_time")
+    for row in hours_qs.iterator(chunk_size=500):
+        is_open, _, _ = evaluate_open_status(row, now_time=now_time)
+        if is_open:
+            open_now += 1
+
+    result = {
+        "total": total,
+        "open_now": open_now,
+        "bookable": bookable,
+        "verified": verified,
+        "industries": industries,
+    }
+    ttl = getattr(settings, "DIRECTORY_CACHE_TTL", 60)
+    cache.set(cache_key, result, ttl)
+    return result
+
+
 def get_industry_facet_counts():
     """Industry counts across all discoverable businesses (for filter chips)."""
     cache_key = _directory_cache_key(kind="industry_facets")
@@ -375,7 +501,7 @@ def get_industry_facet_counts():
         return cached
 
     rows = (
-        _discoverable_queryset()
+        _lean_discoverable_queryset()
         .values("industry_type")
         .annotate(c=Count("id", distinct=True))
     )
@@ -400,13 +526,7 @@ def get_area_facet_counts(industry=""):
     if cached is not None:
         return cached
 
-    # Lean queryset — no prefetch (Django 5.1 forbids iterator() after prefetch
-    # without chunk_size; we only need addresses for counting).
-    qs = (
-        _discoverable_queryset()
-        .prefetch_related(None)
-        .values_list("public_address", flat=True)
-    )
+    qs = _lean_discoverable_queryset().values_list("public_address", flat=True)
     if industry and industry in dict(Business.INDUSTRY_CHOICES):
         qs = qs.filter(industry_type=industry)
 
@@ -501,8 +621,12 @@ def get_business_listing_context(business, services):
     max_duration = max(durations) if durations else None
 
     booking_qs = Appointment.objects.filter(business=business).exclude(status="cancelled")
-    booking_count = booking_qs.count()
-    completed_count = booking_qs.filter(status="completed").count()
+    booking_agg = booking_qs.aggregate(
+        booking_count=Count("id"),
+        completed_count=Count("id", filter=Q(status="completed")),
+    )
+    booking_count = booking_agg["booking_count"] or 0
+    completed_count = booking_agg["completed_count"] or 0
 
     from catalog.models import Product
     from core.plans import (

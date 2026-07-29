@@ -134,7 +134,7 @@ if redis_url:
     }
 
 # How long a directory listing query result is cached for, in seconds.
-DIRECTORY_CACHE_TTL = int(os.getenv('DIRECTORY_CACHE_TTL', '60'))
+DIRECTORY_CACHE_TTL = int(os.getenv('DIRECTORY_CACHE_TTL', '120'))
 
 
 # Password validation

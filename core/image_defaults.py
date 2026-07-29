@@ -77,7 +77,7 @@ def optimize_image_url(url: str, width: int = 480, quality: int = 45) -> str:
 
 def image_srcset(
     url: str,
-    widths: tuple[int, ...] = (320, 480, 640),
+    widths: tuple[int, ...] | list[int] = (320, 480, 640),
     quality: int = 45,
 ) -> str:
     """Responsive srcset for Unsplash only (local defaults skip srcset)."""
@@ -85,5 +85,5 @@ def image_srcset(
         return ""
     parts = []
     for w in widths:
-        parts.append(f"{optimize_image_url(url, width=w, quality=quality)} {w}w")
+        parts.append(f"{optimize_image_url(url, width=int(w), quality=quality)} {int(w)}w")
     return ", ".join(parts)

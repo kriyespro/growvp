@@ -2,6 +2,22 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Perf + mobile: lean directory COUNT/facets (no nested service
+  prefetch); hydrate capped ~32–48; removed home double-query; platform
+  KPI cache; CSS linked (not inlined) ~41KB less HTML; listing hero
+  srcset/LCP; HTMX search 450ms; Mission Control poll 60s; larger mobile
+  tap targets; table overflow-x-auto; cache TTL default 120s
+
+- [DONE] Listing import for partner + Mission Control — CSV/Excel/Google
+  Sheets; sample CSV+XLSX download; all listing fields + hero_image_url;
+  openpyxl dep; /partner/listings/import/ and /admin/businesses/import/
+
+- [DONE] Applied all migrations; seeded demo + directory + roles;
+  server http://127.0.0.1:8000 (admin@test.com / test1234)
+
+- [DONE] Recreated broken venv (Python 3.12 path missing); deps installed;
+  Django runserver up at http://127.0.0.1:8000
+
 - [DONE] Fix broken listing images — optical Unsplash 404; local
   listing-default.webp/jpg; clear srcset on onerror fallback; empty alt on cards
 
