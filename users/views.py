@@ -161,7 +161,14 @@ def login_view(request):
     if request.method == "POST":
         email = request.POST.get("email", "").strip()
         password = request.POST.get("password", "")
+        # App accounts use email as username; createsuperuser may set a different username.
         user = authenticate(request, username=email, password=password)
+        if user is None and email:
+            candidate = User.objects.filter(email__iexact=email).first()
+            if candidate is not None:
+                user = authenticate(
+                    request, username=candidate.username, password=password
+                )
         if user is not None:
             login(request, user)
             profile = getattr(user, "profile", None)

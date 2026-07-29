@@ -2,6 +2,9 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Fix email login after createsuperuser (username≠email); add
+  create_platform_admin management command for Mission Control admins
+
 - [DONE] Perf + mobile: lean directory COUNT/facets (no nested service
   prefetch); hydrate capped ~32–48; removed home double-query; platform
   KPI cache; CSS linked (not inlined) ~41KB less HTML; listing hero
