@@ -153,6 +153,10 @@ class ListingImportForm(forms.Form):
             attrs={"placeholder": "https://docs.google.com/spreadsheets/d/…"}
         ),
     )
+    partner_id = forms.IntegerField(
+        required=False,
+        label="Assign created listings to partner (optional)",
+    )
 
     def clean(self):
         cleaned = super().clean()
@@ -176,4 +180,47 @@ class ListingImportForm(forms.Form):
                 )
             if uploaded.size and uploaded.size > 5 * 1024 * 1024:
                 raise forms.ValidationError("File too large (max 5 MB).")
+        partner_id = cleaned.get("partner_id")
+        if partner_id:
+            partner = User.objects.filter(
+                pk=partner_id, platform_role="marketing_partner"
+            ).first()
+            if partner is None:
+                raise forms.ValidationError("Selected partner was not found.")
+            cleaned["partner"] = partner
+        else:
+            cleaned["partner"] = None
         return cleaned
+
+
+class ControlBusinessEditForm(forms.ModelForm):
+    """Admin edit for partner listings — includes plan."""
+
+    class Meta:
+        model = Business
+        fields = [
+            "name",
+            "industry_type",
+            "hero_title",
+            "hero_subtitle",
+            "hero_image_url",
+            "public_phone",
+            "public_email",
+            "public_address",
+            "website_url",
+            "map_embed_url",
+            "testimonial_quote",
+            "testimonial_author",
+            "listing_plan",
+            "slug",
+        ]
+
+    def clean_public_phone(self):
+        phone = (self.cleaned_data.get("public_phone") or "").strip()
+        if phone:
+            digits = "".join(ch for ch in phone if ch.isdigit())
+            if len(digits) < 10:
+                raise forms.ValidationError(
+                    "Enter a valid phone number with at least 10 digits."
+                )
+        return phone

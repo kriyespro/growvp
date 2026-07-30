@@ -406,12 +406,14 @@ def import_listing_rows(
     body_rows: list[list[str]],
     *,
     allow_paid_plans: bool = False,
+    owner=None,
 ) -> ImportResult:
     from catalog.services import ensure_default_hours, ensure_starter_categories
     from core.services import bust_directory_cache
 
     header_map = map_headers(headers)
     result = ImportResult()
+    listing_owner = owner or actor
 
     if len(body_rows) > MAX_IMPORT_ROWS:
         raise ValueError(f"Too many rows (max {MAX_IMPORT_ROWS}). Split the sheet.")
@@ -426,7 +428,7 @@ def import_listing_rows(
             if not data:
                 result.skipped_empty += 1
                 continue
-            business = _create_business_from_import(actor, data)
+            business = _create_business_from_import(listing_owner, data)
             ensure_starter_categories(business)
             ensure_default_hours(business)
             created_any = True
@@ -526,6 +528,54 @@ def build_sample_xlsx() -> bytes:
     tip["A5"] = "4. hero_image_url: public HTTPS image URL (JPG/PNG/WebP)."
     tip["A6"] = "5. Google Sheets: File → Share → Anyone with link → Viewer, then paste URL."
     tip["A7"] = "6. Upload CSV/XLSX or paste Google Sheet URL in Partner / Admin import page."
+    out = io.BytesIO()
+    wb.save(out)
+    return out.getvalue()
+
+
+EXPORT_COLUMNS = ["id", "created_by_email", "assigned_partners"] + IMPORT_COLUMNS
+
+
+def business_to_export_row(business) -> dict:
+    partners = ""
+    try:
+        partners = ";".join(
+            p.email for p in business.assigned_partners.all() if p.email
+        )
+    except Exception:  # noqa: BLE001
+        partners = ""
+    created_by_email = ""
+    if getattr(business, "created_by", None) is not None:
+        created_by_email = business.created_by.email or ""
+    row = {
+        "id": business.pk,
+        "created_by_email": created_by_email,
+        "assigned_partners": partners,
+    }
+    for col in IMPORT_COLUMNS:
+        row[col] = getattr(business, col, "") or ""
+    return row
+
+
+def export_listings_csv(businesses) -> bytes:
+    buf = io.StringIO()
+    writer = csv.DictWriter(buf, fieldnames=EXPORT_COLUMNS, extrasaction="ignore")
+    writer.writeheader()
+    for business in businesses:
+        writer.writerow(business_to_export_row(business))
+    return buf.getvalue().encode("utf-8-sig")
+
+
+def export_listings_xlsx(businesses) -> bytes:
+    from openpyxl import Workbook
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Partner listings"
+    ws.append(EXPORT_COLUMNS)
+    for business in businesses:
+        row = business_to_export_row(business)
+        ws.append([row.get(col, "") for col in EXPORT_COLUMNS])
     out = io.BytesIO()
     wb.save(out)
     return out.getvalue()

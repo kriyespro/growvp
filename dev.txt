@@ -2,6 +2,10 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Mission Control Partner listings page — list/filter by partner,
+  edit, bulk delete, CSV+Excel export, CSV/Excel/Google Sheets import
+  with optional partner assign; nav link /admin/partner-listings/
+
 - [DONE] .env.example for suratbazar.online + 159.195.52.197 + strong
   DJANGO_SECRET_KEY; DB user sb_d6d558f1 (password placeholder)
 

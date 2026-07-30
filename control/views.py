@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
 from control.access import control_login_required
@@ -202,6 +203,7 @@ def businesses_import(request):
                     headers,
                     body,
                     allow_paid_plans=True,
+                    owner=form.cleaned_data.get("partner") or request.user,
                 )
                 services.log_admin_action(
                     request.user,
@@ -257,6 +259,173 @@ def businesses_import_sample(request):
                 'attachment; filename="suratbazar-listings-sample.csv"'
             ),
         },
+    )
+
+
+@control_login_required
+@require_GET
+def partner_listings(request):
+    from leads.services import list_marketing_partners
+
+    q = (request.GET.get("q") or "").strip()
+    partner_id = request.GET.get("partner") or ""
+    partner_pk = int(partner_id) if str(partner_id).isdigit() else None
+    qs = services.partner_listings_queryset(q=q, partner_id=partner_pk)
+    return render(
+        request,
+        "control/partner_listings.jinja",
+        _control_context(
+            request,
+            nav="partner_listings",
+            businesses=list(qs[:300]),
+            total_count=qs.count(),
+            q=q,
+            partner_id=partner_pk or "",
+            partners=list(list_marketing_partners()),
+            deleted=request.GET.get("deleted"),
+            saved=request.GET.get("saved"),
+        ),
+    )
+
+
+@control_login_required
+@require_GET
+def partner_listings_export(request):
+    from users.listing_import import export_listings_csv, export_listings_xlsx
+
+    q = (request.GET.get("q") or "").strip()
+    partner_id = request.GET.get("partner") or ""
+    partner_pk = int(partner_id) if str(partner_id).isdigit() else None
+    ids = request.GET.getlist("id")
+    qs = services.partner_listings_queryset(q=q, partner_id=partner_pk)
+    if ids:
+        id_ints = [int(i) for i in ids if str(i).isdigit()]
+        qs = qs.filter(pk__in=id_ints)
+    businesses = list(qs[:2000])
+    fmt = (request.GET.get("format") or "csv").strip().lower()
+    if fmt in ("xlsx", "excel", "xls"):
+        data = export_listings_xlsx(businesses)
+        return HttpResponse(
+            data,
+            content_type=(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ),
+            headers={
+                "Content-Disposition": (
+                    'attachment; filename="partner-listings-export.xlsx"'
+                ),
+            },
+        )
+    data = export_listings_csv(businesses)
+    return HttpResponse(
+        data,
+        content_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": (
+                'attachment; filename="partner-listings-export.csv"'
+            ),
+        },
+    )
+
+
+@control_login_required
+def partner_listings_import(request):
+    from leads.services import list_marketing_partners
+    from users.forms import ListingImportForm
+    from users.listing_import import (
+        IMPORT_COLUMNS,
+        import_listing_rows,
+        load_rows_from_source,
+    )
+
+    form = ListingImportForm()
+    result = None
+    error = None
+    if request.method == "POST":
+        form = ListingImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                headers, body = load_rows_from_source(
+                    uploaded_file=form.cleaned_data.get("file"),
+                    google_sheet_url=form.cleaned_data.get("google_sheet_url") or "",
+                )
+                owner = form.cleaned_data.get("partner") or request.user
+                result = import_listing_rows(
+                    request.user,
+                    headers,
+                    body,
+                    allow_paid_plans=True,
+                    owner=owner,
+                )
+                services.log_admin_action(
+                    request.user,
+                    "other",
+                    (
+                        f"Partner listings import: {result.created_count} created, "
+                        f"{result.error_count} errors"
+                    ),
+                    request=request,
+                )
+                form = ListingImportForm()
+            except ValueError as exc:
+                error = str(exc)
+    return render(
+        request,
+        "control/partner_listings_import.jinja",
+        _control_context(
+            request,
+            nav="partner_listings",
+            form=form,
+            result=result,
+            error=error,
+            columns=IMPORT_COLUMNS,
+            partners=list(list_marketing_partners()),
+        ),
+    )
+
+
+@control_login_required
+@require_POST
+def partner_listings_bulk_delete(request):
+    ids = request.POST.getlist("ids")
+    deleted = services.bulk_delete_partner_listings(
+        request.user, ids, request=request
+    )
+    return redirect(f"{reverse('control:partner_listings')}?deleted={deleted}")
+
+
+@control_login_required
+def partner_listing_edit(request, pk):
+    from core.services import bust_directory_cache
+    from users.forms import ControlBusinessEditForm
+
+    business = get_object_or_404(services.partner_listings_queryset(), pk=pk)
+    if request.method == "POST":
+        form = ControlBusinessEditForm(request.POST, instance=business)
+        if form.is_valid():
+            updated = form.save(commit=False)
+            if updated.public_phone and updated.public_address:
+                updated.profile_setup_completed = True
+            updated.save()
+            bust_directory_cache()
+            services.log_admin_action(
+                request.user,
+                "other",
+                f"Edited partner listing {updated.name}",
+                request=request,
+            )
+            return redirect(f"{reverse('control:partner_listings')}?saved=1")
+    else:
+        form = ControlBusinessEditForm(instance=business)
+    return render(
+        request,
+        "control/partner_listing_edit.jinja",
+        _control_context(
+            request,
+            nav="partner_listings",
+            form=form,
+            business=business,
+        ),
     )
 
 

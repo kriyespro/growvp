@@ -22,6 +22,36 @@ urlpatterns = [
         views.businesses_import_sample,
         name="businesses_import_sample",
     ),
+    path(
+        "partner-listings/",
+        views.partner_listings,
+        name="partner_listings",
+    ),
+    path(
+        "partner-listings/export/",
+        views.partner_listings_export,
+        name="partner_listings_export",
+    ),
+    path(
+        "partner-listings/import/",
+        views.partner_listings_import,
+        name="partner_listings_import",
+    ),
+    path(
+        "partner-listings/import/sample/",
+        views.businesses_import_sample,
+        name="partner_listings_import_sample",
+    ),
+    path(
+        "partner-listings/bulk-delete/",
+        views.partner_listings_bulk_delete,
+        name="partner_listings_bulk_delete",
+    ),
+    path(
+        "partner-listings/<int:pk>/edit/",
+        views.partner_listing_edit,
+        name="partner_listing_edit",
+    ),
     path("partners/", views.partners_list, name="partners"),
     path("partners/assign/", views.partner_assign, name="partner_assign"),
     path("partners/unassign/", views.partner_unassign, name="partner_unassign"),

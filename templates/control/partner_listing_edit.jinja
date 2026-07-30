@@ -1,0 +1,109 @@
+{% extends 'control/base_control.jinja' %}
+
+{% block title %}Edit listing{% endblock %}
+{% block page_title %}Edit partner listing{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <a href="{{ url('control:partner_listings') }}" class="text-xs font-semibold text-control-link hover:underline">← Partner listings</a>
+  <p class="mt-1 text-sm text-control-muted">
+    <a href="/b/{{ business.slug }}/" class="text-control-link hover:underline" target="_blank">{{ business.name }}</a>
+    {% if business.created_by %} · by {{ business.created_by.email }}{% endif %}
+  </p>
+</div>
+
+<form method="post" class="max-w-2xl space-y-4 rounded-xl border border-control-border bg-control-panel p-5">
+  {{ csrf_field(request) }}
+  {% if form.errors %}
+  <div class="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+    Please fix the errors below.
+  </div>
+  {% endif %}
+
+  <div>
+    <label class="block text-sm font-semibold">Name</label>
+    <input name="name" value="{{ form.name.value() or '' }}" required class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+    {% if form.name.errors %}<p class="mt-1 text-xs text-red-300">{{ form.name.errors.0 }}</p>{% endif %}
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold">Category</label>
+    <select name="industry_type" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+      {% for value, label in form.fields.industry_type.choices %}
+      <option value="{{ value }}" {% if form.industry_type.value() == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold">Plan</label>
+    <select name="listing_plan" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+      {% for value, label in form.fields.listing_plan.choices %}
+      <option value="{{ value }}" {% if form.listing_plan.value() == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold">Slug</label>
+    <input name="slug" value="{{ form.slug.value() or '' }}" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+    {% if form.slug.errors %}<p class="mt-1 text-xs text-red-300">{{ form.slug.errors.0 }}</p>{% endif %}
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold">Hero title</label>
+    <input name="hero_title" value="{{ form.hero_title.value() or '' }}" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold">Hero subtitle</label>
+    <textarea name="hero_subtitle" rows="2" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">{{ form.hero_subtitle.value() or '' }}</textarea>
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold">Listing photo URL</label>
+    <input name="hero_image_url" type="url" value="{{ form.hero_image_url.value() or '' }}" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+    {% if business.public_hero_image_url %}
+    <img src="{{ business.public_hero_image_url|img_url(480) }}" alt="" class="mt-2 h-28 w-full rounded-lg object-cover border border-control-border">
+    {% endif %}
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold">Phone</label>
+    <input name="public_phone" value="{{ form.public_phone.value() or '' }}" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+    {% if form.public_phone.errors %}<p class="mt-1 text-xs text-red-300">{{ form.public_phone.errors.0 }}</p>{% endif %}
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold">Email</label>
+    <input name="public_email" type="email" value="{{ form.public_email.value() or '' }}" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold">Address</label>
+    <textarea name="public_address" rows="2" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">{{ form.public_address.value() or '' }}</textarea>
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold">Website URL</label>
+    <input name="website_url" type="url" value="{{ form.website_url.value() or '' }}" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold">Map embed URL</label>
+    <input name="map_embed_url" type="url" value="{{ form.map_embed_url.value() or '' }}" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold">Testimonial quote</label>
+    <textarea name="testimonial_quote" rows="2" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">{{ form.testimonial_quote.value() or '' }}</textarea>
+  </div>
+
+  <div>
+    <label class="block text-sm font-semibold">Testimonial author</label>
+    <input name="testimonial_author" value="{{ form.testimonial_author.value() or '' }}" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+  </div>
+
+  <button type="submit" class="rounded-md bg-control-accent px-4 py-2 text-sm font-semibold text-black hover:opacity-90">Save listing</button>
+</form>
+{% endblock %}

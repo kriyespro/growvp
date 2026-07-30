@@ -265,3 +265,51 @@ def get_activity_feed(limit=30):
 
     items.sort(key=lambda x: x["at"] or timezone.now(), reverse=True)
     return items[:limit]
+
+
+def partner_listings_queryset(q="", partner_id=None):
+    """Listings created by or assigned to marketing partners."""
+    qs = (
+        Business.objects.filter(
+            Q(created_by__platform_role="marketing_partner")
+            | Q(assigned_partners__platform_role="marketing_partner")
+        )
+        .select_related("created_by")
+        .prefetch_related("assigned_partners")
+        .distinct()
+        .order_by("-created_at")
+    )
+    q = (q or "").strip()
+    if q:
+        qs = qs.filter(
+            Q(name__icontains=q)
+            | Q(slug__icontains=q)
+            | Q(public_phone__icontains=q)
+            | Q(public_address__icontains=q)
+            | Q(created_by__email__icontains=q)
+        )
+    if partner_id:
+        qs = qs.filter(
+            Q(created_by_id=partner_id) | Q(assigned_partners__id=partner_id)
+        ).distinct()
+    return qs
+
+
+def bulk_delete_partner_listings(actor, ids, request=None):
+    """Delete partner-related listings by id. Returns deleted count."""
+    from core.services import bust_directory_cache
+
+    ids = [int(i) for i in ids if str(i).isdigit()]
+    if not ids:
+        return 0
+    qs = partner_listings_queryset().filter(pk__in=ids)
+    names = list(qs.values_list("name", flat=True)[:20])
+    deleted, _ = qs.delete()
+    bust_directory_cache()
+    log_admin_action(
+        actor,
+        "other",
+        f"Bulk deleted {deleted} partner listing(s): {', '.join(names)}",
+        request=request,
+    )
+    return deleted
