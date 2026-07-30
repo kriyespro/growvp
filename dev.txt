@@ -1,7 +1,18 @@
 # In Progress
 - Manual QA multi-role dashboards
+- Awaiting confirm to migrate: users/0009_business_seo_meta_fields.py
 
 # Completed (latest)
+- [DONE] Listing SEO meta for partners — seo_title / seo_description /
+  seo_keywords on Business; partner edit + Mission Control + business SEO
+  tab; auto fallback via core.seo; keywords meta on public pages; CSV import
+  columns; migration 0009 ready (not applied yet)
+
+- [DONE] Advanced partner dashboard + enquiry tools — KPI grid (plans,
+  open/replied/closed/today), recent leads, listing health; inbox filters
+  (status/listing/search/sort HTMX), bulk status, thread quick-replies +
+  mark open/replied/close; partner nav Import + Needs reply
+
 - [DONE] Mission Control /admin/dummy-data/ — detect + bulk purge seed/demo
   listings (and optional @test.com users) with DELETE DUMMY confirm;
   partner listings page highlights CSV/Excel/Google Sheet import + sample

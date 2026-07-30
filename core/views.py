@@ -9,6 +9,7 @@ from core.seo import (
     absolute_url,
     breadcrumb_json_ld,
     business_meta_description,
+    business_meta_keywords,
     business_page_title,
     collection_json_ld,
     collection_page_meta,
@@ -169,6 +170,7 @@ def business_landing(request, business_slug):
         "similar_businesses": get_similar_businesses(business),
         "page_title": business_page_title(business),
         "meta_description": business_meta_description(business),
+        "meta_keywords": business_meta_keywords(business),
         "canonical_url": absolute_url(f"/b/{business.slug}/", request),
         "og_image_url": business.public_hero_image_url,
         "local_business_json_ld": local_business_json_ld(

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ static('css/app.css') }}">
     <title>{% block title %}SuratBazar | Find & book local businesses{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Find and book trusted local businesses in Surat — salons, clinics, opticals, pet care and more. Compare prices, hours, and book online.{% endblock %}">
+    {% block meta_keywords_tag %}{% endblock %}
     <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
     <link rel="canonical" href="{% block canonical %}{% if request is defined %}{{ request.build_absolute_uri(request.path) }}{% else %}/{% endif %}{% endblock %}">
 

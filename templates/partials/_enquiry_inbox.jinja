@@ -1,18 +1,41 @@
+{% if can_manage_status %}
+<form method="post" action="/leads/bulk-status/" id="enquiry-bulk-form" x-data="{ count: 0 }" @change="count = [...$el.querySelectorAll('input[name=ids]:checked')].length">
+  {{ csrf_field(request) }}
+  <div class="mb-3 flex flex-wrap items-center gap-2">
+    <span class="text-xs text-textMuted" x-text="count ? count + ' selected' : 'Select rows for bulk actions'"></span>
+    <button type="submit" name="status" value="replied" class="rounded-md border border-stone-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-textMain hover:bg-stone-50" :disabled="!count">Mark replied</button>
+    <button type="submit" name="status" value="open" class="rounded-md border border-stone-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-textMain hover:bg-stone-50" :disabled="!count">Mark open</button>
+    <button type="submit" name="status" value="closed" class="rounded-md border border-red-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50" :disabled="!count" onclick="return confirm('Close selected enquiries?')">Close</button>
+  </div>
+{% endif %}
+
 {% if not enquiries %}
-<p class="rounded-xl border border-dashed border-stone-300 bg-white p-8 text-center text-textMuted">No enquiries yet.</p>
+<p class="rounded-xl border border-dashed border-stone-300 bg-white p-8 text-center text-textMuted">No enquiries match these filters.</p>
 {% else %}
 <ul class="divide-y divide-stone-200 overflow-hidden rounded-xl border border-stone-200 bg-white">
   {% for e in enquiries %}
-  <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
-    <div class="min-w-0">
+  <li class="flex flex-wrap items-center gap-3 px-4 py-3">
+    {% if can_manage_status %}
+    <input type="checkbox" name="ids" value="{{ e.id }}" class="rounded border-stone-300">
+    {% endif %}
+    <div class="min-w-0 flex-1">
       <a href="/leads/{{ e.id }}/" class="font-semibold text-textMain hover:text-brand">{{ e.subject or ('Enquiry #' ~ e.id) }}</a>
       <p class="truncate text-xs text-textMuted">
-        {{ e.business.name }} · {{ e.client.email }} · {{ e.get_status_display() }}
+        {{ e.business.name }} · {{ e.client.email }}
         · {{ e.message_count if e.message_count is defined else '' }} msgs
+        · {{ e.updated_at.strftime('%d %b %H:%M') }}
       </p>
     </div>
+    <span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide
+      {% if e.status == 'open' %}bg-brand/10 text-brand
+      {% elif e.status == 'replied' %}bg-emerald-100 text-emerald-800
+      {% else %}bg-stone-100 text-stone-600{% endif %}">{{ e.get_status_display() }}</span>
     <a href="/leads/{{ e.id }}/" class="text-sm font-semibold text-brand">Open</a>
   </li>
   {% endfor %}
 </ul>
+{% endif %}
+
+{% if can_manage_status %}
+</form>
 {% endif %}

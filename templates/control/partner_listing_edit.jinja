@@ -104,6 +104,23 @@
     <input name="testimonial_author" value="{{ form.testimonial_author.value() or '' }}" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
   </div>
 
+  <div class="border-t border-control-border pt-4">
+    <p class="text-sm font-semibold text-control-text">SEO overrides</p>
+    <p class="mt-1 text-xs text-control-muted">Blank = auto from name, category, address.</p>
+  </div>
+  <div>
+    <label class="block text-sm font-semibold">SEO title</label>
+    <input name="seo_title" maxlength="70" value="{{ form.seo_title.value() or '' }}" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
+  </div>
+  <div>
+    <label class="block text-sm font-semibold">Meta description</label>
+    <textarea name="seo_description" rows="2" maxlength="160" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">{{ form.seo_description.value() or '' }}</textarea>
+  </div>
+  <div>
+    <label class="block text-sm font-semibold">Keywords</label>
+    <input name="seo_keywords" maxlength="255" value="{{ form.seo_keywords.value() or '' }}" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm" placeholder="salon Vesu, hair spa Surat">
+  </div>
+
   <button type="submit" class="rounded-md bg-control-accent px-4 py-2 text-sm font-semibold text-white hover:opacity-90">Save listing</button>
 </form>
 {% endblock %}

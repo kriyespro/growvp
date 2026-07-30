@@ -101,6 +101,38 @@
     <input type="text" name="testimonial_author" value="{{ form.testimonial_author.value() or '' }}" class="block w-full rounded-md border-0 py-2.5 px-4 text-sm ring-1 ring-inset ring-stone-300">
   </div>
 
+  <div class="border-t border-stone-200 pt-4 space-y-3">
+    <div>
+      <p class="text-sm font-semibold text-textMain">SEO / search listing</p>
+      <p class="mt-1 text-xs text-textMuted">Optional overrides for Google &amp; social previews. Leave blank to use auto-generated title, description, and keywords from this listing.</p>
+    </div>
+
+    {% if seo_preview %}
+    <div class="rounded-lg border border-stone-200 bg-stone-50 p-3 text-xs text-textMuted space-y-2">
+      <p class="font-semibold text-textMain">Live preview {% if seo_preview.title_is_custom or seo_preview.description_is_custom or seo_preview.keywords_is_custom %}(custom + auto mix){% else %}(auto){% endif %}</p>
+      <p><span class="font-semibold text-blue-700">{{ seo_preview.title }}</span></p>
+      <p class="text-emerald-800">{{ seo_preview.description }}</p>
+      <p class="text-stone-500">Keywords: {{ seo_preview.keywords }}</p>
+    </div>
+    {% endif %}
+
+    <div class="space-y-1">
+      <label class="block text-sm font-medium" for="id_seo_title">SEO title <span class="font-normal text-textMuted">(≤70 chars)</span></label>
+      <input id="id_seo_title" type="text" name="seo_title" maxlength="70" value="{{ form.seo_title.value() or '' }}" placeholder="{{ seo_preview.title if seo_preview else '' }}" class="block w-full rounded-md border-0 py-2.5 px-4 text-sm ring-1 ring-inset ring-stone-300">
+      {% if form.seo_title.errors %}<p class="text-xs text-red-600">{{ form.seo_title.errors|join(', ') }}</p>{% endif %}
+    </div>
+    <div class="space-y-1">
+      <label class="block text-sm font-medium" for="id_seo_description">Meta description <span class="font-normal text-textMuted">(≤160 chars)</span></label>
+      <textarea id="id_seo_description" name="seo_description" rows="3" maxlength="160" placeholder="{{ seo_preview.description if seo_preview else '' }}" class="block w-full rounded-md border-0 py-2.5 px-4 text-sm ring-1 ring-inset ring-stone-300">{{ form.seo_description.value() or '' }}</textarea>
+      {% if form.seo_description.errors %}<p class="text-xs text-red-600">{{ form.seo_description.errors|join(', ') }}</p>{% endif %}
+    </div>
+    <div class="space-y-1">
+      <label class="block text-sm font-medium" for="id_seo_keywords">Keywords <span class="font-normal text-textMuted">(comma-separated)</span></label>
+      <input id="id_seo_keywords" type="text" name="seo_keywords" maxlength="255" value="{{ form.seo_keywords.value() or '' }}" placeholder="{{ seo_preview.keywords if seo_preview else '' }}" class="block w-full rounded-md border-0 py-2.5 px-4 text-sm ring-1 ring-inset ring-stone-300">
+      <p class="text-xs text-textMuted">Also sets &lt;meta name="keywords"&gt;. Google mostly ignores keywords; title + description matter more.</p>
+    </div>
+  </div>
+
   {{ btn.render(type="submit", text="Save listing", cls="justify-center") }}
 </form>
 {% endblock %}

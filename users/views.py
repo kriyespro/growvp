@@ -246,6 +246,8 @@ def business_profile(request):
     else:
         form = BusinessLandingForm(instance=business)
 
+    from core.seo import business_seo_preview
+
     context = {
         "form": form,
         "business": business,
@@ -256,6 +258,7 @@ def business_profile(request):
         "readiness": get_listing_readiness(business),
         "website_enabled": plan_allows_website(business.listing_plan),
         "plan": get_plan_config(business.listing_plan),
+        "seo_preview": business_seo_preview(business),
         "csrf_input_html": f'<input type="hidden" name="csrfmiddlewaretoken" value="{get_token(request)}">',
     }
 
@@ -305,17 +308,23 @@ def listing_plans(request):
 @require_platform_role("marketing_partner")
 @ensure_csrf_cookie
 def partner_home(request):
-    from leads.services import partner_enquiry_stats
+    from leads.services import partner_dashboard_stats
 
-    listings = businesses_for_partner(request.user)
-    stats = partner_enquiry_stats(request.user)
+    dash = partner_dashboard_stats(request.user)
     return render(
         request,
         "pages/partner/home.jinja",
         {
-            "listings": listings,
-            "listing_count": listings.count(),
-            "enquiry_stats": stats,
+            "listings": dash["listings"],
+            "listing_count": dash["listing_count"],
+            "enquiry_stats": dash["enquiry_stats"],
+            "plan_free": dash["plan_free"],
+            "plan_pro": dash["plan_pro"],
+            "plan_premium": dash["plan_premium"],
+            "incomplete_listings": dash["incomplete_listings"],
+            "created_by_me": dash["created_by_me"],
+            "assigned_to_me": dash["assigned_to_me"],
+            "recent_enquiries": dash["recent_enquiries"],
             "nav": "home",
         },
     )
@@ -380,6 +389,8 @@ def partner_listing_edit(request, pk):
             form = BusinessLandingForm(instance=business)
     else:
         form = BusinessLandingForm(instance=business)
+    from core.seo import business_seo_preview
+
     return render(
         request,
         "pages/partner/listing_edit.jinja",
@@ -387,6 +398,7 @@ def partner_listing_edit(request, pk):
             "form": form,
             "business": business,
             "saved": saved,
+            "seo_preview": business_seo_preview(business),
             "website_enabled": plan_allows_website(business.listing_plan),
             "plan": get_plan_config(business.listing_plan),
             "show_map": plan_shows_map_embed(business.listing_plan),
@@ -429,7 +441,7 @@ def partner_listing_import(request):
             "result": result,
             "error": error,
             "columns": IMPORT_COLUMNS,
-            "nav": "listings",
+            "nav": "import",
         },
     )
 

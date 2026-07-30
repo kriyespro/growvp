@@ -30,6 +30,22 @@ class Business(models.Model):
     testimonial_author = models.CharField(max_length=150, blank=True)
     listing_plan = models.CharField(max_length=20, choices=PLAN_CHOICES, default="free")
     profile_setup_completed = models.BooleanField(default=False)
+    # Optional SEO overrides — blank = programmatic defaults from core.seo
+    seo_title = models.CharField(
+        max_length=70,
+        blank=True,
+        help_text="Custom <title> / og:title (≤70 chars). Leave blank for auto.",
+    )
+    seo_description = models.CharField(
+        max_length=160,
+        blank=True,
+        help_text="Custom meta description (≤160 chars). Leave blank for auto.",
+    )
+    seo_keywords = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Comma-separated keywords. Leave blank for auto.",
+    )
     created_by = models.ForeignKey(
         "User",
         on_delete=models.SET_NULL,

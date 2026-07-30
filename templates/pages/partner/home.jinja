@@ -4,38 +4,126 @@
 {% block robots %}noindex, nofollow{% endblock %}
 
 {% block partner_content %}
-<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+<div class="mb-6 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <h2 class="font-display text-2xl font-bold text-textMain">Overview</h2>
+    <p class="mt-1 text-sm text-textMuted">Listings, leads, and quick actions for your partner pipeline.</p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <a href="/partner/listings/import/" class="rounded-md border border-stone-300 bg-white px-3 py-2 text-sm font-semibold text-textMain hover:bg-stone-50">Import sheet</a>
+    <a href="/partner/listings/new/" class="rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white hover:bg-brandHover">New listing</a>
+  </div>
+</div>
+
+<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
   <article class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
-    <p class="text-xs font-semibold uppercase text-textMuted">My listings</p>
-    <p class="mt-2 text-3xl font-bold text-textMain">{{ listing_count }}</p>
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-textMuted">Listings</p>
+    <p class="mt-2 text-2xl font-bold text-textMain">{{ listing_count }}</p>
   </article>
   <article class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
-    <p class="text-xs font-semibold uppercase text-textMuted">Open enquiries</p>
-    <p class="mt-2 text-3xl font-bold text-brand">{{ enquiry_stats.open }}</p>
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-textMuted">Needs reply</p>
+    <p class="mt-2 text-2xl font-bold text-brand">{{ enquiry_stats.open }}</p>
   </article>
   <article class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
-    <p class="text-xs font-semibold uppercase text-textMuted">Total enquiries</p>
-    <p class="mt-2 text-3xl font-bold text-textMain">{{ enquiry_stats.total }}</p>
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-textMuted">Replied</p>
+    <p class="mt-2 text-2xl font-bold text-textMain">{{ enquiry_stats.replied }}</p>
+  </article>
+  <article class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-textMuted">Closed</p>
+    <p class="mt-2 text-2xl font-bold text-textMain">{{ enquiry_stats.closed }}</p>
+  </article>
+  <article class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-textMuted">Today</p>
+    <p class="mt-2 text-2xl font-bold text-textMain">{{ enquiry_stats.today }}</p>
+  </article>
+  <article class="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-textMuted">All enquiries</p>
+    <p class="mt-2 text-2xl font-bold text-textMain">{{ enquiry_stats.total }}</p>
   </article>
 </div>
-<div class="mt-8 flex flex-wrap gap-3">
-  <a href="/partner/listings/new/" class="inline-flex rounded-md bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brandHover">Create listing</a>
-  <a href="/leads/" class="inline-flex rounded-md border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-textMain">Open enquiry inbox</a>
+
+<div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm">
+    <span class="text-textMuted">Free</span>
+    <span class="float-right font-semibold text-textMain">{{ plan_free }}</span>
+  </div>
+  <div class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm">
+    <span class="text-textMuted">Pro</span>
+    <span class="float-right font-semibold text-textMain">{{ plan_pro }}</span>
+  </div>
+  <div class="rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm">
+    <span class="text-textMuted">Premium</span>
+    <span class="float-right font-semibold text-textMain">{{ plan_premium }}</span>
+  </div>
+  <div class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm">
+    <span class="text-amber-900">Incomplete setup</span>
+    <span class="float-right font-semibold text-amber-950">{{ incomplete_listings }}</span>
+  </div>
 </div>
-{% if listings %}
-<section class="mt-10">
-  <h2 class="font-display text-xl font-bold text-textMain">Recent listings</h2>
-  <ul class="mt-4 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white">
-    {% for b in listings[:8] %}
-    <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
-      <div>
-        <a href="/b/{{ b.slug }}/" class="font-semibold text-textMain hover:text-brand">{{ b.name }}</a>
-        <p class="text-xs text-textMuted">{{ b.get_industry_type_display() }} · {{ b.plan_label }}</p>
-      </div>
-      <a href="/partner/listings/{{ b.id }}/edit/" class="text-sm font-semibold text-brand">Edit</a>
-    </li>
-    {% endfor %}
-  </ul>
+
+<div class="mt-4 flex flex-wrap gap-2 text-xs text-textMuted">
+  <span class="rounded-full bg-white px-3 py-1 ring-1 ring-stone-200">Created by you: <strong class="text-textMain">{{ created_by_me }}</strong></span>
+  <span class="rounded-full bg-white px-3 py-1 ring-1 ring-stone-200">Assigned only: <strong class="text-textMain">{{ assigned_to_me }}</strong></span>
+</div>
+
+<section class="mt-8 grid gap-6 lg:grid-cols-2">
+  <div>
+    <div class="mb-3 flex items-center justify-between gap-2">
+      <h3 class="font-display text-lg font-bold text-textMain">Recent enquiries</h3>
+      <a href="/leads/?status=open" class="text-xs font-semibold text-brand hover:underline">Open inbox →</a>
+    </div>
+    {% if recent_enquiries %}
+    <ul class="divide-y divide-stone-200 overflow-hidden rounded-xl border border-stone-200 bg-white">
+      {% for e in recent_enquiries %}
+      <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+        <div class="min-w-0">
+          <a href="/leads/{{ e.id }}/" class="font-semibold text-textMain hover:text-brand">{{ e.subject or ('Enquiry #' ~ e.id) }}</a>
+          <p class="truncate text-xs text-textMuted">{{ e.business.name }} · {{ e.client.email }} · {{ e.get_status_display() }}</p>
+        </div>
+        <span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase
+          {% if e.status == 'open' %}bg-brand/10 text-brand
+          {% elif e.status == 'replied' %}bg-emerald-100 text-emerald-800
+          {% else %}bg-stone-100 text-stone-600{% endif %}">{{ e.status }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="rounded-xl border border-dashed border-stone-300 bg-white p-6 text-center text-sm text-textMuted">No enquiries yet. Share listing links to start getting leads.</p>
+    {% endif %}
+    <div class="mt-3 flex flex-wrap gap-2">
+      <a href="/leads/?status=open" class="rounded-md bg-brand/10 px-3 py-1.5 text-xs font-semibold text-brand">Needs reply</a>
+      <a href="/leads/?status=replied" class="rounded-md border border-stone-300 bg-white px-3 py-1.5 text-xs font-semibold text-textMain">Replied</a>
+      <a href="/leads/?status=closed" class="rounded-md border border-stone-300 bg-white px-3 py-1.5 text-xs font-semibold text-textMain">Closed</a>
+      <a href="/leads/" class="rounded-md border border-stone-300 bg-white px-3 py-1.5 text-xs font-semibold text-textMain">All</a>
+    </div>
+  </div>
+
+  <div>
+    <div class="mb-3 flex items-center justify-between gap-2">
+      <h3 class="font-display text-lg font-bold text-textMain">Your listings</h3>
+      <a href="/partner/listings/" class="text-xs font-semibold text-brand hover:underline">Manage →</a>
+    </div>
+    {% if listings %}
+    <ul class="divide-y divide-stone-200 overflow-hidden rounded-xl border border-stone-200 bg-white">
+      {% for b in listings[:8] %}
+      <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+        <div class="min-w-0">
+          <a href="/b/{{ b.slug }}/" class="font-semibold text-textMain hover:text-brand">{{ b.name }}</a>
+          <p class="text-xs text-textMuted">
+            {{ b.get_industry_type_display() }} · {{ b.plan_label }}
+            {% if not b.profile_setup_completed %} · <span class="text-amber-700">Incomplete</span>{% endif %}
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <a href="/leads/?business={{ b.id }}" class="text-xs font-semibold text-textMuted hover:text-brand">Leads</a>
+          <a href="/partner/listings/{{ b.id }}/edit/" class="text-xs font-semibold text-brand">Edit</a>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="rounded-xl border border-dashed border-stone-300 bg-white p-6 text-center text-sm text-textMuted">No listings yet. Create one or import a CSV/Excel sheet.</p>
+    {% endif %}
+  </div>
 </section>
-{% endif %}
 {% endblock %}

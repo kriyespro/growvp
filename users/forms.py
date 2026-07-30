@@ -102,6 +102,9 @@ class BusinessLandingForm(forms.ModelForm):
             "map_embed_url",
             "testimonial_quote",
             "testimonial_author",
+            "seo_title",
+            "seo_description",
+            "seo_keywords",
         ]
 
     def clean_public_phone(self):
@@ -124,6 +127,15 @@ class BusinessLandingForm(forms.ModelForm):
                 "Address is required so customers can find you."
             )
         return address
+
+    def clean_seo_title(self):
+        return (self.cleaned_data.get("seo_title") or "").strip()
+
+    def clean_seo_description(self):
+        return (self.cleaned_data.get("seo_description") or "").strip()
+
+    def clean_seo_keywords(self):
+        return (self.cleaned_data.get("seo_keywords") or "").strip()
 
 
 class ListingPlanForm(forms.Form):
@@ -213,6 +225,9 @@ class ControlBusinessEditForm(forms.ModelForm):
             "testimonial_author",
             "listing_plan",
             "slug",
+            "seo_title",
+            "seo_description",
+            "seo_keywords",
         ]
 
     def clean_public_phone(self):

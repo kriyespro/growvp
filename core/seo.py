@@ -89,6 +89,9 @@ def area_to_slug(area_label: str) -> str:
 
 
 def business_meta_description(business) -> str:
+    custom = (getattr(business, "seo_description", None) or "").strip()
+    if custom:
+        return truncate_meta(custom, 160)
     parts = []
     subtitle = (business.hero_subtitle or business.hero_title or "").strip()
     if subtitle:
@@ -102,6 +105,9 @@ def business_meta_description(business) -> str:
 
 
 def business_page_title(business) -> str:
+    custom = (getattr(business, "seo_title", None) or "").strip()
+    if custom:
+        return truncate_meta(custom, 70)
     industry = business.get_industry_type_display()
     area = ""
     address = (business.public_address or "").strip()
@@ -114,6 +120,53 @@ def business_page_title(business) -> str:
     if area:
         return f"{business.name} — {industry} in {area} | SuratBazar"
     return f"{business.name} — {industry} | Book on SuratBazar"
+
+
+def business_meta_keywords(business) -> str:
+    """Comma-separated keywords — custom override or programmatic from listing."""
+    custom = (getattr(business, "seo_keywords", None) or "").strip()
+    if custom:
+        return truncate_meta(custom, 255)
+
+    from core.services import extract_area_label
+
+    industry = business.get_industry_type_display()
+    area = extract_area_label(business.public_address) or "Surat"
+    bits = [
+        business.name,
+        industry,
+        f"{industry} in {area}",
+        f"{industry} Surat",
+        f"{area} Surat",
+        "SuratBazar",
+        "book online Surat",
+    ]
+    # Deduplicate while preserving order
+    seen = set()
+    out = []
+    for bit in bits:
+        key = bit.strip().lower()
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        out.append(bit.strip())
+    return truncate_meta(", ".join(out), 255)
+
+
+def business_seo_preview(business) -> dict:
+    """Resolved SEO values for partner edit preview (auto or custom)."""
+    return {
+        "title": business_page_title(business),
+        "description": business_meta_description(business),
+        "keywords": business_meta_keywords(business),
+        "title_is_custom": bool((getattr(business, "seo_title", None) or "").strip()),
+        "description_is_custom": bool(
+            (getattr(business, "seo_description", None) or "").strip()
+        ),
+        "keywords_is_custom": bool(
+            (getattr(business, "seo_keywords", None) or "").strip()
+        ),
+    }
 
 
 def collection_page_meta(*, industry_key="", area_label="", count=0):

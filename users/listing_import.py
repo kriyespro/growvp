@@ -35,6 +35,9 @@ IMPORT_COLUMNS = [
     "timezone",
     "upi_id",
     "slug",
+    "seo_title",
+    "seo_description",
+    "seo_keywords",
 ]
 
 # Friendly header aliases → canonical column
@@ -84,6 +87,17 @@ HEADER_ALIASES = {
     "upi_id": "upi_id",
     "upi": "upi_id",
     "slug": "slug",
+    "seo_title": "seo_title",
+    "meta title": "seo_title",
+    "meta_title": "seo_title",
+    "page title": "seo_title",
+    "seo_description": "seo_description",
+    "meta description": "seo_description",
+    "meta_description": "seo_description",
+    "seo_keywords": "seo_keywords",
+    "keywords": "seo_keywords",
+    "meta keywords": "seo_keywords",
+    "meta_keywords": "seo_keywords",
 }
 
 
@@ -114,6 +128,9 @@ SAMPLE_ROWS = [
         "timezone": "Asia/Kolkata",
         "upi_id": "",
         "slug": "",
+        "seo_title": "Sample Glow Salon — Hair salon Ring Road Surat",
+        "seo_description": "Haircuts, spa and bridal beauty near Ring Road, Surat. Book online on SuratBazar.",
+        "seo_keywords": "salon Ring Road Surat, hair spa Surat, bridal makeup Surat",
     },
     {
         "name": "Sample Care Dental",
@@ -132,6 +149,9 @@ SAMPLE_ROWS = [
         "timezone": "Asia/Kolkata",
         "upi_id": "",
         "slug": "",
+        "seo_title": "",
+        "seo_description": "",
+        "seo_keywords": "",
     },
 ]
 
@@ -267,6 +287,9 @@ def parse_row(row: list, header_map: dict[str, int], *, allow_paid_plans: bool) 
         "timezone": get("timezone") or "Asia/Kolkata",
         "upi_id": get("upi_id")[:50],
         "slug": get("slug")[:255],
+        "seo_title": get("seo_title")[:70],
+        "seo_description": get("seo_description")[:160],
+        "seo_keywords": get("seo_keywords")[:255],
     }
     email = data["public_email"]
     if email and "@" not in email:
@@ -483,6 +506,9 @@ def _create_business_from_import(actor, data: dict) -> Business:
         listing_plan=data.get("listing_plan") or "free",
         timezone=data.get("timezone") or "Asia/Kolkata",
         upi_id=data.get("upi_id") or "",
+        seo_title=data.get("seo_title") or "",
+        seo_description=data.get("seo_description") or "",
+        seo_keywords=data.get("seo_keywords") or "",
         created_by=actor if actor and actor.is_authenticated else None,
         profile_setup_completed=setup_done,
     )
@@ -526,7 +552,8 @@ def build_sample_xlsx() -> bytes:
     tip["A3"] = "2. industry_type: salon, dentist, optical, gym, restaurant, …"
     tip["A4"] = "3. listing_plan: free | pro | premium (public page shows fields by plan)."
     tip["A5"] = "4. hero_image_url: public HTTPS image URL (JPG/PNG/WebP)."
-    tip["A6"] = "5. Google Sheets: File → Share → Anyone with link → Viewer, then paste URL."
+    tip["A6"] = "5. seo_title / seo_description / seo_keywords: optional; blank = auto SEO."
+    tip["A7"] = "6. Google Sheets: File → Share → Anyone with link → Viewer, then paste URL."
     tip["A7"] = "6. Upload CSV/XLSX or paste Google Sheet URL in Partner / Admin import page."
     out = io.BytesIO()
     wb.save(out)

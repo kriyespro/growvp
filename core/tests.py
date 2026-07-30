@@ -490,4 +490,16 @@ class PublicBusinessLandingTests(TestCase):
         self.assertContains(response, "SEO Glow")
         self.assertContains(response, "/surat/salon/")
         self.assertContains(response, "/surat/salon/vesu/")
+        self.assertContains(response, 'name="keywords"')
+
+        business.seo_title = "Custom SEO Glow Title"
+        business.seo_description = "Custom meta description for SEO Glow salon."
+        business.seo_keywords = "custom salon, vesu hair"
+        business.save(update_fields=["seo_title", "seo_description", "seo_keywords"])
+        response = self.client.get(
+            reverse("business_landing", kwargs={"business_slug": business.slug})
+        )
+        self.assertContains(response, "Custom SEO Glow Title")
+        self.assertContains(response, "Custom meta description for SEO Glow salon.")
+        self.assertContains(response, "custom salon, vesu hair")
 

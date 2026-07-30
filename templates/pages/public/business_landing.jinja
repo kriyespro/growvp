@@ -2,6 +2,9 @@
 
 {% block title %}{{ page_title }}{% endblock %}
 {% block meta_description %}{{ meta_description }}{% endblock %}
+{% block meta_keywords_tag %}
+{% if meta_keywords %}<meta name="keywords" content="{{ meta_keywords }}">{% endif %}
+{% endblock %}
 {% block canonical %}{{ canonical_url }}{% endblock %}
 {% block og_type %}website{% endblock %}
 {% block og_image %}
