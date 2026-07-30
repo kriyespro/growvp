@@ -15,7 +15,15 @@
   {% for b in listings %}
   <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
     <div>
-      <p class="font-semibold text-textMain">{{ b.name }}</p>
+      <div class="flex flex-wrap items-center gap-2">
+        <p class="font-semibold text-textMain">{{ b.name }}</p>
+        <span class="inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide
+          {% if b.listing_plan == 'premium' %}bg-amber-100 text-amber-900
+          {% elif b.listing_plan == 'pro' %}bg-indigo-100 text-indigo-900
+          {% else %}bg-stone-100 text-stone-600{% endif %}">
+          {{ b.plan_label }}
+        </span>
+      </div>
       <p class="text-xs text-textMuted">
         {{ b.get_industry_type_display() }}
         {% if b.created_by_id == request.user.id %} · Created by you{% else %} · Assigned{% endif %}

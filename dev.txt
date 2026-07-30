@@ -2,6 +2,9 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Partner import stores Free/Pro/Premium fields; edit UI shows
+  plan-gated public visibility; Mission Control light theme
+
 - [DONE] Mission Control Partner listings page — list/filter by partner,
   edit, bulk delete, CSV+Excel export, CSV/Excel/Google Sheets import
   with optional partner assign; nav link /admin/partner-listings/

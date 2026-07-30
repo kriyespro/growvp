@@ -48,29 +48,29 @@
         </div>
       </div>
       <nav class="flex-1 space-y-1 p-3 text-sm">
-        <a href="{{ url('control:dashboard') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'dashboard' %}bg-white/10 text-white{% else %}text-control-muted hover:bg-white/5 hover:text-white{% endif %}">
+        <a href="{{ url('control:dashboard') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'dashboard' %}bg-brand/10 font-semibold text-brand{% else %}text-control-muted hover:bg-stone-100 hover:text-control-text{% endif %}">
           Dashboard
         </a>
-        <a href="{{ url('control:users') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'users' %}bg-white/10 text-white{% else %}text-control-muted hover:bg-white/5 hover:text-white{% endif %}">
+        <a href="{{ url('control:users') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'users' %}bg-brand/10 font-semibold text-brand{% else %}text-control-muted hover:bg-stone-100 hover:text-control-text{% endif %}">
           Users
         </a>
-        <a href="{{ url('control:businesses') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'businesses' %}bg-white/10 text-white{% else %}text-control-muted hover:bg-white/5 hover:text-white{% endif %}">
+        <a href="{{ url('control:businesses') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'businesses' %}bg-brand/10 font-semibold text-brand{% else %}text-control-muted hover:bg-stone-100 hover:text-control-text{% endif %}">
           Businesses
         </a>
-        <a href="{{ url('control:partner_listings') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'partner_listings' %}bg-white/10 text-white{% else %}text-control-muted hover:bg-white/5 hover:text-white{% endif %}">
+        <a href="{{ url('control:partner_listings') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'partner_listings' %}bg-brand/10 font-semibold text-brand{% else %}text-control-muted hover:bg-stone-100 hover:text-control-text{% endif %}">
           Partner listings
         </a>
-        <a href="{{ url('control:partners') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'partners' %}bg-white/10 text-white{% else %}text-control-muted hover:bg-white/5 hover:text-white{% endif %}">
+        <a href="{{ url('control:partners') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'partners' %}bg-brand/10 font-semibold text-brand{% else %}text-control-muted hover:bg-stone-100 hover:text-control-text{% endif %}">
           Partners
         </a>
-        <a href="{{ url('control:activity') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'activity' %}bg-white/10 text-white{% else %}text-control-muted hover:bg-white/5 hover:text-white{% endif %}">
+        <a href="{{ url('control:activity') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'activity' %}bg-brand/10 font-semibold text-brand{% else %}text-control-muted hover:bg-stone-100 hover:text-control-text{% endif %}">
           Activity
         </a>
         <div class="my-3 border-t border-control-border"></div>
-        <a href="/sd/" target="_blank" class="flex items-center gap-2 rounded-md px-3 py-2 text-control-muted hover:bg-white/5 hover:text-white">
+        <a href="/sd/" target="_blank" class="flex items-center gap-2 rounded-md px-3 py-2 text-control-muted hover:bg-stone-100 hover:text-control-text">
           Django admin ↗
         </a>
-        <a href="/" target="_blank" class="flex items-center gap-2 rounded-md px-3 py-2 text-control-muted hover:bg-white/5 hover:text-white">
+        <a href="/" target="_blank" class="flex items-center gap-2 rounded-md px-3 py-2 text-control-muted hover:bg-stone-100 hover:text-control-text">
           Public site ↗
         </a>
       </nav>
@@ -90,7 +90,7 @@
         </div>
         <div class="flex items-center gap-2 text-xs">
           <span class="hidden text-control-muted sm:inline" id="control-clock"></span>
-          <a href="/auth/logout/" class="rounded-md border border-control-border px-2.5 py-1.5 font-semibold text-control-muted hover:text-white">Logout</a>
+          <a href="/auth/logout/" class="rounded-md border border-control-border px-2.5 py-1.5 font-semibold text-control-muted hover:text-control-text">Logout</a>
         </div>
       </header>
 

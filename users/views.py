@@ -13,7 +13,14 @@ from catalog.services import (
     get_listing_readiness,
     get_business_hours,
 )
-from core.plans import PLAN_CONFIG, get_plan_config, plan_allows_website
+from core.plans import (
+    PLAN_CONFIG,
+    get_plan_config,
+    plan_allows_website,
+    plan_shows_map_embed,
+    plan_shows_public_email,
+    plan_shows_testimonial,
+)
 from core.services import bust_directory_cache
 from users.forms import (
     RegistrationForm,
@@ -382,6 +389,9 @@ def partner_listing_edit(request, pk):
             "saved": saved,
             "website_enabled": plan_allows_website(business.listing_plan),
             "plan": get_plan_config(business.listing_plan),
+            "show_map": plan_shows_map_embed(business.listing_plan),
+            "show_testimonial": plan_shows_testimonial(business.listing_plan),
+            "show_public_email": plan_shows_public_email(business.listing_plan),
             "nav": "listings",
             "csrf_input_html": f'<input type="hidden" name="csrfmiddlewaretoken" value="{get_token(request)}">',
         },
@@ -406,7 +416,7 @@ def partner_listing_import(request):
                     request.user,
                     headers,
                     body,
-                    allow_paid_plans=False,
+                    allow_paid_plans=True,
                 )
                 form = ListingImportForm()
             except ValueError as exc:

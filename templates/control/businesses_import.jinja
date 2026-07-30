@@ -10,8 +10,8 @@
     <p class="mt-1 text-sm text-control-muted">CSV, Excel (.xlsx), or public Google Sheet. Max 200 rows. Plans from sheet are applied.</p>
   </div>
   <div class="flex flex-wrap gap-2">
-    <a href="{{ url('control:businesses_import_sample') }}?format=csv" class="rounded-md border border-control-border px-3 py-2 text-xs font-semibold text-control-muted hover:text-white">Sample CSV</a>
-    <a href="{{ url('control:businesses_import_sample') }}?format=xlsx" class="rounded-md border border-control-border px-3 py-2 text-xs font-semibold text-control-muted hover:text-white">Sample Excel</a>
+    <a href="{{ url('control:businesses_import_sample') }}?format=csv" class="rounded-md border border-control-border px-3 py-2 text-xs font-semibold text-control-muted hover:text-control-text">Sample CSV</a>
+    <a href="{{ url('control:businesses_import_sample') }}?format=xlsx" class="rounded-md border border-control-border px-3 py-2 text-xs font-semibold text-control-muted hover:text-control-text">Sample Excel</a>
   </div>
 </div>
 
@@ -72,6 +72,6 @@
     <input id="id_google_sheet_url" type="url" name="google_sheet_url" value="{{ form.google_sheet_url.value() or '' }}" placeholder="https://docs.google.com/spreadsheets/d/…" class="mt-1 w-full rounded-md border border-control-border bg-control-bg px-3 py-2 text-sm">
   </div>
 
-  <button type="submit" class="rounded-md bg-control-accent px-4 py-2 text-sm font-semibold text-black hover:opacity-90">Import listings</button>
+  <button type="submit" class="rounded-md bg-control-accent px-4 py-2 text-sm font-semibold text-white hover:opacity-90">Import listings</button>
 </form>
 {% endblock %}

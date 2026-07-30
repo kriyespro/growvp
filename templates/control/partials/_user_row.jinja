@@ -19,7 +19,7 @@
   <td class="px-4 py-3 font-mono text-xs text-control-muted">{{ user.date_joined.strftime('%Y-%m-%d') }}</td>
   <td class="px-4 py-3 text-right">
     <div class="inline-flex flex-wrap justify-end gap-1.5">
-      <a href="{{ url('control:user_detail', kwargs={'pk': user.id}) }}" class="rounded border border-control-border px-2 py-1 text-[11px] font-semibold text-control-muted hover:text-white">View</a>
+      <a href="{{ url('control:user_detail', kwargs={'pk': user.id}) }}" class="rounded border border-control-border px-2 py-1 text-[11px] font-semibold text-control-muted hover:text-control-text">View</a>
       {% if user.is_active and not user.is_superuser %}
       <form method="post" action="{{ url('control:user_ban', kwargs={'pk': user.id}) }}" hx-post="{{ url('control:user_ban', kwargs={'pk': user.id}) }}" hx-target="#user-row-{{ user.id }}" hx-swap="outerHTML" class="inline">
         {{ csrf_field(request) }}
