@@ -524,7 +524,7 @@ def build_sample_xlsx() -> bytes:
     tip["A1"] = "How to import"
     tip["A2"] = "1. Fill rows on the Listings sheet (keep header row)."
     tip["A3"] = "2. industry_type: salon, dentist, optical, gym, restaurant, …"
-    tip["A4"] = "3. listing_plan: free | pro | premium (partners import as free)."
+    tip["A4"] = "3. listing_plan: free | pro | premium (public page shows fields by plan)."
     tip["A5"] = "4. hero_image_url: public HTTPS image URL (JPG/PNG/WebP)."
     tip["A6"] = "5. Google Sheets: File → Share → Anyone with link → Viewer, then paste URL."
     tip["A7"] = "6. Upload CSV/XLSX or paste Google Sheet URL in Partner / Admin import page."
