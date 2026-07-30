@@ -55,4 +55,6 @@ urlpatterns = [
     path("partners/", views.partners_list, name="partners"),
     path("partners/assign/", views.partner_assign, name="partner_assign"),
     path("partners/unassign/", views.partner_unassign, name="partner_unassign"),
+    path("dummy-data/", views.dummy_data, name="dummy_data"),
+    path("dummy-data/purge/", views.dummy_data_purge, name="dummy_data_purge"),
 ]

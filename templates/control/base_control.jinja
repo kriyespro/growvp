@@ -66,6 +66,9 @@
         <a href="{{ url('control:activity') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'activity' %}bg-brand/10 font-semibold text-brand{% else %}text-control-muted hover:bg-stone-100 hover:text-control-text{% endif %}">
           Activity
         </a>
+        <a href="{{ url('control:dummy_data') }}" class="flex items-center gap-2 rounded-md px-3 py-2 {% if nav == 'dummy_data' %}bg-brand/10 font-semibold text-brand{% else %}text-control-muted hover:bg-stone-100 hover:text-control-text{% endif %}">
+          Dummy data
+        </a>
         <div class="my-3 border-t border-control-border"></div>
         <a href="/sd/" target="_blank" class="flex items-center gap-2 rounded-md px-3 py-2 text-control-muted hover:bg-stone-100 hover:text-control-text">
           Django admin ↗

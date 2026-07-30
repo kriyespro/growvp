@@ -2,6 +2,11 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] Mission Control /admin/dummy-data/ — detect + bulk purge seed/demo
+  listings (and optional @test.com users) with DELETE DUMMY confirm;
+  partner listings page highlights CSV/Excel/Google Sheet import + sample
+  CSV/XLSX download
+
 - [DONE] Partner import stores Free/Pro/Premium fields; edit UI shows
   plan-gated public visibility; Mission Control light theme
 

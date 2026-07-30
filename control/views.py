@@ -395,6 +395,50 @@ def partner_listings_bulk_delete(request):
 
 
 @control_login_required
+@require_GET
+def dummy_data(request):
+    preview = services.get_dummy_data_preview(exclude_user_id=request.user.pk)
+    return render(
+        request,
+        "control/dummy_data.jinja",
+        {
+            "nav": "dummy_data",
+            **preview,
+            "error": request.GET.get("error", ""),
+            "purged_b": request.GET.get("purged_b", ""),
+            "purged_u": request.GET.get("purged_u", ""),
+        },
+    )
+
+
+@control_login_required
+@require_POST
+def dummy_data_purge(request):
+    scope = (request.POST.get("scope") or "all").strip()
+    selected = request.POST.getlist("ids") if scope == "selected" else None
+    try:
+        result = services.purge_dummy_data(
+            request.user,
+            confirm_phrase=request.POST.get("confirm_phrase", ""),
+            delete_businesses=request.POST.get("delete_businesses") == "1",
+            delete_users=request.POST.get("delete_users") == "1",
+            selected_ids=selected,
+            request=request,
+        )
+    except ValueError as exc:
+        from urllib.parse import quote
+
+        return redirect(
+            f"{reverse('control:dummy_data')}?error={quote(str(exc))}"
+        )
+    return redirect(
+        f"{reverse('control:dummy_data')}"
+        f"?purged_b={result['businesses_deleted']}"
+        f"&purged_u={result['users_deleted']}"
+    )
+
+
+@control_login_required
 def partner_listing_edit(request, pk):
     from core.services import bust_directory_cache
     from users.forms import ControlBusinessEditForm

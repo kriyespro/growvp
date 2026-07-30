@@ -313,3 +313,152 @@ def bulk_delete_partner_listings(actor, ids, request=None):
         request=request,
     )
     return deleted
+
+
+# Phrase required in Mission Control before dummy purge runs.
+DUMMY_PURGE_CONFIRM = "DELETE DUMMY"
+
+# Seed / QA accounts created by management commands (never real customers).
+_DUMMY_USER_EXACT = frozenset(
+    {
+        "admin@test.com",
+        "demo.admin@test.com",
+        "demo.staff@test.com",
+        "partner01@test.com",
+        "partner02@test.com",
+        "partner03@test.com",
+        "client01@test.com",
+        "client02@test.com",
+        "client03@test.com",
+    }
+)
+
+
+def dummy_users_queryset(exclude_user_id=None):
+    """Users created by seed/demo commands (@test.com, seed*, demo*, bulk*)."""
+    qs = User.objects.filter(
+        Q(email__in=_DUMMY_USER_EXACT)
+        | Q(email__iendswith="@test.com")
+        | Q(email__istartswith="seed")
+        | Q(email__istartswith="demo.")
+        | Q(email__istartswith="bulk")
+        | Q(username__iendswith="@test.com")
+    ).distinct()
+    if exclude_user_id:
+        qs = qs.exclude(pk=exclude_user_id)
+    return qs.order_by("email")
+
+
+def dummy_businesses_queryset():
+    """
+    Listings that look like seed / demo / sample import data.
+
+    Detected via owner email patterns, .test contact domains, bulk-* slugs,
+    seed UPI ids, and Sample* import template names.
+    """
+    dummy_user_ids = dummy_users_queryset().values_list("pk", flat=True)
+    return (
+        Business.objects.filter(
+            Q(created_by_id__in=dummy_user_ids)
+            | Q(staff__user_id__in=dummy_user_ids)
+            | Q(public_email__iendswith=".test")
+            | Q(public_email__iendswith="@test.com")
+            | Q(public_email__iendswith=".example")
+            | Q(slug__startswith="bulk-")
+            | Q(upi_id__istartswith="seed")
+            | Q(website_url__icontains=".suratbazar.test")
+            | Q(website_url__icontains=".example.test")
+            | Q(name__istartswith="Sample ")
+            | Q(name__in=("Partner Glow Studio", "Partner Care Dental", "Partner Fit Hub"))
+        )
+        .select_related("created_by")
+        .distinct()
+        .order_by("name")
+    )
+
+
+def get_dummy_data_preview(exclude_user_id=None, limit=80):
+    """Counts + sample rows for Mission Control dummy-data page."""
+    businesses = dummy_businesses_queryset()
+    users = dummy_users_queryset(exclude_user_id=exclude_user_id)
+    business_ids = list(businesses.values_list("pk", flat=True))
+
+    enquiry_count = 0
+    appointment_count = 0
+    if business_ids:
+        from booking.models import Appointment
+        from leads.models import Enquiry
+
+        enquiry_count = Enquiry.objects.filter(business_id__in=business_ids).count()
+        appointment_count = Appointment.objects.filter(
+            business_id__in=business_ids
+        ).count()
+
+    return {
+        "business_count": businesses.count(),
+        "user_count": users.count(),
+        "enquiry_count": enquiry_count,
+        "appointment_count": appointment_count,
+        "businesses": list(businesses[:limit]),
+        "users": list(users[:limit]),
+        "confirm_phrase": DUMMY_PURGE_CONFIRM,
+    }
+
+
+def purge_dummy_data(
+    actor,
+    *,
+    confirm_phrase,
+    delete_businesses=True,
+    delete_users=False,
+    selected_ids=None,
+    request=None,
+):
+    """
+    Bulk-delete detected dummy listings (and optionally dummy users).
+
+    Always skips the acting admin. Returns a result dict.
+    """
+    from core.services import bust_directory_cache
+
+    if (confirm_phrase or "").strip() != DUMMY_PURGE_CONFIRM:
+        raise ValueError(
+            f'Type "{DUMMY_PURGE_CONFIRM}" exactly to confirm purge.'
+        )
+    if not delete_businesses and not delete_users:
+        raise ValueError("Select at least listings or users to delete.")
+
+    result = {
+        "businesses_deleted": 0,
+        "users_deleted": 0,
+        "names": [],
+    }
+
+    if delete_businesses:
+        qs = dummy_businesses_queryset()
+        if selected_ids is not None:
+            ids = [int(i) for i in selected_ids if str(i).isdigit()]
+            if not ids:
+                raise ValueError("Check at least one listing, or choose All detected.")
+            qs = qs.filter(pk__in=ids)
+        result["names"] = list(qs.values_list("name", flat=True)[:30])
+        deleted, _ = qs.delete()
+        result["businesses_deleted"] = deleted
+
+    if delete_users:
+        uqs = dummy_users_queryset(exclude_user_id=actor.pk)
+        deleted_u, _ = uqs.delete()
+        result["users_deleted"] = deleted_u
+
+    bust_directory_cache()
+    log_admin_action(
+        actor,
+        "other",
+        (
+            f"Purged dummy data: businesses_ops={result['businesses_deleted']}, "
+            f"users_ops={result['users_deleted']}; "
+            f"samples={', '.join(result['names']) or '—'}"
+        ),
+        request=request,
+    )
+    return result

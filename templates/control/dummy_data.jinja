@@ -1,0 +1,128 @@
+{% extends 'control/base_control.jinja' %}
+
+{% block title %}Dummy data{% endblock %}
+{% block page_title %}Dummy / seed data{% endblock %}
+
+{% block content %}
+{% if error %}
+<div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ error }}</div>
+{% endif %}
+{% if purged_b or purged_u %}
+<div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+  Purge finished. Business-related rows removed: <strong>{{ purged_b or 0 }}</strong>
+  · User rows removed: <strong>{{ purged_u or 0 }}</strong>
+</div>
+{% endif %}
+
+<p class="mb-4 max-w-3xl text-sm text-control-muted">
+  Detects seed/demo listings and QA accounts (<code class="rounded bg-stone-100 px-1 text-xs">@test.com</code>,
+  <code class="rounded bg-stone-100 px-1 text-xs">seed*</code>, <code class="rounded bg-stone-100 px-1 text-xs">bulk-*</code>,
+  sample imports). Real partner CSV imports with normal emails are not included.
+  You can purge anytime after seeding.
+</p>
+
+<div class="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="rounded-xl border border-control-border bg-control-panel p-4">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-control-muted">Dummy listings</p>
+    <p class="mt-1 font-mono text-2xl font-bold text-control-text">{{ business_count }}</p>
+  </div>
+  <div class="rounded-xl border border-control-border bg-control-panel p-4">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-control-muted">Dummy users</p>
+    <p class="mt-1 font-mono text-2xl font-bold text-control-text">{{ user_count }}</p>
+  </div>
+  <div class="rounded-xl border border-control-border bg-control-panel p-4">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-control-muted">Linked enquiries</p>
+    <p class="mt-1 font-mono text-2xl font-bold text-control-text">{{ enquiry_count }}</p>
+  </div>
+  <div class="rounded-xl border border-control-border bg-control-panel p-4">
+    <p class="text-[11px] font-semibold uppercase tracking-wide text-control-muted">Linked bookings</p>
+    <p class="mt-1 font-mono text-2xl font-bold text-control-text">{{ appointment_count }}</p>
+  </div>
+</div>
+
+<form method="post" action="{{ url('control:dummy_data_purge') }}" class="space-y-5" x-data="{ scope: 'all' }">
+  {{ csrf_field(request) }}
+
+  <div class="overflow-x-auto rounded-xl border border-control-border bg-control-panel">
+    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-control-border px-4 py-3">
+      <p class="text-sm font-semibold text-control-text">Detected listings (preview)</p>
+      <label class="flex items-center gap-2 text-xs text-control-muted">
+        <input type="radio" name="scope" value="all" x-model="scope" checked>
+        All detected
+      </label>
+      <label class="flex items-center gap-2 text-xs text-control-muted">
+        <input type="radio" name="scope" value="selected" x-model="scope">
+        Only checked rows
+      </label>
+    </div>
+    <table class="min-w-full text-left text-sm">
+      <thead class="border-b border-control-border text-[11px] uppercase text-control-muted">
+        <tr>
+          <th class="px-4 py-3 w-10"></th>
+          <th class="px-4 py-3">Business</th>
+          <th class="px-4 py-3">Plan</th>
+          <th class="px-4 py-3">Created by</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in businesses %}
+        <tr class="border-b border-control-border/60">
+          <td class="px-4 py-3">
+            <input type="checkbox" name="ids" value="{{ b.id }}" class="rounded border-control-border" :disabled="scope !== 'selected'">
+          </td>
+          <td class="px-4 py-3">
+            <a href="/b/{{ b.slug }}/" class="text-control-link hover:underline" target="_blank">{{ b.name }}</a>
+            <p class="text-xs text-control-muted">{{ b.slug }}</p>
+          </td>
+          <td class="px-4 py-3">{{ b.plan_label }}</td>
+          <td class="px-4 py-3 text-control-muted">{% if b.created_by %}{{ b.created_by.email }}{% else %}—{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="px-4 py-8 text-center text-control-muted">No dummy listings detected.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if business_count > businesses|length %}
+    <p class="border-t border-control-border px-4 py-2 text-xs text-control-muted">
+      Showing {{ businesses|length }} of {{ business_count }}. “All detected” still deletes every match.
+    </p>
+    {% endif %}
+  </div>
+
+  {% if users %}
+  <div class="rounded-xl border border-control-border bg-control-panel p-4">
+    <p class="text-sm font-semibold text-control-text">Dummy users (optional)</p>
+    <ul class="mt-2 max-h-40 space-y-1 overflow-y-auto text-xs text-control-muted">
+      {% for u in users %}
+      <li>{{ u.email }} · {{ u.platform_role }}</li>
+      {% endfor %}
+    </ul>
+    {% if user_count > users|length %}
+    <p class="mt-2 text-xs text-control-muted">Showing {{ users|length }} of {{ user_count }}.</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="rounded-xl border border-amber-200 bg-amber-50 p-5 space-y-4">
+    <p class="text-sm font-semibold text-amber-950">Confirm bulk delete</p>
+    <label class="flex items-start gap-2 text-sm text-amber-950">
+      <input type="checkbox" name="delete_businesses" value="1" checked class="mt-1 rounded border-amber-300">
+      <span>Delete dummy listings (and cascaded catalog / enquiries / bookings)</span>
+    </label>
+    <label class="flex items-start gap-2 text-sm text-amber-950">
+      <input type="checkbox" name="delete_users" value="1" class="mt-1 rounded border-amber-300">
+      <span>Also delete dummy users (<code class="text-xs">@test.com</code> / seed / demo / partners / clients). Your own login is never deleted.</span>
+    </label>
+    <div>
+      <label class="block text-sm font-semibold text-amber-950" for="confirm_phrase">
+        Type <code class="rounded bg-white px-1.5 py-0.5 text-xs">{{ confirm_phrase }}</code> to confirm
+      </label>
+      <input id="confirm_phrase" name="confirm_phrase" type="text" autocomplete="off" placeholder="{{ confirm_phrase }}" class="mt-1 w-full max-w-md rounded-md border border-amber-300 bg-white px-3 py-2 text-sm font-mono" required>
+    </div>
+    <button type="submit" class="rounded-md bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
+      onclick="return confirm('Permanently delete dummy data? This cannot be undone.')">
+      Purge dummy data
+    </button>
+  </div>
+</form>
+{% endblock %}
