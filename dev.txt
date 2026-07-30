@@ -2,6 +2,9 @@
 - Manual QA multi-role dashboards
 
 # Completed (latest)
+- [DONE] .env.example for suratbazar.online + 159.195.52.197 + strong
+  DJANGO_SECRET_KEY; DB user sb_d6d558f1 (password placeholder)
+
 - [DONE] Docker compose: growvyapaar_* container names; external volumes
   app_postgres_data + app_media_data (recover data after project rename)
 
